@@ -24,7 +24,10 @@
 #' @export
 #' @md
 
-randomization_test <- function(data_matrix_original,
+randomization_test <- function(
+                               data_matrix_original,
+                               X,
+                               obsY = NULL,
                                c_initial = 2,
                                alpha = 0.05,
                                input_permutation_matrix_array,
@@ -46,11 +49,11 @@ randomization_test <- function(data_matrix_original,
     if(ncol(input_permutation_matrix) == 1){ input_permutation_matrix <- t(input_permutation_matrix)}
     if(!is.null(coef_prior)){
       prior_coef_draw <- coef_prior()
-      data_matrix_original$Y_0 <- as.matrix(data_matrix_original[,1:length(prior_coef_draw)]) %*% prior_coef_draw
+      Y_0 <- as.matrix(data_matrix_original[,1:length(prior_coef_draw)]) %*% prior_coef_draw
 
       #tau_samp <- rnorm(n=n_units, mean=prior_treatment_effect_mean, sd = prior_treatment_effect_SD)
       tau_samp <- rnorm(n=1, mean=prior_treatment_effect_mean, sd = prior_treatment_effect_SD)
-      data_matrix_original$Y_1 <- data_matrix_original$Y_0 + tau_samp
+      Y_1 <- Y_0 + tau_samp
       #true_treatment_vec <- input_permutation_matrix[sample(1:nrow(input_permutation_matrix),1),]
     }
 
@@ -58,16 +61,16 @@ randomization_test <- function(data_matrix_original,
     data_matrix_original$treated[true_treatment_vec == 1] <- 1
     data_matrix_original$treated[true_treatment_vec == 0] <- 0
 
-    data_matrix_original$Y_obs[true_treatment_vec == 0] <- data_matrix_original$Y_0[true_treatment_vec == 0]
-    data_matrix_original$Y_obs[true_treatment_vec == 1] <- data_matrix_original$Y_1[true_treatment_vec == 1]
+    obsY[true_treatment_vec == 0] <- Y_0[true_treatment_vec == 0]
+    obsY[true_treatment_vec == 1] <- Y_1[true_treatment_vec == 1]
   }
 
   if(simulate==F){
-    data_matrix_original$Y_obs <- data_matrix_original$Y_1*true_treatment_vec + data_matrix_original$Y_0*(1-true_treatment_vec)
+    obsY <- Y_1*true_treatment_vec + Y_0*(1-true_treatment_vec)
   }
 
-  #tau_obs <- mean(data_matrix_original$Y_obs[true_treatment_vec == 1]) - mean(data_matrix_original$Y_obs[true_treatment_vec == 0])
-  tau_obs <- c(np$array( FastDiffInMeans(jnp$array(data_matrix_original$Y_obs),
+  #tau_obs <- mean(obsY[true_treatment_vec == 1]) - mean(obsY[true_treatment_vec == 0])
+  tau_obs <- c(np$array( FastDiffInMeans(jnp$array(obsY),
                                          jnp$array(true_treatment_vec),
                                          n0_array,
                                          n1_array) ))
@@ -76,12 +79,12 @@ randomization_test <- function(data_matrix_original,
   if( ncol(input_permutation_matrix)==1 ) { input_permutation_matrix <- t(input_permutation_matrix)}
   if(T == F){
     tau_perm_null_0 <- apply( input_permutation_matrix, 1, function(perm_treat_vec)
-      mean(data_matrix_original$Y_obs[perm_treat_vec == 1]) - mean(data_matrix_original$Y_obs[perm_treat_vec == 0]) )
+      mean(obsY[perm_treat_vec == 1]) - mean(obsY[perm_treat_vec == 0]) )
   }
   if(T == T){
     tau_perm_null_0 <- np$array(
       VectorizedFastDiffInMeans(
-        jnp$array(data_matrix_original$Y_obs),  # y_ =
+        jnp$array(obsY),  # y_ =
         input_permutation_matrix_array, # t_ =
         n0_array, # n0 =
         n1_array # n1 =
@@ -113,8 +116,8 @@ randomization_test <- function(data_matrix_original,
 
         #update lower
         {
-          lower_Y_0_under_null[true_treatment_vec == 0] <- data_matrix_original$Y_obs[true_treatment_vec == 0]
-          lower_Y_0_under_null[true_treatment_vec == 1] <- data_matrix_original$Y_obs[true_treatment_vec == 1] - lowerBound_estimate_step_t
+          lower_Y_0_under_null[true_treatment_vec == 0] <- obsY[true_treatment_vec == 0]
+          lower_Y_0_under_null[true_treatment_vec == 1] <- obsY[true_treatment_vec == 1] - lowerBound_estimate_step_t
           lower_Y_obs_perm[permutation_treatment_vec==0] <- lower_Y_0_under_null[permutation_treatment_vec==0]
           lower_Y_obs_perm[permutation_treatment_vec==1] <- lower_Y_0_under_null[permutation_treatment_vec==1] + lowerBound_estimate_step_t
           #lower_tau_at_step_t <- mean(lower_Y_obs_perm[permutation_treatment_vec == 1]) - mean(lower_Y_obs_perm[permutation_treatment_vec == 0])
@@ -128,8 +131,8 @@ randomization_test <- function(data_matrix_original,
 
         #update upper
         {
-          upper_Y_0_under_null[true_treatment_vec == 0] <- data_matrix_original$Y_obs[true_treatment_vec == 0]
-          upper_Y_0_under_null[true_treatment_vec == 1] <- data_matrix_original$Y_obs[true_treatment_vec == 1] - upperBound_estimate_step_t
+          upper_Y_0_under_null[true_treatment_vec == 0] <- obsY[true_treatment_vec == 0]
+          upper_Y_0_under_null[true_treatment_vec == 1] <- obsY[true_treatment_vec == 1] - upperBound_estimate_step_t
           upper_Y_obs_perm[permutation_treatment_vec==0] <- upper_Y_0_under_null[permutation_treatment_vec==0]
           upper_Y_obs_perm[permutation_treatment_vec==1] <- upper_Y_0_under_null[permutation_treatment_vec==1] + upperBound_estimate_step_t
           upper_tau_at_step_t <- mean(upper_Y_obs_perm[permutation_treatment_vec == 1]) - mean(upper_Y_obs_perm[permutation_treatment_vec == 0])
@@ -154,8 +157,8 @@ randomization_test <- function(data_matrix_original,
       tau_pseudo_seq <- seq(CI[1]-1, CI[2]*2,length.out=100)
       pvals_vec <- sapply(tau_pseudo_seq, function(tau_pseudo){
         stat_vec_at_tau_pseudo <- apply(input_permutation_matrix,1,function(treatment_pseudo){
-          Y0_under_null <- data_matrix_original$Y_obs - true_treatment_vec*tau_pseudo
-          #Y0_under_null1 <- (data_matrix_original$Y_obs-tau_pseudo)*true_treatment_vec + data_matrix_original$Y_obs*(1-true_treatment_vec)
+          Y0_under_null <- obsY - true_treatment_vec*tau_pseudo
+          #Y0_under_null1 <- (obsY-tau_pseudo)*true_treatment_vec + obsY*(1-true_treatment_vec)
           Y1_under_null_pseudo <- Y0_under_null + treatment_pseudo*tau_pseudo
           Yobs_pseudo <- Y1_under_null_pseudo*treatment_pseudo + Y0_under_null * (1-treatment_pseudo)
           #stat_ <- mean(Y1_under_null_pseudo[treatment_pseudo == 1]) - mean(Y0_under_null[treatment_pseudo == 0])

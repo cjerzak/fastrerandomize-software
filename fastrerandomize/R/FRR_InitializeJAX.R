@@ -23,10 +23,10 @@
 #' @export
 #' @md
 
-InitializeJax <- function(conda_env, conda_env_required){
+InitializeJAX <- function(conda_env, conda_env_required){
   library(fastmatch);
   library(reticulate)
-  reticulate::use_condaenv(conda_env = conda_env, required = conda_env_required)
+  reticulate::use_condaenv(condaenv = conda_env, required = conda_env_required)
 
   #print(   tf$config$list_physical_devices('GPU')  )
   #tfFloatType <- tf$float64
