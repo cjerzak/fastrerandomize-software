@@ -24,6 +24,25 @@
 #' @md
 
 InitializeJAXFxns <- function(){
+
+  expand_grid_jax <- function(...){
+    #grid <- jnp$meshgrid(jnp$array(c(0,1L)), jnp$array(c(0,1L)), jnp$array(c(0,1L)), indexing = "ij")
+    grid <- jnp$meshgrid(..., indexing='ij')
+    grid <- jnp$vstack(lapply(grid,function(zer){jnp$ravel(zer)}))
+    grid <- jnp$transpose(grid)
+    return( grid )
+  }
+
+  if(T == F){
+    n_units <- 35
+    expand_grid_jax_text <- paste(rep("jnp$array(0L:1L)",times = n_units), collapse = ", ")
+    expand_grid_text <- paste(rep("0L:1L",times = n_units), collapse = ", ")
+    system.time( tmp1 <- eval(parse(text = sprintf("expand_grid_jax(%s)",expand_grid_jax_text))) )
+    system.time( tmp2 <- eval(parse(text = sprintf("expand.grid(%s)",expand_grid_text))) )
+    tmp1$shape
+    dim( tmp2 )
+  }
+
   FastHotel2T2 <<- jax$jit( function(samp_, t_, n0, n1){
     # set up calc
     RowBroadcast <- jax$vmap(function(mat, vec){
@@ -76,4 +95,39 @@ InitializeJAXFxns <- function(){
     FastDiffInMeans(y_, t_, n0, n1)
     np$array( VectorizedFastDiffInMeans(y_, t_mat, n0, n1) )
   }
+
+  get_stat_vec_at_tau_pseudo <<- jax$jit( function(treatment_pseudo,
+                                                  obsY_array,
+                                                  obsW_array,
+                                                  tau_pseudo,
+                                                  n0_array,
+                                                  n1_array){
+    #Y0_under_null <- obsY - obsW*tau_pseudo
+    Y0_under_null <- jnp$subtract(obsY_array,  jnp$multiply(obsW_array, tau_pseudo))
+
+    #Y1_under_null_pseudo <- Y0_under_null + treatment_pseudo*tau_pseudo
+    Y1_under_null_pseudo <- jnp$add(Y0_under_null,  jnp$multiply(treatment_pseudo, tau_pseudo))
+
+    #Yobs_pseudo <- Y1_under_null_pseudo*treatment_pseudo + Y0_under_null * (1-treatment_pseudo)
+    Yobs_pseudo <- jnp$add(jnp$multiply(Y1_under_null_pseudo,treatment_pseudo),
+                           jnp$multiply(Y0_under_null, jnp$subtract(1., treatment_pseudo)))
+
+    #stat_ <- mean(Yobs_pseudo[treatment_pseudo == 1]) - mean(Yobs_pseudo[treatment_pseudo == 0])
+    stat_ <- FastDiffInMeans(Yobs_pseudo, treatment_pseudo, n0_array, n1_array)
+  } )
+
+  vec1_get_stat_vec_at_tau_pseudo <<- jax$jit( jax$vmap(function(treatment_pseudo,
+                                                                obsY_array,
+                                                                obsW_array,
+                                                                tau_pseudo,
+                                                                n0_array,
+                                                                n1_array){
+    get_stat_vec_at_tau_pseudo(treatment_pseudo,
+                               obsY_array,
+                               obsW_array,
+                               tau_pseudo,
+                               n0_array,
+                               n1_array)
+    }, in_axes = list(0L, NULL, NULL, NULL, NULL, NULL)) )
 }
+

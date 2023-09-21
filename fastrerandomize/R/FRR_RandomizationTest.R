@@ -84,26 +84,6 @@ randomization_test <- function(
   if(findCI == T){
     obsY_array <- jnp$array( obsY )
     obsW_array <- jnp$array( obsW )
-    get_stat_vec_at_tau_pseudo <- jax$jit( function(treatment_pseudo,tau_pseudo){
-      # tau_pseudo <- jnp$array(1.)
-      # treatment_pseudo <- jnp$array(input_permutation_matrix[1,])
-
-      #Y0_under_null <- obsY - obsW*tau_pseudo
-      Y0_under_null <- jnp$subtract(obsY_array,  jnp$multiply(obsW_array, tau_pseudo))
-
-      #Y1_under_null_pseudo <- Y0_under_null + treatment_pseudo*tau_pseudo
-      Y1_under_null_pseudo <- jnp$add(Y0_under_null,  jnp$multiply(treatment_pseudo, tau_pseudo))
-
-      #Yobs_pseudo <- Y1_under_null_pseudo*treatment_pseudo + Y0_under_null * (1-treatment_pseudo)
-      Yobs_pseudo <- jnp$add(jnp$multiply(Y1_under_null_pseudo,treatment_pseudo),
-                             jnp$multiply(Y0_under_null, jnp$subtract(1., treatment_pseudo)))
-
-      #stat_ <- mean(Yobs_pseudo[treatment_pseudo == 1]) - mean(Yobs_pseudo[treatment_pseudo == 0])
-      stat_ <- FastDiffInMeans(Yobs_pseudo, treatment_pseudo, n0_array, n1_array)
-    } )
-    vec1_get_stat_vec_at_tau_pseudo <- jax$jit( jax$vmap(function(treatment_pseudo, tau_pseudo){
-      get_stat_vec_at_tau_pseudo(treatment_pseudo, tau_pseudo)},
-      in_axes = list(0L, NULL)) )
 
     n_search_attempts <- 500
     exhaustive_search  <-  length(obsW) <= n_search_attempts
@@ -169,7 +149,13 @@ randomization_test <- function(
     if(T == T){
       tau_pseudo_seq <- seq(CI[1]-1, CI[2]*2,length.out=100)
       pvals_vec <- sapply(tau_pseudo_seq, function(tau_pseudo){
-        stat_vec_at_tau_pseudo <- np$array( vec1_get_stat_vec_at_tau_pseudo(input_permutation_matrix_array, tau_pseudo) )
+        stat_vec_at_tau_pseudo <- np$array(     vec1_get_stat_vec_at_tau_pseudo(input_permutation_matrix_array,# treatment_pseudo
+                                                                                obsY_array,# obsY_array
+                                                                                obsW_array, # obsW_array
+                                                                                tau_pseudo, # tau_pseudo
+                                                                                n0_array, # n0_array
+                                                                                n1_array #
+                                                                                )  )
 
         #quantiles_ <- c(quantile(stat_vec_at_tau_pseudo,alpha/2), quantile(stat_vec_at_tau_pseudo,1-alpha/2))
         #quantiles_ <- np$array(jnp$stack( list(jnp$quantile(stat_vec_at_tau_pseudo, alpha/2), jnp$quantile(stat_vec_at_tau_pseudo, 1-alpha/2)), 0L))
