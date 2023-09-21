@@ -45,8 +45,6 @@ randomization_test <- function(
 
   # simulate generates new (synthetic values) of Y_obs
   if(simulate==T){
-    if(ncol(input_permutation_matrix) == 1){ input_permutation_matrix <- t(input_permutation_matrix)}
-
     {
       prior_coef_draw <- coef_prior()
       Y_0 <- X %*% prior_coef_draw
@@ -54,7 +52,6 @@ randomization_test <- function(
       #tau_samp <- rnorm(n=n_units, mean=prior_treatment_effect_mean, sd = prior_treatment_effect_SD)
       tau_samp <- rnorm(n=1, mean=prior_treatment_effect_mean, sd = prior_treatment_effect_SD)
       Y_1 <- Y_0 + tau_samp
-      #obsW <- input_permutation_matrix[sample(1:nrow(input_permutation_matrix),1),]
     }
 
     #observed_value considerations
@@ -72,8 +69,6 @@ randomization_test <- function(
                                          n1_array) ))
 
   #fix if nrow = 0
-  if( ncol(input_permutation_matrix)==1 ) { input_permutation_matrix <- t(input_permutation_matrix)}
-  # if(T == F){tau_perm_null_0 <- apply( input_permutation_matrix, 1, function(perm_treat_vec) mean(obsY[perm_treat_vec == 1]) - mean(obsY[perm_treat_vec == 0]) ) }
   if(T == T){
     tau_perm_null_0 <- np$array(
       VectorizedFastDiffInMeans(
@@ -87,8 +82,31 @@ randomization_test <- function(
   p_value <- mean( abs(tau_perm_null_0) >= abs(tau_obs) )
 
   if(findCI == T){
+    obsY_array <- jnp$array( obsY )
+    obsW_array <- jnp$array( obsW )
+    get_stat_vec_at_tau_pseudo <- jax$jit( function(treatment_pseudo,tau_pseudo){
+      # tau_pseudo <- jnp$array(1.)
+      # treatment_pseudo <- jnp$array(input_permutation_matrix[1,])
+
+      #Y0_under_null <- obsY - obsW*tau_pseudo
+      Y0_under_null <- jnp$subtract(obsY_array,  jnp$multiply(obsW_array, tau_pseudo))
+
+      #Y1_under_null_pseudo <- Y0_under_null + treatment_pseudo*tau_pseudo
+      Y1_under_null_pseudo <- jnp$add(Y0_under_null,  jnp$multiply(treatment_pseudo, tau_pseudo))
+
+      #Yobs_pseudo <- Y1_under_null_pseudo*treatment_pseudo + Y0_under_null * (1-treatment_pseudo)
+      Yobs_pseudo <- jnp$add(jnp$multiply(Y1_under_null_pseudo,treatment_pseudo),
+                             jnp$multiply(Y0_under_null, jnp$subtract(1., treatment_pseudo)))
+
+      #stat_ <- mean(Yobs_pseudo[treatment_pseudo == 1]) - mean(Yobs_pseudo[treatment_pseudo == 0])
+      stat_ <- FastDiffInMeans(Yobs_pseudo, treatment_pseudo, n0_array, n1_array)
+    } )
+    vec1_get_stat_vec_at_tau_pseudo <- jax$jit( jax$vmap(function(treatment_pseudo, tau_pseudo){
+      get_stat_vec_at_tau_pseudo(treatment_pseudo, tau_pseudo)},
+      in_axes = list(0L, NULL)) )
+
     n_search_attempts <- 500
-    exhaustive_search  <-  nrow(input_permutation_matrix) <= n_search_attempts
+    exhaustive_search  <-  length(obsW) <= n_search_attempts
     bound_counter <- 0
     upperBound_storage_vec <- lowerBound_storage_vec <- rep(NA, n_search_attempts)
     {
@@ -100,11 +118,12 @@ randomization_test <- function(
       c_step_t <- c_initial
       z_alpha <- qnorm( p = (1-alpha) )
       k <- 2 / (  z_alpha *   (2 * pi)^(-1/2) * exp( -z_alpha^2 / 2)  )
+      NAHolder <- rep(NA, length(obsW))
       for(step_t in 1:n_search_attempts)
       {
         #initialize for next step
         permutation_treatment_vec <- input_permutation_matrix[sample(1:nrow(input_permutation_matrix), size=1),]
-        lower_Y_0_under_null <- lower_Y_obs_perm <- rep(NA, length(obsW))
+        lower_Y_0_under_null <- lower_Y_obs_perm <- NAHolder
         upper_Y_0_under_null <- upper_Y_obs_perm <- lower_Y_obs_perm
 
         #update lower
@@ -128,7 +147,8 @@ randomization_test <- function(
           upper_Y_0_under_null[obsW == 1] <- obsY[obsW == 1] - upperBound_estimate_step_t
           upper_Y_obs_perm[permutation_treatment_vec==0] <- upper_Y_0_under_null[permutation_treatment_vec==0]
           upper_Y_obs_perm[permutation_treatment_vec==1] <- upper_Y_0_under_null[permutation_treatment_vec==1] + upperBound_estimate_step_t
-          upper_tau_at_step_t <- mean(upper_Y_obs_perm[permutation_treatment_vec == 1]) - mean(upper_Y_obs_perm[permutation_treatment_vec == 0])
+          #upper_tau_at_step_t <- mean(upper_Y_obs_perm[permutation_treatment_vec == 1]) - mean(upper_Y_obs_perm[permutation_treatment_vec == 0])
+          upper_tau_at_step_t <- np$array( FastDiffInMeans(jnp$array(upper_Y_obs_perm), jnp$array(permutation_treatment_vec), n0_array, n1_array) )
 
           c_step_t <- k * (upperBound_estimate_step_t  -  tau_obs)
           #if(is.na(c_step_t)){
@@ -149,24 +169,17 @@ randomization_test <- function(
     if(T == T){
       tau_pseudo_seq <- seq(CI[1]-1, CI[2]*2,length.out=100)
       pvals_vec <- sapply(tau_pseudo_seq, function(tau_pseudo){
-        stat_vec_at_tau_pseudo <- apply(input_permutation_matrix,1,function(treatment_pseudo){
-          Y0_under_null <- obsY - obsW*tau_pseudo
-          #Y0_under_null1 <- (obsY-tau_pseudo)*obsW + obsY*(1-obsW)
-          Y1_under_null_pseudo <- Y0_under_null + treatment_pseudo*tau_pseudo
-          Yobs_pseudo <- Y1_under_null_pseudo*treatment_pseudo + Y0_under_null * (1-treatment_pseudo)
-          #stat_ <- mean(Y1_under_null_pseudo[treatment_pseudo == 1]) - mean(Y0_under_null[treatment_pseudo == 0])
-          stat_ <- mean(Yobs_pseudo[treatment_pseudo == 1]) - mean(Yobs_pseudo[treatment_pseudo == 0])
-        })
-        quantiles_ <- c(quantile(stat_vec_at_tau_pseudo,alpha/2), quantile(stat_vec_at_tau_pseudo,1-alpha/2))
-        #my_ecdf <- ecdf(stat_vec_at_tau_pseudo); ret_ <- min(my_ecdf(tau_obs),(1-my_ecdf(tau_obs))) * 2
+        stat_vec_at_tau_pseudo <- np$array( vec1_get_stat_vec_at_tau_pseudo(input_permutation_matrix_array, tau_pseudo) )
+
+        #quantiles_ <- c(quantile(stat_vec_at_tau_pseudo,alpha/2), quantile(stat_vec_at_tau_pseudo,1-alpha/2))
+        #quantiles_ <- np$array(jnp$stack( list(jnp$quantile(stat_vec_at_tau_pseudo, alpha/2), jnp$quantile(stat_vec_at_tau_pseudo, 1-alpha/2)), 0L))
+
         ret_ <- min(mean( tau_obs >= stat_vec_at_tau_pseudo),
                     mean( tau_obs <= stat_vec_at_tau_pseudo))
         #ret_ <- reject_ <- tau_obs >= quantiles_[1] & tau_obs <= quantiles_[2]
         return( ret_ )
       } )
       #plot( tau_pseudo_seq,  pvals_vec );abline(h=0.05,col="gray",lty=2); abline(v=CI[1],lty=2); abline(v=CI[2],lty=2); abline(v=tau_obs)
-
-      #CI <- summary(tau_pseudo_seq[pvals_vec])[c(1,6)]
       CI <- summary(tau_pseudo_seq[pvals_vec>0.05])[c(1,6)]
       CI_width <- abs( max(CI) - min(CI) )
     }
