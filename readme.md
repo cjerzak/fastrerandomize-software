@@ -1,2 +1,2 @@
-# `fastrerandomize`: An `R` Package for Ultra Fast Re-randomization Using a JAX Backend
+# `fastrerandomize`: An `R` Package for Ultra-fast Rerandomization Using a JAX Backend
 
