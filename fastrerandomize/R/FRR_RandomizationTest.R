@@ -31,7 +31,7 @@ randomization_test <- function(
                                c_initial = 2,
                                alpha = 0.05,
                                input_permutation_matrix,
-                               input_permutation_matrix_array,
+                               input_permutation_matrix_array = NULL,
                                n0_array,
                                n1_array,
                                prior_treatment_effect_mean = NULL,
@@ -42,6 +42,10 @@ randomization_test <- function(
                                nSimulate = 50L,
                                findCI = F){
   CI <- CI_width <- covers_truth <- zero_in_CI <- NULL
+
+  if(is.null(input_permutation_matrix_array)){
+    input_permutation_matrix_array <- jnp$array( input_permutation_matrix )
+  }
 
   # simulate generates new (synthetic values) of Y_obs
   if(simulate==T){
