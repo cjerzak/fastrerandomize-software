@@ -7,9 +7,9 @@
 randomization_test(X, ...)
 }
 \arguments{
-\item{obsW}{A numeric vector where \code{0}'s correspond to control units and \code{1}'s to treated units.}
-
 \item{obsY}{A numeric vector containing observed outcomes.}
+
+\item{obsW}{A numeric vector where \code{0}'s correspond to control units and \code{1}'s to treated units.}
 }
 \value{
 A list consiting of \itemize{
