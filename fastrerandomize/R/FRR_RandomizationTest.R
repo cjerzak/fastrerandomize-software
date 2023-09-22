@@ -39,47 +39,55 @@ randomization_test <- function(
                                true_treatment_effect = NULL,
                                simulate=F,
                                coef_prior = NULL,
-                               nSimulate = NULL,
+                               nSimulate = 50L,
                                findCI = F){
   CI <- CI_width <- covers_truth <- zero_in_CI <- NULL
 
   # simulate generates new (synthetic values) of Y_obs
   if(simulate==T){
-    {
+    obsY_array <- jnp$array( t(replicate(nSimulate, {
       prior_coef_draw <- coef_prior()
       Y_0 <- X %*% prior_coef_draw
 
       #tau_samp <- rnorm(n=n_units, mean=prior_treatment_effect_mean, sd = prior_treatment_effect_SD)
       tau_samp <- rnorm(n=1, mean=prior_treatment_effect_mean, sd = prior_treatment_effect_SD)
       Y_1 <- Y_0 + tau_samp
-    }
 
-    #observed_value considerations
-    #data_matrix_original$treated[obsW == 1] <- 1
-    #data_matrix_original$treated[obsW == 0] <- 0
+      obsY[obsW == 0] <- Y_0[obsW == 0]
+      obsY[obsW == 1] <- Y_1[obsW == 1]
+      return( obsY )
+  }) ))
 
-    obsY[obsW == 0] <- Y_0[obsW == 0]
-    obsY[obsW == 1] <- Y_1[obsW == 1]
-  }
-
-  #tau_obs <- mean(obsY[obsW == 1]) - mean(obsY[obsW == 0])
-  tau_obs <- c(np$array( FastDiffInMeans(jnp$array(obsY),
-                                         jnp$array(obsW),
-                                         n0_array,
-                                         n1_array) ))
-
-  #fix if nrow = 0
-  if(T == T){
-    tau_perm_null_0 <- np$array(
-      VectorizedFastDiffInMeans(
-        jnp$array(obsY),  # y_ =
+    tau_obs <- Y_VectorizedFastDiffInMeans(obsY_array,
+                                           jnp$array(obsW),
+                                           n0_array,
+                                           n1_array)
+    tau_perm_null_0 <-  YW_VectorizedFastDiffInMeans(
+        obsY_array,  # y_ =
         input_permutation_matrix_array, # t_ =
         n0_array, # n0 =
         n1_array # n1 =
-      ))
+      )
+
+    p_value <- np$array( GreaterEqualMagCompare(tau_perm_null_0, tau_obs) )
+    #p_value <- jnp$mean(jnp$greater_equal(jnp$abs(tau_perm_null_0),  jnp$expand_dims(tau_obs,1L)), 1L)
+    #p_value <- mean( abs(tau_perm_null_0) >= abs(tau_obs) )
   }
-  # print( st )
-  p_value <- mean( abs(tau_perm_null_0) >= abs(tau_obs) )
+
+  if(simulate == F){
+    tau_obs <- c(np$array( FastDiffInMeans(jnp$array(obsY),
+                                           jnp$array(obsW),
+                                           n0_array,
+                                           n1_array) ))
+    tau_perm_null_0 <- np$array(
+      W_VectorizedFastDiffInMeans(
+          jnp$array(obsY),  # y_ =
+          input_permutation_matrix_array, # t_ =
+          n0_array, # n0 =
+          n1_array # n1 =
+    ))
+    p_value <- mean( abs(tau_perm_null_0) >= abs(tau_obs) )
+  }
 
   if(findCI == T){
     obsY_array <- jnp$array( obsY )

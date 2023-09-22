@@ -43,13 +43,13 @@ InitializeJAXFxns <- function(){
     dim( tmp2 )
   }
 
-  FastHotel2T2 <<- jax$jit( function(samp_, t_, n0, n1){
+  FastHotel2T2 <<- jax$jit( function(samp_, w_, n0, n1){
     # set up calc
     RowBroadcast <- jax$vmap(function(mat, vec){
       jnp$multiply(mat, vec)},
       in_axes = list(1L, NULL))
-    xbar1 <- jnp$divide(jnp$sum(RowBroadcast(samp_,t_),1L,keepdims = T), n1)
-    xbar2 <- jnp$divide(jnp$sum(RowBroadcast(samp_,jnp$subtract(1.,t_)),1L,keepdims = T), n0)
+    xbar1 <- jnp$divide(jnp$sum(RowBroadcast(samp_,w_),1L,keepdims = T), n1)
+    xbar2 <- jnp$divide(jnp$sum(RowBroadcast(samp_,jnp$subtract(1.,w_)),1L,keepdims = T), n0)
     CovPooled <- jnp$cov(samp_, rowvar = F)
     CovWts <- jnp$add(jnp$reciprocal(n0), jnp$reciprocal(n1))
     xbar_diff <- jnp$subtract(xbar1, xbar2)
@@ -61,39 +61,55 @@ InitializeJAXFxns <- function(){
       xbar_diff)
   })
 
-  VectorizedFastHotel2T2 <<- jax$jit( jax$vmap(function(samp_, t_, n0, n1){
-    FastHotel2T2(samp_, t_, n0, n1)},
+  VectorizedFastHotel2T2 <<- jax$jit( jax$vmap(function(samp_, w_, n0, n1){
+    FastHotel2T2(samp_, w_, n0, n1)},
     in_axes = list(NULL, 0L, NULL, NULL)) )
 
   if(T == F){
     # tests
     Compositional::hotel2T2()
     samp_ <- jnp$array(matrix(rnorm(10*100),nrow=100))
-    t_ <- jnp$array(sample(c(0,1), size = 100, replace =T))
-    t_full <- jnp$array(matrix(rbinom(100*34,size = 1, prob = 0.5),nrow = 100))
-    FastHotel2T2(samp_ = samp_, t_ = t_, n0 = n0, n1 = n1)
-    VectorizedFastHotel2T2(samp_, t_full, n0, n1)
+    w_ <- jnp$array(sample(c(0,1), size = 100, replace =T))
+    w_full <- jnp$array(matrix(rbinom(100*34,size = 1, prob = 0.5),nrow = 100))
+    FastHotel2T2(samp_ = samp_, w_ = w_, n0 = n0, n1 = n1)
+    VectorizedFastHotel2T2(samp_, w_full, n0, n1)
   }
 
-  FastDiffInMeans <<- jax$jit( function(y_,t_, n0, n1){
-    my1 <- jnp$divide(jnp$sum(jnp$multiply(y_, t_)), n1)
-    my0 <- jnp$divide(jnp$sum(jnp$multiply(y_, jnp$subtract(1.,t_))), n0)
+  FastDiffInMeans <<- jax$jit( function(y_,w_, n0, n1){
+    my1 <- jnp$divide(jnp$sum(jnp$multiply(y_, w_)), n1)
+    my0 <- jnp$divide(jnp$sum(jnp$multiply(y_, jnp$subtract(1.,w_))), n0)
     return( diff10 <- jnp$subtract(my1, my0) )
   })
 
-  VectorizedFastDiffInMeans <<- jax$jit( jax$vmap(function(y_, t_, n0, n1){
-    FastDiffInMeans(y_, t_, n0, n1)},
+  W_VectorizedFastDiffInMeans <<- jax$jit( jax$vmap(function(y_, w_, n0, n1){
+    FastDiffInMeans(y_, w_, n0, n1)},
     in_axes = list(NULL, 0L, NULL, NULL)) )
+
+  Y_VectorizedFastDiffInMeans <<- jax$jit( jax$vmap(function(y_, w_, n0, n1){
+    FastDiffInMeans(y_, w_, n0, n1)},
+    in_axes = list(0L, NULL, NULL, NULL)) )
+
+  YW_VectorizedFastDiffInMeans <<- jax$jit( jax$vmap(function(y_, w_, n0, n1){
+    W_VectorizedFastDiffInMeans(y_, w_, n0, n1)},
+    in_axes = list(0L, NULL, NULL, NULL)) )
+
+  WVectorizedFastDiffInMeans <<- jax$jit( jax$vmap(function(y_, w_, n0, n1){
+    FastDiffInMeans(y_, w_, n0, n1)},
+    in_axes = list(NULL, 0L, NULL, NULL)) )
+
+  GreaterEqualMagCompare <<- jax$jit(function(NULL_, OBS_){
+    jnp$mean(jnp$greater_equal(jnp$abs(NULL_),  jnp$expand_dims(OBS_,1L)), 1L)
+  })
 
   if(T == F){
     # tests
     y_ <- jnp$array(rnorm(10))
-    t_ <-  jnp$array(rbinom(10,size=1, prob = 0.5))
+    w_ <-  jnp$array(rbinom(10,size=1, prob = 0.5))
     n0 <- jnp$array(10.)
     n1 <- jnp$array(3.)
-    t_mat <- jnp$array( matrix(rbinom(100*10, size = 1, prob = 0.5),nrow = 100) )
-    FastDiffInMeans(y_, t_, n0, n1)
-    np$array( VectorizedFastDiffInMeans(y_, t_mat, n0, n1) )
+    w_mat <- jnp$array( matrix(rbinom(100*10, size = 1, prob = 0.5),nrow = 100) )
+    FastDiffInMeans(y_, w_, n0, n1)
+    np$array( VectorizedFastDiffInMeans(y_, w_mat, n0, n1) )
   }
 
   get_stat_vec_at_tau_pseudo <<- jax$jit( function(treatment_pseudo,
