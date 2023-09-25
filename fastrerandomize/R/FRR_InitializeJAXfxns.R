@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-#' Initialize JAX
+#' Initialize JAX functions
 #'
 #' @usage
 #'

@@ -2,17 +2,18 @@
 % Please edit documentation in R/FRR_InitializeJAXfxns.R
 \name{InitializeJAXFxns}
 \alias{InitializeJAXFxns}
-\title{Initialize JAX}
+\title{Initialize JAX functions}
 \usage{
 InitializeJAXFxns()
 }
-\value{
-A list consiting of \itemize{
-\item
+\arguments{
+\item{...}{This function takes no arguments}
 }
+\value{
+This function should be run just after \code{fastrerandomize::InitializeJax}.This sets up the internal JAX functions for rerandomization analysis.
 }
 \description{
-Initialize JAX
+Initialize JAX functions
 }
 \examples{
 # For tutorials, see
