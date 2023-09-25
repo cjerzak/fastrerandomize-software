@@ -28,22 +28,17 @@ GenerateCausalData(n_units)
 \item{Y1_coefficients}{An optional numeric vector specifying the coefficients for the treated outcome model. If not provided, the function assumes a NULL value.}
 }
 \value{
-A list consiting of \itemize{
-\item \code{pval} A p-value.
+A list consisting of \itemize{
+\item \code{data_matrix} A data frame containing the simulated covariates and outcomes for both control (Y0) and treatment (Y1) groups.
+\item \code{Y0_coefficients} A numeric vector representing the coefficients used for the control outcome model.
+\item \code{Y1_coefficients} A numeric vector representing the coefficients used for the treated outcome model.
 }
 }
 \description{
 This function generates simulated causal data based on specified parameters.
 }
-\section{References}{
-
-\itemize{
-\item
-}
-}
-
 \examples{
 # For a tutorial, see
-# github.com/cjerzak/fastrerandomization
+# github.com/cjerzak/fastrerandomization-software
 
 }

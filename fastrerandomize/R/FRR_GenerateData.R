@@ -16,18 +16,16 @@
 #' @param Y0_coefficients An optional numeric vector specifying the coefficients for the control outcome model. If not provided, the function assumes a NULL value.
 #' @param Y1_coefficients An optional numeric vector specifying the coefficients for the treated outcome model. If not provided, the function assumes a NULL value.
 #'
-#' @return A list consiting of \itemize{
-#'   \item `pval` A p-value.
+#' @return A list consisting of \itemize{
+#'   \item `data_matrix` A data frame containing the simulated covariates and outcomes for both control (Y0) and treatment (Y1) groups.
+#'   \item `Y0_coefficients` A numeric vector representing the coefficients used for the control outcome model.
+#'   \item `Y1_coefficients` A numeric vector representing the coefficients used for the treated outcome model.
 #' }
 #'
-#' @section References:
-#' \itemize{
-#' \item
-#' }
 #'
 #' @examples
 #' # For a tutorial, see
-#' # github.com/cjerzak/fastrerandomization
+#' # github.com/cjerzak/fastrerandomization-software
 #'
 #' @export
 #' @md
