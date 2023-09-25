@@ -1,12 +1,21 @@
 #!/usr/bin/env Rscript
-#' Generate data
+#' This function generates simulated causal data based on specified parameters.
 #'
 #' @usage
 #'
-#' generate_data()
+#' GenerateCausalData(n_units)
 #'
-#' @param
-
+#' @param n_units A numeric value specifying the total number of units in the sample.
+#' @param proportion_treated A numeric value between 0 and 1 indicating the proportion of units that receive treatment.
+#' @param k_covars A numeric value indicating the number of covariates to be generated.
+#' @param rho A numeric value representing the correlation coefficient.
+#' @param SD_inherent A numeric value indicating the standard deviation inherent to the data.
+#' @param treatment_effect_mean A numeric value representing the mean of the treatment effect.
+#' @param treatment_effect_SD A numeric value indicating the standard deviation of the treatment effect.
+#' @param covariates_SD A numeric value or vector specifying the standard deviation of the covariates.
+#' @param Y0_coefficients An optional numeric vector specifying the coefficients for the control outcome model. If not provided, the function assumes a NULL value.
+#' @param Y1_coefficients An optional numeric vector specifying the coefficients for the treated outcome model. If not provided, the function assumes a NULL value.
+#'
 #' @return A list consiting of \itemize{
 #'   \item `pval` A p-value.
 #' }
@@ -23,7 +32,7 @@
 #' @export
 #' @md
 
-generate_data <- function(n_units, proportion_treated, k_covars, rho, SD_inherent,
+GenerateCausalData <- function(n_units, proportion_treated, k_covars, rho, SD_inherent,
                           treatment_effect_mean, treatment_effect_SD, covariates_SD,
                           Y0_coefficients = NULL, Y1_coefficients = NULL){
   if(is.null(Y0_coefficients)){

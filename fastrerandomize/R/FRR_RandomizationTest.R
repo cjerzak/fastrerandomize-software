@@ -3,7 +3,7 @@
 #'
 #' @usage
 #'
-#' randomization_test(X, ...)
+#' RandomizationTest(X, ...)
 #'
 #' @param obsW A numeric vector where `0`'s correspond to control units and `1`'s to treated units.
 #' @param obsY A numeric vector containing observed outcomes.
@@ -19,7 +19,7 @@
 #' @param prior_treatment_effect_mean An optional numeric value for the prior mean of the treatment effect. Default is NULL.
 #' @param prior_treatment_effect_SD An optional numeric value for the prior standard deviation of the treatment effect. Default is NULL.
 #' @param true_treatment_effect An optional numeric value specifying the true treatment effect. Default is NULL.
-#' @param simulate A logical value indicating whether to run `randomization_test` in simulation mode. Default is FALSE.
+#' @param simulate A logical value indicating whether to run `RandomizationTest` in simulation mode. Default is FALSE.
 #' @param coef_prior An optional function generating coefficients on values of `X` for predicting `Y(0)`.
 #' @param nSimulate_obsW A numeric value specifying the number of simulated values for obsW. Default is `50L`.
 #' @param nSimulate_obsY A numeric value specifying the number of simulated values for obsY. Default is `50L`.
@@ -45,7 +45,7 @@
 #' @export
 #' @md
 
-randomization_test <- function(
+RandomizationTest <- function(
                                obsW,
                                obsY = NULL,
                                X = NULL,

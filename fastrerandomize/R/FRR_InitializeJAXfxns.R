@@ -9,7 +9,6 @@
 #'
 #' @return This function should be run just after `fastrerandomize::InitializeJax`.This sets up the internal JAX functions for rerandomization analysis.
 #'
-#'
 #' @examples
 #' # For tutorials, see
 #' # github.com/cjerzak/fastrerandomization-software
