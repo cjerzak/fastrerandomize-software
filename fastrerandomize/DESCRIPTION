@@ -1,8 +1,8 @@
 Package: fastrerandomize
-Title: fastrerandomize: R Package for Ultra Fast Re-randomization Using a JAX Backend
+Title: fastrerandomize: R Package for Ultra-fast Re-randomization Using a JAX Backend
 Version: 0.1
 Authors: 'Connor Jerzak <connor.jerzak@gmail.com> [aut, cre], Rebecca Goldstein <rgoldstein@berkeley.edu> [aut]'
-Description: An R Package for Ultra Fast Re-randomization Using a JAX Backend
+Description: An R Package for Ultra-fast Re-randomization Using a JAX Backend
 Depends: R (>= 3.3.3)
 License: Creative Commons Attribution-Noncommercial-No Derivative Works 4.0, for academic use only.
 Encoding: UTF-8
