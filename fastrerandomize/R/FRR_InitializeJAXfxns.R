@@ -5,11 +5,9 @@
 #'
 #' InitializeJAXFxns()
 #'
-#' @param
-
-#' @return A list consiting of \itemize{
-#'   \item
-#' }
+#' @param ... This function takes no arguments
+#'
+#' @return This function should be run just after `fastrerandomize::InitializeJax`.This sets up the internal JAX functions for rerandomization analysis.
 #'
 #'
 #' @examples
