@@ -6,7 +6,7 @@
 | [**Documentation**](https://github.com/cjerzak/fastrerandomize-software/blob/main/fastrerandomize.pdf)
 
 # What is `fastrerandomize`?<a id="description"></a>
-The `fastrerandomize` contains functions such as `RandomizationTest`, which offers a streamlined approach for performing randomization tests. These tests are pivotal in the realm of causal inference, especially in randomized experiments. This tutorial walks you through how to effectively harness this function.
+The `fastrerandomize` contains functions such as `RandomizationTest`, which offers a streamlined approach for performing randomization tests after using rerandomization in the research design. 
 
 # Package Installation<a id="installation"></a>
 ```
