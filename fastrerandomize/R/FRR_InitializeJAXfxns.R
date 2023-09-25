@@ -81,6 +81,15 @@ InitializeJAXFxns <- function(){
     return( diff10 <- jnp$subtract(my1, my0) )
   })
 
+  VectorizedTakeAxis0 <<- jax$jit( function(A_, I_){
+    jnp$expand_dims(jnp$take(A_, I_, axis = 0L), 0L)
+  })
+
+  Potentisl2Obs <<- jax$jit(function(Y0__, Y1__, obsW__){
+    jnp$add( jnp$multiply(Y0__, jnp$subtract(1, obsW__)),
+             jnp$multiply(Y1__, obsW__))
+  })
+
   W_VectorizedFastDiffInMeans <<- jax$jit( jax$vmap(function(y_, w_, n0, n1){
     FastDiffInMeans(y_, w_, n0, n1)},
     in_axes = list(NULL, 0L, NULL, NULL)) )

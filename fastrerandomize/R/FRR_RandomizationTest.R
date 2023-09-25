@@ -30,8 +30,8 @@ randomization_test <- function(
                                obsW,
                                c_initial = 2,
                                alpha = 0.05,
-                               input_permutation_matrix,
-                               input_permutation_matrix_array = NULL,
+                               candidate_randomizations,
+                               candidate_randomizations_array = NULL,
                                n0_array,
                                n1_array,
                                prior_treatment_effect_mean = NULL,
@@ -39,17 +39,19 @@ randomization_test <- function(
                                true_treatment_effect = NULL,
                                simulate=F,
                                coef_prior = NULL,
-                               nSimulate = 50L,
+                               nSimulate_obsW = 50L,
+                               nSimulate_obsY = 50L,
+                               randomization_accept_prob = NULL,
                                findCI = F){
-  CI <- CI_width <- covers_truth <- zero_in_CI <- NULL
+  tau_obs <- CI <- CI_width <- covers_truth <- zero_in_CI <- NULL
 
-  if(is.null(input_permutation_matrix_array)){
-    input_permutation_matrix_array <- jnp$array( input_permutation_matrix )
+  if(is.null(candidate_randomizations_array)){
+    candidate_randomizations_array <- jnp$array( candidate_randomizations )
   }
 
   # simulate generates new (synthetic values) of Y_obs
   if(simulate==T){
-    obsY_array <- jnp$array( t(replicate(nSimulate, {
+    obsY1_array <- jnp$array( replicate(nSimulate_obsY, {
       prior_coef_draw <- coef_prior()
       Y_0 <- X %*% prior_coef_draw
 
@@ -57,25 +59,58 @@ randomization_test <- function(
       tau_samp <- rnorm(n=1, mean=prior_treatment_effect_mean, sd = prior_treatment_effect_SD)
       Y_1 <- Y_0 + tau_samp
 
-      obsY[obsW == 0] <- Y_0[obsW == 0]
-      obsY[obsW == 1] <- Y_1[obsW == 1]
-      return( obsY )
-  }) ))
+      return(cbind(Y_0, Y_1))
+    }) )
+    obsY1_array <- jnp$transpose(obsY1_array, axes = c(2L,0L,1L))
+    obsY0_array <- jnp$take(obsY1_array,0L, axis = 2L)
+    obsY1_array <- jnp$take(obsY1_array,1L, axis = 2L)
 
-    tau_obs <- Y_VectorizedFastDiffInMeans(obsY_array,
-                                           jnp$array(obsW),
-                                           n0_array,
-                                           n1_array)
-    tau_perm_null_0 <-  YW_VectorizedFastDiffInMeans(
-        obsY_array,  # y_ =
-        input_permutation_matrix_array, # t_ =
-        n0_array, # n0 =
-        n1_array # n1 =
-      )
+    chi_squared_approx <- F
+    #candidate_randomizations <- candidate_randomizations[sample(1:nrow(candidate_randomizations), nrow(candidate_randomizations)),]
+    if(is.null(candidate_randomizations_array)){
+      candidate_randomizations <- np$array( candidate_randomizations_array )
+    }
+    if(is.null(candidate_randomizations_array)){
+      candidate_randomizations_array <- jnp$array(candidate_randomizations, dtype = jnp$float32)
+    }
+    M_results <- jnp$squeeze(VectorizedFastHotel2T2(jnp$array( X ),
+                                                    candidate_randomizations_array,
+                                                    n0_array, n1_array), 1L:2L)
+    a_threshold_vec <- jnp$quantile(M_results, jnp$array(prob_accept_randomization_seq))
+    #a_threshold_vec <- quantile(np$array(M_results), prob_accept_randomization_seq)
+    M_results <- np$array( M_results )
+    #if(chi_squared_approx==T){ a_threshold <- qchisq(p=prob_accept_randomization_seq[ii], df=k_covars) }
+    #if(chi_squared_approx==F){ a_threshold <- quantile(x=M_results, probs=prob_accept_randomization_seq[ii]) }
 
-    p_value <- np$array( GreaterEqualMagCompare(tau_perm_null_0, tau_obs) )
-    #p_value <- jnp$mean(jnp$greater_equal(jnp$abs(tau_perm_null_0),  jnp$expand_dims(tau_obs,1L)), 1L)
-    #p_value <- mean( abs(tau_perm_null_0) >= abs(tau_obs) )
+    #success_index <- which(M_results <= a_threshold)
+    #permutations_accept_ii <- permutation_matrix[success_index, ]
+
+    p_value <- sapply(np$array(a_threshold_vec), function(a_){
+          acceptedWs_array <- jnp$take( candidate_randomizations_array,
+                                        jnp$where( jnp$less_equal( M_results, a_))[[1]], axis = 0L)
+          AcceptedRandomizations <- acceptedWs_array$shape[[1]]
+          sampTheseIndices <- 0L:(AcceptedRandomizations-1L)
+
+          p_value_outer_vec <- c(replicate(nSimulate_obsW, {
+            obsW_ <- VectorizedTakeAxis0(acceptedWs_array,
+                                         jnp$array(sample(sampTheseIndices,1)))
+            obsY_array <- Potentisl2Obs(obsY0_array, obsY1_array, obsW_)
+            tau_obs <- Y_VectorizedFastDiffInMeans(obsY_array,
+                                                   obsW_,
+                                                   n0_array,
+                                                   n1_array)
+
+            tau_perm_null_0 <-  YW_VectorizedFastDiffInMeans(
+                obsY_array,  # y_ =
+                acceptedWs_array, # t_ =
+                n0_array, # n0 =
+                n1_array # n1 =
+              )
+            p_value_inner_vec <- np$array( GreaterEqualMagCompare(tau_perm_null_0, tau_obs) )
+            mean( p_value_inner_vec )
+          }))
+      } )
+    # plot(colMeans(p_value))
   }
 
   if(simulate == F){
@@ -86,7 +121,7 @@ randomization_test <- function(
     tau_perm_null_0 <- np$array(
       W_VectorizedFastDiffInMeans(
           jnp$array(obsY),  # y_ =
-          input_permutation_matrix_array, # t_ =
+          candidate_randomizations_array, # t_ =
           n0_array, # n0 =
           n1_array # n1 =
     ))
@@ -114,7 +149,7 @@ randomization_test <- function(
       for(step_t in 1:n_search_attempts)
       {
         #initialize for next step
-        permutation_treatment_vec <- input_permutation_matrix[sample(1:nrow(input_permutation_matrix), size=1),]
+        permutation_treatment_vec <- candidate_randomizations[sample(1:nrow(candidate_randomizations), size=1),]
         lower_Y_0_under_null <- lower_Y_obs_perm <- NAHolder
         upper_Y_0_under_null <- upper_Y_obs_perm <- lower_Y_obs_perm
 
@@ -161,7 +196,7 @@ randomization_test <- function(
     if(T == T){
       tau_pseudo_seq <- seq(CI[1]-1, CI[2]*2,length.out=100)
       pvals_vec <- sapply(tau_pseudo_seq, function(tau_pseudo){
-        stat_vec_at_tau_pseudo <- np$array(     vec1_get_stat_vec_at_tau_pseudo(input_permutation_matrix_array,# treatment_pseudo
+        stat_vec_at_tau_pseudo <- np$array(     vec1_get_stat_vec_at_tau_pseudo(candidate_randomizations_array,# treatment_pseudo
                                                                                 obsY_array,# obsY_array
                                                                                 obsW_array, # obsW_array
                                                                                 tau_pseudo, # tau_pseudo
@@ -183,12 +218,12 @@ randomization_test <- function(
     }
   }
 
-  return_list <- list(CI=CI,
-                      p_value=p_value,
-                      CI_width=CI_width,
-                      covers_truth=covers_truth,
-                      zero_in_CI=zero_in_CI,
-                      true_effect=true_treatment_effect,
-                      tau_obs=tau_obs)
+  return_list <- list(CI = CI,
+                      p_value = p_value,
+                      CI_width = CI_width,
+                      covers_truth = covers_truth,
+                      zero_in_CI = zero_in_CI,
+                      true_effect = true_treatment_effect,
+                      tau_obs = tau_obs)
   return(return_list)
 }
