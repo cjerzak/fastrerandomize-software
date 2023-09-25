@@ -64,7 +64,7 @@ RandomizationTest <- function(
                                randomization_accept_prob = NULL,
                                findFI = F,
                                c_initial = 2){
-  tau_obs <- FI <- FI_width <- covers_truth <- zero_in_FI <- NULL
+  tau_obs <- FI <- covers_truth <- NULL
 
   if(is.null(candidate_randomizations_array)){
     candidate_randomizations_array <- jnp$array( candidate_randomizations )
@@ -169,8 +169,7 @@ RandomizationTest <- function(
       z_alpha <- qnorm( p = (1-alpha) )
       k <- 2 / (  z_alpha *   (2 * pi)^(-1/2) * exp( -z_alpha^2 / 2)  )
       NAHolder <- rep(NA, length(obsW))
-      for(step_t in 1:n_search_attempts)
-      {
+      for(step_t in 1:n_search_attempts){
         #initialize for next step
         permutation_treatment_vec <- candidate_randomizations[sample(1:nrow(candidate_randomizations), size=1),]
         lower_Y_0_under_null <- lower_Y_obs_perm <- NAHolder
@@ -212,11 +211,8 @@ RandomizationTest <- function(
 
     # save results
     FI <- c(lowerBound_storage_vec[length(lowerBound_storage_vec)], upperBound_storage_vec[length(upperBound_storage_vec)])
-    FI_width <- abs( max(FI) - min(FI) )
-    zero_in_FI <- 1 * ( min(FI) < 0  &  max(FI) > 0 )
-    covers_truth <- 1 * ( min(FI) < true_treatment_effect  &  max(FI) > true_treatment_effect )
 
-    if(T == T){
+    {
       tau_pseudo_seq <- seq(FI[1]-1, FI[2]*2,length.out=100)
       pvals_vec <- sapply(tau_pseudo_seq, function(tau_pseudo){
         stat_vec_at_tau_pseudo <- np$array(     vec1_get_stat_vec_at_tau_pseudo(candidate_randomizations_array,# treatment_pseudo
@@ -238,7 +234,6 @@ RandomizationTest <- function(
       # checks
       #plot( tau_pseudo_seq,  pvals_vec );abline(h=0.05,col="gray",lty=2); abline(v=FI[1],lty=2); abline(v=FI[2],lty=2); abline(v=tau_obs)
       FI <- summary(tau_pseudo_seq[pvals_vec>0.05])[c(1,6)]
-      FI_width <- abs( max(FI) - min(FI) )
     }
   }
 
