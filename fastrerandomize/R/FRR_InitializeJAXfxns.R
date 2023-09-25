@@ -11,10 +11,6 @@
 #'   \item
 #' }
 #'
-#' @section References:
-#' \itemize{
-#' \item
-#' }
 #'
 #' @examples
 #' # For tutorials, see

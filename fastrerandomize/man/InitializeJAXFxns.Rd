@@ -14,13 +14,6 @@ A list consiting of \itemize{
 \description{
 Initialize JAX
 }
-\section{References}{
-
-\itemize{
-\item
-}
-}
-
 \examples{
 # For tutorials, see
 # github.com/cjerzak/fastrerandomization-software

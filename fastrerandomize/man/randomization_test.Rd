@@ -7,13 +7,47 @@
 randomization_test(X, ...)
 }
 \arguments{
-\item{obsY}{A numeric vector containing observed outcomes.}
-
 \item{obsW}{A numeric vector where \code{0}'s correspond to control units and \code{1}'s to treated units.}
+
+\item{obsY}{An optional numeric vector of observed outcomes. If not provided, the function assumes a NULL value.}
+
+\item{X}{A numeric matrix of covariates.}
+
+\item{alpha}{The significance level for the test. Default is \code{0.05}.}
+
+\item{candidate_randomizations}{A numeric matrix of candidate randomizations.}
+
+\item{candidate_randomizations_array}{An optional JAX array of candidate randomizations. If not provided, the function coerces \code{candidate_randomizations} into a JAX array.}
+
+\item{n0_array}{An optional array specifying the number of control units.}
+
+\item{n1_array}{An optional array specifying the number of treated units.}
+
+\item{prior_treatment_effect_mean}{An optional numeric value for the prior mean of the treatment effect. Default is NULL.}
+
+\item{prior_treatment_effect_SD}{An optional numeric value for the prior standard deviation of the treatment effect. Default is NULL.}
+
+\item{true_treatment_effect}{An optional numeric value specifying the true treatment effect. Default is NULL.}
+
+\item{simulate}{A logical value indicating whether to run \code{randomization_test} in simulation mode. Default is FALSE.}
+
+\item{coef_prior}{An optional function generating coefficients on values of \code{X} for predicting \code{Y(0)}.}
+
+\item{nSimulate_obsW}{A numeric value specifying the number of simulated values for obsW. Default is \code{50L}.}
+
+\item{nSimulate_obsY}{A numeric value specifying the number of simulated values for obsY. Default is \code{50L}.}
+
+\item{randomization_accept_prob}{An numeric scalar or vector of probabilities for accepting each randomization.}
+
+\item{findFI}{A logical value indicating whether to find the fiducial interval. Default is FALSE.}
+
+\item{c_initial}{A numeric value representing the initial criterion for the randomization. Default is \code{2}.}
 }
 \value{
-A list consiting of \itemize{
-\item \code{pval} A p-value.
+A list consisting of \itemize{
+\item \code{p_value} A numeric value or vector representing the p-value of the test (or the expected p-value under the prior structure specified in the function inputs).
+\item \code{FI} A numeric vector representing the fiducial interval if \code{findFI=T}.
+\item \code{tau_obs} A numeric value or vector representing the estimated treatment effect(s)
 }
 }
 \description{
@@ -28,6 +62,6 @@ Fast randomization test
 
 \examples{
 # For a tutorial, see
-# github.com/cjerzak/fastrerandomization
+# github.com/cjerzak/fastrerandomization-software
 
 }

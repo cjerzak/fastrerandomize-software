@@ -7,10 +7,31 @@
 #'
 #' @param obsW A numeric vector where `0`'s correspond to control units and `1`'s to treated units.
 #' @param obsY A numeric vector containing observed outcomes.
-
-#' @return A list consiting of \itemize{
-#'   \item `pval` A p-value.
+#' @param X A numeric matrix of covariates.
+#' @param obsY An optional numeric vector of observed outcomes. If not provided, the function assumes a NULL value.
+#' @param obsW A numeric vector where `0`'s correspond to control units and `1`'s to treated units.
+#' @param c_initial A numeric value representing the initial criterion for the randomization. Default is `2`.
+#' @param alpha The significance level for the test. Default is `0.05`.
+#' @param candidate_randomizations A numeric matrix of candidate randomizations.
+#' @param candidate_randomizations_array An optional JAX array of candidate randomizations. If not provided, the function coerces `candidate_randomizations` into a JAX array.
+#' @param n0_array An optional array specifying the number of control units.
+#' @param n1_array An optional array specifying the number of treated units.
+#' @param prior_treatment_effect_mean An optional numeric value for the prior mean of the treatment effect. Default is NULL.
+#' @param prior_treatment_effect_SD An optional numeric value for the prior standard deviation of the treatment effect. Default is NULL.
+#' @param true_treatment_effect An optional numeric value specifying the true treatment effect. Default is NULL.
+#' @param simulate A logical value indicating whether to run `randomization_test` in simulation mode. Default is FALSE.
+#' @param coef_prior An optional function generating coefficients on values of `X` for predicting `Y(0)`.
+#' @param nSimulate_obsW A numeric value specifying the number of simulated values for obsW. Default is `50L`.
+#' @param nSimulate_obsY A numeric value specifying the number of simulated values for obsY. Default is `50L`.
+#' @param randomization_accept_prob An numeric scalar or vector of probabilities for accepting each randomization.
+#' @param findFI A logical value indicating whether to find the fiducial interval. Default is FALSE.
+#'
+#' @return A list consisting of \itemize{
+#'   \item `p_value` A numeric value or vector representing the p-value of the test (or the expected p-value under the prior structure specified in the function inputs).
+#'   \item `FI` A numeric vector representing the fiducial interval if `findFI=T`.
+#'   \item `tau_obs` A numeric value or vector representing the estimated treatment effect(s)
 #' }
+
 #'
 #' @section References:
 #' \itemize{
@@ -19,35 +40,37 @@
 #'
 #' @examples
 #' # For a tutorial, see
-#' # github.com/cjerzak/fastrerandomization
+#' # github.com/cjerzak/fastrerandomization-software
 #'
 #' @export
 #' @md
 
 randomization_test <- function(
-                               X,
-                               obsY = NULL,
                                obsW,
-                               c_initial = 2,
+                               obsY = NULL,
+                               X = NULL,
                                alpha = 0.05,
                                candidate_randomizations,
                                candidate_randomizations_array = NULL,
-                               n0_array,
-                               n1_array,
+                               n0_array = NULL,
+                               n1_array = NULL,
                                prior_treatment_effect_mean = NULL,
                                prior_treatment_effect_SD = NULL,
                                true_treatment_effect = NULL,
-                               simulate=F,
+                               simulate = F ,
                                coef_prior = NULL,
                                nSimulate_obsW = 50L,
                                nSimulate_obsY = 50L,
                                randomization_accept_prob = NULL,
-                               findCI = F){
-  tau_obs <- CI <- CI_width <- covers_truth <- zero_in_CI <- NULL
+                               findFI = F,
+                               c_initial = 2){
+  tau_obs <- FI <- FI_width <- covers_truth <- zero_in_FI <- NULL
 
   if(is.null(candidate_randomizations_array)){
     candidate_randomizations_array <- jnp$array( candidate_randomizations )
   }
+  if(is.null(n0_array)){ n0_array <- jnp$array(sum(obsW == 0)) }
+  if(is.null(n1_array)){ n0_array <- jnp$array(sum(obsW == 1)) }
 
   # simulate generates new (synthetic values) of Y_obs
   if(simulate==T){
@@ -87,7 +110,7 @@ randomization_test <- function(
 
     p_value <- sapply(np$array(a_threshold_vec), function(a_){
           acceptedWs_array <- jnp$take( candidate_randomizations_array,
-                                        jnp$where( jnp$less_equal( M_results, a_))[[1]], axis = 0L)
+                                        jnp$where( jnp$less_equal( M_results,  a_))[[1]], axis = 0L)
           AcceptedRandomizations <- acceptedWs_array$shape[[1]]
           sampTheseIndices <- 0L:(AcceptedRandomizations-1L)
 
@@ -128,7 +151,7 @@ randomization_test <- function(
     p_value <- mean( abs(tau_perm_null_0) >= abs(tau_obs) )
   }
 
-  if(findCI == T){
+  if(findFI == T){
     obsY_array <- jnp$array( obsY )
     obsW_array <- jnp$array( obsW )
 
@@ -188,13 +211,13 @@ randomization_test <- function(
     }#for(bound_side in c("lower", "upper"))
 
     # save results
-    CI <- c(lowerBound_storage_vec[length(lowerBound_storage_vec)], upperBound_storage_vec[length(upperBound_storage_vec)])
-    CI_width <- abs( max(CI) - min(CI) )
-    zero_in_CI <- 1 * ( min(CI) < 0  &  max(CI) > 0 )
-    covers_truth <- 1 * ( min(CI) < true_treatment_effect  &  max(CI) > true_treatment_effect )
+    FI <- c(lowerBound_storage_vec[length(lowerBound_storage_vec)], upperBound_storage_vec[length(upperBound_storage_vec)])
+    FI_width <- abs( max(FI) - min(FI) )
+    zero_in_FI <- 1 * ( min(FI) < 0  &  max(FI) > 0 )
+    covers_truth <- 1 * ( min(FI) < true_treatment_effect  &  max(FI) > true_treatment_effect )
 
     if(T == T){
-      tau_pseudo_seq <- seq(CI[1]-1, CI[2]*2,length.out=100)
+      tau_pseudo_seq <- seq(FI[1]-1, FI[2]*2,length.out=100)
       pvals_vec <- sapply(tau_pseudo_seq, function(tau_pseudo){
         stat_vec_at_tau_pseudo <- np$array(     vec1_get_stat_vec_at_tau_pseudo(candidate_randomizations_array,# treatment_pseudo
                                                                                 obsY_array,# obsY_array
@@ -212,18 +235,17 @@ randomization_test <- function(
         #ret_ <- reject_ <- tau_obs >= quantiles_[1] & tau_obs <= quantiles_[2]
         return( ret_ )
       } )
-      #plot( tau_pseudo_seq,  pvals_vec );abline(h=0.05,col="gray",lty=2); abline(v=CI[1],lty=2); abline(v=CI[2],lty=2); abline(v=tau_obs)
-      CI <- summary(tau_pseudo_seq[pvals_vec>0.05])[c(1,6)]
-      CI_width <- abs( max(CI) - min(CI) )
+      # checks
+      #plot( tau_pseudo_seq,  pvals_vec );abline(h=0.05,col="gray",lty=2); abline(v=FI[1],lty=2); abline(v=FI[2],lty=2); abline(v=tau_obs)
+      FI <- summary(tau_pseudo_seq[pvals_vec>0.05])[c(1,6)]
+      FI_width <- abs( max(FI) - min(FI) )
     }
   }
 
-  return_list <- list(CI = CI,
+  return_list <- list(
                       p_value = p_value,
-                      CI_width = CI_width,
-                      covers_truth = covers_truth,
-                      zero_in_CI = zero_in_CI,
-                      true_effect = true_treatment_effect,
-                      tau_obs = tau_obs)
+                      FI = FI,
+                      tau_obs = tau_obs
+                      )
   return(return_list)
 }

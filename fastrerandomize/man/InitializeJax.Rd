@@ -4,25 +4,21 @@
 \alias{InitializeJAX}
 \title{Initialize JAX}
 \usage{
-InitializeJax()
+InitializeJax(conda_env, conda_env_required)
+}
+\arguments{
+\item{conda_env}{A character string representing the conda environment to activate. A version of JAX should live in that environment.}
+
+\item{conda_env_required}{A logical representing whether to force use the specified conda environment.}
 }
 \value{
-A list consiting of \itemize{
-\item \code{pval} A p-value.
-}
+This function initializes a JAX-containing conda environment as specified by \code{conda_env}. This function must be run before any others in \code{fastrerandomize}.
 }
 \description{
 Initialize JAX
 }
-\section{References}{
-
-\itemize{
-\item
-}
-}
-
 \examples{
 # For a tutorial, see
-# github.com/cjerzak/fastrerandomization
+# github.com/cjerzak/fastrerandomization-software
 
 }
