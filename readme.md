@@ -12,7 +12,11 @@ We employ a JAX backend to make exact rerandomization inference possible even fo
 
 # Package Installation and Loading <a id="installation"></a>
 ```
-# Install if you haven't already
+
+# Install devtools if needed 
+# install.packages("devtools")
+
+# Install fastrerandomize if you haven't already
 # devtools::install_github(repo = "cjerzak/fastrerandomize-software/fastrerandomize")
 
 # Load the package
