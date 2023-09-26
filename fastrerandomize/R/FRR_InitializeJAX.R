@@ -108,8 +108,9 @@ InitializeJAX <- function(conda_env, conda_env_required){
 
   print("Attempting setup of core JAX functions...")
   {
-    expand_grid_jax <<- function(...){
+    expand_grid_jax <<- function(n_treated, n_control){
       #grid <- jnp$meshgrid(jnp$array(c(0,1L)), jnp$array(c(0,1L)), jnp$array(c(0,1L)), indexing = "ij")
+      expand_grid_jax_text <- paste(rep("jnp$array(0L:1L)",times = n_units), collapse = ", ")
       grid <- jnp$meshgrid(..., indexing='ij')
       grid <- jnp$vstack(lapply(grid,function(zer){jnp$ravel(zer)}))
       grid <- jnp$transpose(grid)
@@ -118,7 +119,6 @@ InitializeJAX <- function(conda_env, conda_env_required){
 
     if(T == F){
       n_units <- 35
-      expand_grid_jax_text <- paste(rep("jnp$array(0L:1L)",times = n_units), collapse = ", ")
       expand_grid_text <- paste(rep("0L:1L",times = n_units), collapse = ", ")
       system.time( tmp1 <- eval(parse(text = sprintf("expand_grid_jax(%s)",expand_grid_jax_text))) )
       system.time( tmp2 <- eval(parse(text = sprintf("expand.grid(%s)",expand_grid_text))) )
