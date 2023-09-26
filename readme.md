@@ -21,6 +21,7 @@ fastrerandomize::InitializeJAX(conda_env = "tensorflow_m1", conda_env_required =
 ```
 
 # Tutorial<a id="tutorial"></a>
+Let's get started with a tutorial. We're first going to use the package for generate a pool of acceptable rerandomizations. 
 ```
 # First, specify some analysis parameters
 n_units <- 20; n_treated <- 10 
@@ -43,7 +44,7 @@ candidate_randomizations_array$shape
 candidate_randomizations <- np$array( candidate_randomizations_array )
 dim( candidate_randomizations )
 ```
-You can also use `fastrerandomize` to perform a randomization test. 
+We can also use `fastrerandomize` to perform a randomization test using those acceptable randomizations. 
 ```
 # Setup simulated outcome data 
 CoefY <- rnorm(ncol(X))
@@ -84,4 +85,9 @@ PreAnalysisEvaluation$suggested_randomization_accept_prob
 # expected p-values for all values of randomization_accept_prob input
 PreAnalysisEvaluation$p_value
 ```
+Currently, we support non-approximate tests and randomization generations for $n \leq 30$ (where the total number of available complete randomizations is about 155 million). In the future, we plan to increase this by both approximations and smart memory handling of rejected randomizations. 
+
+# Development 
+We welcome new features or bug fixes (you can raise an issue or submit a pull request in the relevant GitHub repository). 
+
 
