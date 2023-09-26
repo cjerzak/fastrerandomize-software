@@ -20,8 +20,10 @@ library(  fastrerandomize  )
 
 # Before running any code, you'll need to initialize the JAX environment 
 fastrerandomize::InitializeJAX(conda_env = "tensorflow_m1", conda_env_required = T)
+
+# Note: If you leave `conda_env = NULL`, we will search in the default Python environment for JAX.
 ```
-In order to download the JAX backend in a conda environment, see [this link](https://jax.readthedocs.io/en/latest/installation.html#conda) from the JAX developers. 
+In order to download the JAX backend in a conda environment, see [this link](https://jax.readthedocs.io/en/latest/installation.html) from the JAX developers. 
 
 # Tutorial<a id="tutorial"></a>
 Let's get started with a tutorial. We're first going to use the package for generate a pool of acceptable rerandomizations. 

@@ -17,15 +17,17 @@
 #' @export
 #' @md
 
-InitializeJAX <- function(conda_env, conda_env_required){
+InitializeJAX <- function(conda_env = NULL, conda_env_required = T){
   print("Loading JAX...")
   {
   #library(fastmatch);
   library(reticulate)
-  reticulate::use_condaenv(condaenv = conda_env, required = conda_env_required)
+  if(!is.null(conda_env)){
+    reticulate::use_condaenv(condaenv = conda_env, required = conda_env_required)
+  }
 
   # setup packages
-  Sys.sleep(1L)
+  Sys.sleep(0.25)
   jax <<- reticulate::import("jax")
   jnp <<- reticulate::import("jax.numpy")
   np <<- reticulate::import("numpy")
