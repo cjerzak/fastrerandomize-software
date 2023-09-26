@@ -72,16 +72,16 @@ RandomizationTest <- function(
   if(is.null(n0_array)){ n0_array <- jnp$array(sum(obsW == 0)) }
   if(is.null(n1_array)){ n0_array <- jnp$array(sum(obsW == 1)) }
 
+  if(is.null(candidate_randomizations_array) & is.null(candidate_randomizations)){
+    GeneratedPermMat <- T
+    candidate_randomizations_array <- GenerateRandomizations(n_units, n_treated)
+  }
   if(is.null(candidate_randomizations)){
       candidate_randomizations <- np$array( candidate_randomizations_array )
   }
   if(is.null(candidate_randomizations_array)){
       candidate_randomizations_array <- jnp$array(candidate_randomizations, dtype = jnp$float32)
   }
-  if(is.null(candidate_randomizations_array) & is.null(candidate_randomizations)){
-    candidate_randomizations_array <- jnp$array(candidate_randomizations, dtype = jnp$float32)
-  }
-
 
   # simulate generates new (synthetic values) of Y_obs
   if(simulate==T){
@@ -243,4 +243,35 @@ RandomizationTest <- function(
               FI = FI,
               tau_obs = tau_obs
               ))
+}
+
+
+
+
+#!/usr/bin/env Rscript
+#' Fast generation of all possible complete randomizations given target number of experimental units.
+#'
+#' @usage
+#'
+#' GenerateRandomizations(n_units, n_treated)
+#'
+#' @param n_units A integer specifying total number of experimental units.
+#' @param n_treated An integer specifying total number of treated units.
+#'
+#' @return A JAX array containing all possible complete randomizations.
+#' @examples
+#' # For a tutorial, see
+#' # github.com/cjerzak/fastrerandomization-software
+#'
+#' @export
+#' @md
+
+GenerateRandomizations <- function(n_units, n_treated) {
+  # Get all combinations of positions to set to 1
+  combinations <- jnp$array(  combn(n_units, n_treated) - 1L )
+  ZerosHolder <- jnp$zeros(as.integer(n_units), dtype=jnp$int32)
+  permutation_matrix <- InsertOnesVectorized(combinations,
+                                             ZerosHolder)
+
+  return(permutation_matrix)
 }

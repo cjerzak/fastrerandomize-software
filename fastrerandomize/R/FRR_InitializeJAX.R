@@ -108,7 +108,7 @@ InitializeJAX <- function(conda_env, conda_env_required){
 
   print("Attempting setup of core JAX functions...")
   {
-    expand_grid_jax <<- function(n_treated, n_control){
+    expand_grid_JAX <<- function(n_treated, n_control){
       #grid <- jnp$meshgrid(jnp$array(c(0,1L)), jnp$array(c(0,1L)), jnp$array(c(0,1L)), indexing = "ij")
       expand_grid_jax_text <- paste(rep("jnp$array(0L:1L)",times = n_units), collapse = ", ")
       grid <- jnp$meshgrid(..., indexing='ij')
@@ -116,6 +116,14 @@ InitializeJAX <- function(conda_env, conda_env_required){
       grid <- jnp$transpose(grid)
       return( grid )
     }
+
+    InsertOnes <<- jax$jit( function(treat_indices_, zeros_){
+      zeros_ <- zeros_$at[treat_indices_]$add(1L)
+      return(  zeros_ )
+    } )
+    InsertOnesVectorized <<- jax$jit( jax$vmap(function(treat_indices_, zeros_){
+      InsertOnes(treat_indices_, zeros_)
+    }, list(1L,NULL)))
 
     if(T == F){
       n_units <- 35
