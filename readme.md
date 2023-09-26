@@ -40,7 +40,7 @@ py_install("jax")
 py_install("jaxlib")
  fastrerandomize::InitializeJAX(conda_env = NULL)
 ```
-It often helps to re-start your `R` session when debugging package installs. 
+It often helps to re-start your `R` session when debugging package installs. Note that this package has been tested successfully on Windows and Apple machines and should run well on Linux. 
 
 # Tutorial<a id="tutorial"></a>
 Let's get started with a tutorial. We're first going to use the package for generate a pool of acceptable rerandomizations. 
