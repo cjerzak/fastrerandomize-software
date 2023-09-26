@@ -8,7 +8,7 @@
 # What is `fastrerandomize`?<a id="description"></a>
 The `fastrerandomize` contains functions such as `RandomizationTest`, which offers a streamlined approach for performing randomization tests after using rerandomization in the research design. 
 
-We employ a JAX backend to make exact rerandomization inference possible even for larger experiments where the number of randomizations is in the hundreds of millions. In future releases, we will employ improved memory footprint handling to handle even larger cases where the candidate randomization set ranges in the billions. 
+We employ a [JAX backend](https://en.wikipedia.org/wiki/Google_JAX) to make exact rerandomization inference possible even for larger experiments where the number of randomizations is in the hundreds of millions. In future releases, we will employ improved memory footprint handling to handle even larger cases where the candidate randomization set ranges in the billions. 
 
 # Package Installation and Loading <a id="installation"></a>
 ```
