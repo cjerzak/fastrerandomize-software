@@ -259,6 +259,7 @@ RandomizationTest <- function(
   }
   if(simulate == T){
     return( list(p_value = colMeans( p_value ),
+                 p_value_full =  p_value ,
                  suggested_randomization_accept_prob = suggested_randomization_accept_prob,
                  FI = FI,
                  tau_obs = tau_obs ))
