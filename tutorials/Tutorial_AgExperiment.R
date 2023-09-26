@@ -12,6 +12,9 @@ library(  fastrerandomize  )
 # Before running any code, you'll need to initialize the JAX environment
 fastrerandomize::InitializeJAX(conda_env = "tensorflow_m1", conda_env_required = T)
 
+# If you didn't use a conda environment in which to install JAX, try:
+# fastrerandomize::InitializeJAX(  conda_env = NULL )
+
 # Note: If you leave `conda_env = NULL`, we will search in the default Python environment for JAX.
 
 # First, specify some analysis parameters
