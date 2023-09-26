@@ -6,10 +6,8 @@
 #' RandomizationTest(X, ...)
 #'
 #' @param obsW A numeric vector where `0`'s correspond to control units and `1`'s to treated units.
-#' @param obsY A numeric vector containing observed outcomes.
 #' @param X A numeric matrix of covariates.
 #' @param obsY An optional numeric vector of observed outcomes. If not provided, the function assumes a NULL value.
-#' @param obsW A numeric vector where `0`'s correspond to control units and `1`'s to treated units.
 #' @param c_initial A numeric value representing the initial criterion for the randomization. Default is `2`.
 #' @param alpha The significance level for the test. Default is `0.05`.
 #' @param candidate_randomizations A numeric matrix of candidate randomizations.
@@ -46,7 +44,7 @@
 #' @md
 
 RandomizationTest <- function(
-                               obsW,
+                               obsW = NULL,
                                obsY = NULL,
                                X = NULL,
                                alpha = 0.05,
@@ -61,20 +59,35 @@ RandomizationTest <- function(
                                coef_prior = NULL,
                                nSimulate_obsW = 50L,
                                nSimulate_obsY = 50L,
-                               randomization_accept_prob = NULL,
+                               randomization_accept_prob = 1.,
                                findFI = F,
                                c_initial = 2){
   tau_obs <- FI <- covers_truth <- NULL
 
-  if(is.null(candidate_randomizations_array)){
-    candidate_randomizations_array <- jnp$array( candidate_randomizations )
+  if(!simulate){
+    if(is.null(n0_array)){ n0_array <- jnp$array(sum(obsW == 0)) }
+    if(is.null(n1_array)){ n1_array <- jnp$array(sum(obsW == 1)) }
   }
-  if(is.null(n0_array)){ n0_array <- jnp$array(sum(obsW == 0)) }
-  if(is.null(n1_array)){ n0_array <- jnp$array(sum(obsW == 1)) }
+  if(simulate){
+    if(is.null(n0_array)){ n0_array <- jnp$array(nrow(X)/2) }
+    if(is.null(n1_array)){ n1_array <- jnp$array(nrow(X)/2) }
+  }
+  if(!is.null(obsW)){obsW <- c(unlist(obsW))}
+  if(!is.null(X)){X <- as.matrix(X)}
+  if(!is.null(obsY)){obsY <- c(unlist(obsY))}
 
   if(is.null(candidate_randomizations_array) & is.null(candidate_randomizations)){
-    GeneratedPermMat <- T
-    candidate_randomizations_array <- GenerateRandomizations(n_units, n_treated)
+    n_treated <- ( n_units <- nrow(X) ) / 2
+    if(simulate == T){
+      candidate_randomizations_array <- GenerateRandomizations(n_units, n_treated)
+    }
+    if(simulate == F){
+      candidate_randomizations_array <- GenerateRandomizations(
+                                            n_units = n_units,
+                                            n_treated = n_treated,
+                                            X = X,
+                                            randomization_accept_prob = randomization_accept_prob)
+    }
   }
   if(is.null(candidate_randomizations)){
       candidate_randomizations <- np$array( candidate_randomizations_array )
@@ -132,6 +145,9 @@ RandomizationTest <- function(
             mean( p_value_inner_vec )
           }))
       } )
+    suggested_randomization_accept_prob <- prob_accept_randomization_seq[
+                                                which.min(colMeans(p_value))[1]
+                                              ]
     # plot(colMeans(p_value))
   }
 
@@ -209,8 +225,10 @@ RandomizationTest <- function(
       }#for(bound_side in c("lower", "upper"))
 
       # save results
-      FI <- c(lowerBound_storage_vec[length(lowerBound_storage_vec)], upperBound_storage_vec[length(upperBound_storage_vec)])
+      FI <- c(lowerBound_storage_vec[length(lowerBound_storage_vec)],
+              upperBound_storage_vec[length(upperBound_storage_vec)])
 
+      # stage 2
       {
         tau_pseudo_seq <- seq(FI[1]-1, FI[2]*2,length.out=100)
         pvals_vec <- sapply(tau_pseudo_seq, function(tau_pseudo){
@@ -222,27 +240,29 @@ RandomizationTest <- function(
                                                                                   n1_array #
                                                                                   )  )
 
-          #quantiles_ <- c(quantile(stat_vec_at_tau_pseudo,alpha/2), quantile(stat_vec_at_tau_pseudo,1-alpha/2))
-          #quantiles_ <- np$array(jnp$stack( list(jnp$quantile(stat_vec_at_tau_pseudo, alpha/2), jnp$quantile(stat_vec_at_tau_pseudo, 1-alpha/2)), 0L))
-
           ret_ <- min(mean( tau_obs >= stat_vec_at_tau_pseudo),
                       mean( tau_obs <= stat_vec_at_tau_pseudo))
           #ret_ <- reject_ <- tau_obs >= quantiles_[1] & tau_obs <= quantiles_[2]
           return( ret_ )
         } )
-        # checks
-        #plot( tau_pseudo_seq,  pvals_vec );abline(h=0.05,col="gray",lty=2); abline(v=FI[1],lty=2); abline(v=FI[2],lty=2); abline(v=tau_obs)
-        FI <- summary(tau_pseudo_seq[pvals_vec>0.05])[c(1,6)]
+        tau_pseudo_seq_AcceptNull <- tau_pseudo_seq[pvals_vec>0.05]
+        FI <- c(min(tau_pseudo_seq_AcceptNull),
+                max(tau_pseudo_seq_AcceptNull))
       }
     }
   }
 
-  # return
-  return(list(
-              p_value = p_value,
-              FI = FI,
-              tau_obs = tau_obs
-              ))
+  if(simulate == F){
+    return( list(p_value = p_value,
+                  FI = FI,
+                  tau_obs = tau_obs ))
+  }
+  if(simulate == T){
+    return( list(p_value = colMeans( p_value ),
+                 suggested_randomization_accept_prob = suggested_randomization_accept_prob,
+                 FI = FI,
+                 tau_obs = tau_obs ))
+  }
 }
 
 
@@ -266,12 +286,28 @@ RandomizationTest <- function(
 #' @export
 #' @md
 
-GenerateRandomizations <- function(n_units, n_treated) {
+GenerateRandomizations <- function(n_units, n_treated,
+                                   X = NULL,
+                                   randomization_accept_prob = 1){
   # Get all combinations of positions to set to 1
   combinations <- jnp$array(  combn(n_units, n_treated) - 1L )
   ZerosHolder <- jnp$zeros(as.integer(n_units), dtype=jnp$int32)
-  permutation_matrix <- InsertOnesVectorized(combinations,
+  candidate_randomizations <- InsertOnesVectorized(combinations,
                                              ZerosHolder)
 
-  return(permutation_matrix)
+  if(!is.null(X)){
+    n0_array <- jnp$array(  (n_units - n_treated) )
+    n1_array <- jnp$array(  n_treated )
+    M_results <-  VectorizedFastHotel2T2(jnp$array( X ) ,
+                                         jnp$array(candidate_randomizations, dtype = jnp$float32),
+                                         n0_array,
+                                         n1_array)
+    a_threshold <- np$array(jnp$quantile( M_results,  jnp$array(randomization_accept_prob)))[[1]]
+    M_results <- c(np$array( M_results ))
+    candidate_randomizations <- jnp$take(candidate_randomizations,
+                                         indices = jnp$array(which(M_results <= a_threshold)-1L),
+                                         axis = 0L)
+  }
+
+  return( candidate_randomizations )
 }
