@@ -29,7 +29,18 @@ fastrerandomize::InitializeJAX(conda_env = "tensorflow_m1", conda_env_required =
 
 # Note: If you leave `conda_env = NULL`, we will search in the default Python environment for JAX.
 ```
-In order to download the JAX backend in a conda environment, see [\[this link\]](https://jax.readthedocs.io/en/latest/installation.html) from the JAX developers. 
+
+## Installing JAX 
+In order to download the JAX backend in a conda environment, see [\[this link\]](https://jax.readthedocs.io/en/latest/installation.html) from the JAX developers.
+
+You can also try downloading `jax` and `jaxlib` via `R`'s `reticulate` package: 
+```
+library(reticulate)
+py_install("jax")
+py_install("jaxlib")
+ fastrerandomize::InitializeJAX(conda_env = NULL)
+```
+It often helps to re-start your `R` session when debugging package installs. 
 
 # Tutorial<a id="tutorial"></a>
 Let's get started with a tutorial. We're first going to use the package for generate a pool of acceptable rerandomizations. 
