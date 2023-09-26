@@ -88,6 +88,6 @@ PreAnalysisEvaluation$p_value
 Currently, we support non-approximate tests and randomization generations for $n \leq 30$ (where the total number of available complete randomizations is about 155 million). In the future, we plan to increase this by both approximations and smart memory handling of rejected randomizations. 
 
 # Development 
-We welcome new features or bug fixes (you can raise an issue or submit a pull request in the relevant GitHub repository). 
+We welcome new features or bug fixes (you can raise an issue or submit a pull request in the repository). 
 
 
