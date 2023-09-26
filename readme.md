@@ -8,6 +8,8 @@
 # What is `fastrerandomize`?<a id="description"></a>
 The `fastrerandomize` contains functions such as `RandomizationTest`, which offers a streamlined approach for performing randomization tests after using rerandomization in the research design. 
 
+We employ a JAX backend to make exact rerandomization inference possible even for larger experiments where the number of randomizations is in the hundreds of millions.
+
 # Package Installation and Loading <a id="installation"></a>
 ```
 # Install if you haven't already
@@ -19,6 +21,7 @@ library(  fastrerandomize  )
 # Before running any code, you'll need to initialize the JAX environment 
 fastrerandomize::InitializeJAX(conda_env = "tensorflow_m1", conda_env_required = T)
 ```
+In order to download the JAX backend in a conda environment, see [this link](https://jax.readthedocs.io/en/latest/installation.html#conda) from the JAX developers. 
 
 # Tutorial<a id="tutorial"></a>
 Let's get started with a tutorial. We're first going to use the package for generate a pool of acceptable rerandomizations. 
@@ -88,6 +91,6 @@ PreAnalysisEvaluation$p_value
 Currently, we support non-approximate tests and randomization generations for $n \leq 30$ (where the total number of available complete randomizations is about 155 million). In the future, we plan to increase this by both approximations and smart memory handling of rejected randomizations. 
 
 # Development 
-We welcome new features or bug fixes (you can raise an issue or submit a pull request in the repository). 
+We welcome new features or bug fixes (you can raise an issue or submit a pull request in the repository). We will keep the package up-to-date with the latest version of the [JAX backend](https://theaisummer.com/jax/). 
 
 
