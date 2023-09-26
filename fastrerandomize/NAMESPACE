@@ -2,5 +2,4 @@
 
 export(GenerateCausalData)
 export(InitializeJAX)
-export(InitializeJAXFxns)
 export(RandomizationTest)
