@@ -18,7 +18,7 @@
 #' @md
 
 InitializeJAX <- function(conda_env, conda_env_required){
-  print("Attempting JAX configuration...")
+  print("Loading JAX...")
   {
   #library(fastmatch);
   library(reticulate)
@@ -104,7 +104,7 @@ InitializeJAX <- function(conda_env, conda_env_required){
     return(NList)
   }
   }
-  print("Success configuring JAX!")
+  print("Success loading JAX!")
 
   print("Attempting setup of core JAX functions...")
   {
