@@ -6,6 +6,7 @@
 # Install fastrerandomize if you haven't already
 # devtools::install_github(repo = "cjerzak/fastrerandomize-software/fastrerandomize")
 
+
 # Load the package
 library(  fastrerandomize  )
 

@@ -55,18 +55,6 @@ derivative_v_a <- function(a, k){
   return(value)
 }
 
-#empirical second derivative
-empirical_second_deriv <- function(a, k, epsilon=0.001){
-  a_new <- a + epsilon
-  empirical_deriv <- (derivative_v_a(a_new, k=k_covars) -  derivative_v_a(a, k=k_covars) ) / (a_new - a)
-}
-
-#empirical third derivative
-empirical_third_deriv <- function(a, k, epsilon=0.001){
-  a_new <- a + epsilon
-  empirical_deriv <- (empirical_second_deriv(a_new, k=k_covars) -  empirical_second_deriv(a, k=k_covars) ) / (a_new - a)
-}
-
 v_a_value <- function(k_covars, a){
   value <- pchisq(q=a, df=k_covars + 2) / pchisq(q=a, df=k_covars)
   return( value )
@@ -87,7 +75,6 @@ expected_min_p_value_second_derivative <- function(n, p_a){
     n * (n * p_a + 1 ) * (1 - p_a)^(n-1) / ( (n+1) * p_a^2 )
   return( value  )
 }
-
 
 v_a_plus_p_a_derivative <- function(p_a, n, k_covars , epsilon=0.0001){
   p_a_new <- p_a + epsilon

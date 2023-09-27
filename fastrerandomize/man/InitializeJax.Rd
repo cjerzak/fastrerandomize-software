@@ -7,9 +7,9 @@
 InitializeJax(conda_env, conda_env_required)
 }
 \arguments{
-\item{conda_env}{A character string representing the conda environment to activate. A version of JAX should live in that environment.}
+\item{conda_env}{An optioanl character string representing the conda environment to activate. A version of JAX should live in that environment. If NULL, we look in the default Python environment for JAX.}
 
-\item{conda_env_required}{A logical representing whether to force use the specified conda environment.}
+\item{conda_env_required}{A logical representing whether to force use the specified conda environment. Used only if \code{conda_env} specified.}
 }
 \value{
 This function initializes a JAX-containing conda environment as specified by \code{conda_env}. This function must be run before any others in \code{fastrerandomize}.
