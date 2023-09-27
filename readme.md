@@ -42,7 +42,7 @@ py_install("jaxlib") # install jaxlib in the default Python environment
 # now, try restarting your R session and running: 
 fastrerandomize::InitializeJAX(conda_env = NULL)
 ```
-As noted, it often helps to re-start your `R` session when debugging package installs. Note that this package has been tested successfully on Windows and Apple machines and should run well on Linux.
+As noted, it often helps to re-start your `R` session when debugging package installs. Note that this package has been tested successfully on Windows and Apple machines and should run well on Linux. If you're having trouble installing `reticulate`, try installing the latest version of `R`. 
 
 # Tutorial<a id="tutorial"></a>
 Let's get started with a tutorial. We're first going to use the package for generate a pool of acceptable rerandomizations. 
