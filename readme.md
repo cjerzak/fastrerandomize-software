@@ -3,6 +3,7 @@
 [**What is `fastrerandomize`?**](#description)
 | [**Installation**](#installation)
 | [**Tutorial**](#tutorial)
+| [**Data**](#data)
 | [**Documentation**](https://github.com/cjerzak/fastrerandomize-software/blob/main/fastrerandomize.pdf)
 
 # What is `fastrerandomize`?<a id="description"></a>
@@ -111,7 +112,7 @@ PreAnalysisEvaluation$p_value
 ```
 Currently, we support non-approximate tests and randomization generations for $n \leq 30$ (where the total number of available complete randomizations is about 155 million). In the future, we plan to increase this by both approximations and smart memory handling of rejected randomizations. 
 
-# Replication Data
+# Replication Data<a id="data"></a>
 Replication data for the package is available using the `data` command. 
 ```
 data( fastrerandomize )
