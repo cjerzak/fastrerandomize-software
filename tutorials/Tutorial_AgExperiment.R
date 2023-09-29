@@ -6,12 +6,11 @@
 # Install fastrerandomize if you haven't already
 # devtools::install_github(repo = "cjerzak/fastrerandomize-software/fastrerandomize")
 
-
 # Load the package
 library(  fastrerandomize  )
 
 # Before running any code, you'll need to initialize the JAX environment
-fastrerandomize::InitializeJAX(conda_env = "tensorflow_m1", conda_env_required = T)
+fastrerandomize::InitializeJAX(conda_env = "tensorflow_m1", conda_env_required = T) # CPU
 
 # If you didn't use a conda environment in which to install JAX, try:
 # fastrerandomize::InitializeJAX(  conda_env = NULL )
