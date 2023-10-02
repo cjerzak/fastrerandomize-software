@@ -9,7 +9,7 @@ A data frame with 968 rows and many columns containing treatment data for a Quar
 }
 \source{
 Burchardi, Konrad B et al. (2019). "Moral hazard: Experimental evidence from tenancy contracts."
-In: _The Quarterly Journal of Economics_ 134.1, pp. 281–347
+In: The Quarterly Journal of Economics 134.1, pp. 281–347
 }
 \usage{
 QJEData
