@@ -121,4 +121,13 @@ data( fastrerandomize )
 # Development 
 We welcome new features or bug fixes (you can raise an issue or submit a pull request in the repository). We will keep the package up-to-date with the latest version of the [JAX backend](https://en.wikipedia.org/wiki/Google_JAX). 
 
-
+## References<a id="references"></a>
+Connor T. Jerzak and Rebecca Goldstein. "Degrees of Randomness in Rerandomization Procedures."   *ArXiv Preprint*, 2023. [\[PDF\]](https://arxiv.org/pdf/2310.00861.pdf)
+```
+@article{JerGol2023,
+         title={Degrees of Randomness in Rerandomization Procedures},
+         author={Jerzak, Connor T. and Rebecca Goldstein},
+         journal={ArXiv Preprint},
+         year={2023}
+}
+```
