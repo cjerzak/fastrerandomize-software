@@ -128,6 +128,5 @@ Connor T. Jerzak and Rebecca Goldstein. "Degrees of Randomness in Rerandomizatio
          title={Degrees of Randomness in Rerandomization Procedures},
          author={Jerzak, Connor T. and Rebecca Goldstein},
          journal={ArXiv Preprint},
-         year={2023}
-}
+         year={2023}}
 ```
