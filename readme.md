@@ -4,6 +4,7 @@
 | [**Installation**](#installation)
 | [**Tutorial**](#tutorial)
 | [**Data**](#data)
+| [**References**](#references)
 | [**Documentation**](https://github.com/cjerzak/fastrerandomize-software/blob/main/fastrerandomize.pdf)
 
 # What is `fastrerandomize`?<a id="description"></a>
