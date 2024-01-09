@@ -5,32 +5,18 @@
 
   # Install fastrerandomize if you haven't already
   # devtools::install_github(repo = "cjerzak/fastrerandomize-software/fastrerandomize")
-
-  # Local install for development team
-  # devtools::install_github(repo = "cjerzak/fastrerandomize-software/fastrerandomize")
-
-  # Load the package
-  library(  fastrerandomize  )
-
-  # Before running any code, you'll need to initialize the JAX environment
-  # fastrerandomize::InitializeJAX(conda_env = "tensorflow_m1", conda_env_required = T) # CPU
-  fastrerandomize::InitializeJAX(conda_env = "jax_gpu_py3.11", conda_env_required = T) # CPU
-
-
-
-
-  # remote install latest version of the package
   # devtools::install_github(repo = "cjerzak/causalimages-software/causalimages")
 
-  # local install for development team
+  # Local install for development team
   # install.packages("~/Documents/causalimages-software/causalimages",repos = NULL, type = "source",force = F)
+  # install.packages("~/Documents/fastrerandomize-software/fastrerandomize",repos = NULL, type = "source",force = F)
 
   # build backend you haven't ready:
   # causalimages::BuildBackend()
 
   # run code if downloading data for the first time
   download_folder <- "~/Downloads/UgandaAnalysis.zip"
-  reSaveTfRecords <- F
+  reSaveTfRecords <- T
   if( reDownloadRawData <- F  ){
     # specify uganda data URL
     uganda_data_url <- "https://dl.dropboxusercontent.com/s/xy8xvva4i46di9d/Public%20Replication%20Data%2C%20YOP%20Experiment.zip?dl=0"
@@ -140,103 +126,39 @@
     set.seed(144L); UgandaDataProcessed <- UgandaDataProcessed[sample(1:nrow(UgandaDataProcessed)),]
   }
 
+  # subset data
+  UgandaDataProcessed <- UgandaDataProcessed[sample(1:24),]
+
   # Image heterogeneity example with tfrecords
-  {
-    # write a tf records repository
-    # whenever changes are made to the input data to AnalyzeImageHeterogeneity, WriteTfRecord() should be re-run
-    # to ensure correct ordering of data
-    tfrecord_loc <- "~/Downloads/UgandaExample.tfrecord"
-    if( reSaveTfRecords ){
+  # write a tf records repository
+  # whenever changes are made to the input data to AnalyzeImageHeterogeneity, WriteTfRecord() should be re-run
+  # to ensure correct ordering of data
+  tfrecord_loc <- "~/Downloads/GeoRerandomizeTutorial.tfrecord"
+  if( reSaveTfRecords ){
       causalimages::WriteTfRecord(  file = tfrecord_loc,
                                     uniqueImageKeys = unique(UgandaDataProcessed$geo_long_lat_key),
                                     acquireImageFxn = acquireImageRep )
-    }
-
-    # perform image heterogeneity analysis (toy example)
-    ImageHeterogeneityResults <- causalimages::AnalyzeImageHeterogeneity(
-      # data inputs
-      obsW =  UgandaDataProcessed$Wobs,
-      obsY = UgandaDataProcessed$Yobs,
-      imageKeysOfUnits =  UgandaDataProcessed$geo_long_lat_key,
-      file = tfrecord_loc, # location of tf record (use absolute file paths)
-      lat =  UgandaDataProcessed$geo_lat, # not required but helpful for dealing with redundant locations in EO data
-      long =  UgandaDataProcessed$geo_long, # not required but helpful for dealing with redundant locations in EO data
-
-      # inputs to control where visual results are saved as PDF or PNGs
-      # (these image grids are large and difficult to display in RStudio's interactive mode)
-      plotResults = T,
-      figuresPath = "~/Downloads/HeteroTutorial", # where to write analysis figures
-      figuresTag = "causalimagesTutorial",plotBands = 1L:3L,
-
-      # optional arguments for generating transportability maps
-      # here, we leave those NULL for simplicity
-      transportabilityMat = NULL, #
-
-      # other modeling options
-      nSGD = 10L, # make this larger for real applications (e.g., 2000L)
-      kClust_est = 2, # vary depending on problem. Usually < 5
-      batchSize = 16L, # make this larger for real application (e.g., 50L)
-      strides = 2L )
   }
 
-  # video heterogeneity example
-  {
-    acquireVideoRep <- function(keys) {
-      # Get image data as an array from disk
-      tmp <- acquireImageRep(keys)
+  # get representations
+  MyImageEmbeddings <- causalimages::GetImageRepresentations(
+    file  = tfrecord_loc,
+    imageKeysOfUnits = UgandaDataProcessed$geo_long_lat_key,
+    nDepth_ImageRep = 1L,
+    nWidth_ImageRep = 128L )
+  MyImageEmbeddings <- MyImageEmbeddings$ImageRepresentations
 
-      # Expand dimensions: we create a new dimension at the start
-      tmp <- array(tmp, dim = c(1, dim(tmp)))
+  # initialize fastrerandomize
+  fastrerandomize::InitializeJAX(conda_env = "jax_gpu_py3.11", conda_env_required = T) # GPU - fails on METAL backend
 
-      # Transpose dimensions to get the required order
-      tmp <- aperm(tmp, c(2, 1, 3, 4, 5))
-
-      # Swap image dimensions to see variability across time
-      tmp_ <- aperm(tmp, c(1, 2, 4, 3, 5))
-
-      # Concatenate along the second axis
-      if (requireNamespace("abind", quietly = TRUE)) {
-        tmp <- abind::abind(tmp, tmp_, along = 2)
-      } else {
-        stop("The 'abind' package is required for this function to work!")
-      }
-
-      return(tmp)
-    }
-
-    # write the tf records repository
-    tfrecord_loc_imSeq <- "~/Downloads/UgandaExampleVideo.tfrecord"
-    if(reSaveTfRecords){
-      causalimages::WriteTfRecord(  file = tfrecord_loc_imSeq,
-                                    uniqueImageKeys = unique(UgandaDataProcessed$geo_long_lat_key),
-                                    acquireImageFxn = acquireVideoRep, writeVideo = T )
-    }
-    VideoHeterogeneityResults <- causalimages::AnalyzeImageHeterogeneity(
-      # data inputs
-      obsW =  UgandaDataProcessed$Wobs,
-      obsY = UgandaDataProcessed$Yobs,
-      imageKeysOfUnits =  UgandaDataProcessed$geo_long_lat_key,
-      file = tfrecord_loc_imSeq, # location of tf record (absolute paths are safest)
-      dataType = "video",
-      lat =  UgandaDataProcessed$geo_lat, # not required but helpful for dealing with redundant locations in EO data
-      long =  UgandaDataProcessed$geo_long, # not required but helpful for dealing with redundant locations in EO data
-
-      # inputs to control where visual results are saved as PDF or PNGs
-      # (these image grids are large and difficult to display in RStudio's interactive mode)
-      plotResults = T,
-      figuresPath = "~/Downloads/HeteroTutorial",
-      plotBands = 1L:3L, figuresTag = "causalimagesTutorial",
-
-      # optional arguments for generating transportability maps
-      # here, we leave those NULL for simplicity
-      transportabilityMat = NULL, #
-
-      # other modeling options
-      nSGD = 100L, # make this larger for real applications (e.g., 2000L)
-      kClust_est = 2, # vary depending on problem. Usually < 5
-      batchSize = 16L, # make this larger for real application (e.g., 50L)
-      strides = 2L )
-  }
+  # perform rerandomization
+  candidate_randomizations_array <- fastrerandomize::GenerateRandomizations(
+    n_units = nrow(MyImageEmbeddings),
+    n_treated = nrow(MyImageEmbeddings) / 2,
+    X = MyImageEmbeddings,
+    randomization_accept_prob = 0.0001)
+  dim( np$array( candidate_randomizations_array ) )
 
   print("Done with Geo-rerandomization tutorial!")
 }
+

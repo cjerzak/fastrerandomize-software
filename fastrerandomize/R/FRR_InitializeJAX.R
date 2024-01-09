@@ -16,100 +16,30 @@
 InitializeJAX <- function(conda_env = NULL, conda_env_required = T){
   print2("Loading JAX...")
   {
-  #library(fastmatch);
   library(reticulate)
   if(!is.null(conda_env)){
-    reticulate::use_condaenv(condaenv = conda_env, required = conda_env_required)
+    try(reticulate::use_condaenv(condaenv = conda_env, required = conda_env_required),T)
   }
 
   # setup packages
   Sys.sleep(0.25)
-  jax <<- reticulate::import("jax")
-  jnp <<- reticulate::import("jax.numpy")
-  np <<- reticulate::import("numpy")
+  if("jax" %in% ls()){  jax <<- reticulate::import("jax") }
+  if("jmp" %in% ls()){  jmp <<- reticulate::import("jax.numpy") }
+  if("np" %in% ls()){  np <<- reticulate::import("numpy") }
+  if("py_gc" %in% ls()){  py_gc <<- reticulate::import("jax") }
 
   # enable 64 bit computations
   jax$config$update("jax_enable_x64", FALSE); jaxFloatType <<- jnp$float32 # use float64
-  #jaxFloatType <- jnp$float32 # # use float32
-
-  #jax$config$update('jax_platform_name', 'cpu')
-  #optax <- reticulate::import("optax")
-  #eq <- reticulate::import("equinox")
-  #diffrax <- reticulate::import("diffrax")
-  #oryx <- reticulate::import("oryx")
-  #py_gc <- reticulate::import("gc")
   JaxKey <<- function(int_){ jax$random$PRNGKey(int_)}
   SoftPlus_r <<- function(x){ log(exp(x)+1) }
-
-  LinearizeNestedList <<- function (NList, LinearizeDataFrames = FALSE, NameSep = "/",
-                                   ForceNames = FALSE){
-    stopifnot(is.character(NameSep), length(NameSep) == 1)
-    stopifnot(is.logical(LinearizeDataFrames), length(LinearizeDataFrames) ==
-                1)
-    stopifnot(is.logical(ForceNames), length(ForceNames) == 1)
-    if (!is.list(NList))
-      return(NList)
-    if (is.null(names(NList)) | ForceNames == TRUE)
-      names(NList) <- as.character(1:length(NList))
-    if (is.data.frame(NList) & LinearizeDataFrames == FALSE)
-      return(NList)
-    if (is.data.frame(NList) & LinearizeDataFrames == TRUE)
-      return(as.list(NList))
-    A <- 1
-    B <- length(NList)
-    while (A <= B) {
-      Element <- NList[[A]]
-      EName <- names(NList)[A]
-      if (is.list(Element)) {
-        Before <- if (A == 1)
-          NULL
-        else NList[1:(A - 1)]
-        After <- if (A == B)
-          NULL
-        else NList[(A + 1):B]
-        if (is.data.frame(Element)) {
-          if (LinearizeDataFrames == TRUE) {
-            Jump <- length(Element)
-            NList[[A]] <- NULL
-            if (is.null(names(Element)) | ForceNames ==
-                TRUE)
-              names(Element) <- as.character(1:length(Element))
-            Element <- as.list(Element)
-            names(Element) <- paste(EName, names(Element),
-                                    sep = NameSep)
-            NList <- c(Before, Element, After)
-          }
-          Jump <- 1
-        }
-        else {
-          NList[[A]] <- NULL
-          if (is.null(names(Element)) | ForceNames == TRUE)
-            names(Element) <- as.character(1:length(Element))
-          Element <- LinearizeNestedList(Element, LinearizeDataFrames,
-                                         NameSep, ForceNames)
-          names(Element) <- paste(EName, names(Element),
-                                  sep = NameSep)
-          Jump <- length(Element)
-          NList <- c(Before, Element, After)
-        }
-      }
-      else {
-        Jump <- 1
-      }
-      A <- A + Jump
-      B <- length(NList)
-    }
-    return(NList)
-  }
   }
   print2("Success loading JAX!")
 
   print2("Attempting setup of core JAX functions...")
   {
     expand_grid_JAX <<- function(n_treated, n_control){
-      #grid <- jnp$meshgrid(jnp$array(c(0,1L)), jnp$array(c(0,1L)), jnp$array(c(0,1L)), indexing = "ij")
       expand_grid_jax_text <- paste(rep("jnp$array(0L:1L)",times = n_units), collapse = ", ")
-      grid <- jnp$meshgrid(..., indexing='ij')
+      eval(parse(text = "grid <- jnp$meshgrid(..., indexing='ij')"))
       grid <- jnp$vstack(lapply(grid,function(zer){jnp$ravel(zer)}))
       grid <- jnp$transpose(grid)
       return( grid )
@@ -123,13 +53,11 @@ InitializeJAX <- function(conda_env = NULL, conda_env_required = T){
       InsertOnes(treat_indices_, zeros_)
     }, list(1L,NULL)))
 
-    if(T == F){
-      n_units <- 35
-      expand_grid_text <- paste(rep("0L:1L",times = n_units), collapse = ", ")
-      system.time( tmp1 <- eval(parse(text = sprintf("expand_grid_jax(%s)",expand_grid_jax_text))) )
+    if(T == F){ # checks
+      expand_grid_text <- paste(rep("0L:1L",times = n_units <- 20), collapse = ", ")
+      expand_grid_jax_text <- paste(rep("jnp$array(0L:1L)",times = n_units), collapse = ", ")
+      system.time( tmp1 <- eval(parse(text = sprintf("expand_grid_JAX(n_units,n_units/2)",expand_grid_jax_text))) )
       system.time( tmp2 <- eval(parse(text = sprintf("expand.grid(%s)",expand_grid_text))) )
-      tmp1$shape
-      dim( tmp2 )
     }
 
     RowBroadcast <- jax$vmap(function(mat, vec){
@@ -151,8 +79,7 @@ InitializeJAX <- function(conda_env = NULL, conda_env_required = T){
       FastHotel2T2(samp_, w_, n0, n1)},
       in_axes = list(NULL, 0L, NULL, NULL)) )
 
-    if(T == F){
-      # checks
+    if(T == F){ # checks
       Compositional::hotel2T2()
       samp_ <- jnp$array(matrix(rnorm(10*100),nrow=100))
       w_ <- jnp$array(sample(c(0,1), size = 100, replace =T))
@@ -161,30 +88,30 @@ InitializeJAX <- function(conda_env = NULL, conda_env_required = T){
       VectorizedFastHotel2T2(samp_, w_full, n0, n1)
     }
 
-    FastDiffInMeans <<- jax$jit( function(y_,w_, n0, n1){
+    FastDiffInMeans <<- jax$jit( FastDiffInMeans_R <<- function(y_,w_, n0, n1){
       my1 <- jnp$divide(jnp$sum(jnp$multiply(y_, w_)), n1)
       my0 <- jnp$divide(jnp$sum(jnp$multiply(y_, jnp$subtract(1.,w_))), n0)
       return( diff10 <- jnp$subtract(my1, my0) )
     })
 
-    VectorizedTakeAxis0 <<- jax$jit( function(A_, I_){
+    VectorizedTakeAxis0 <<- jax$jit( VectorizedTakeAxis0_R <<- function(A_, I_){
       jnp$expand_dims(jnp$take(A_, I_, axis = 0L), 0L)
     })
 
-    Potentisl2Obs <<- jax$jit(function(Y0__, Y1__, obsW__){
+    Potential2Obs <<- jax$jit(Potential2Obs_R <<- function(Y0__, Y1__, obsW__){
       jnp$add( jnp$multiply(Y0__, jnp$subtract(1, obsW__)),
                jnp$multiply(Y1__, obsW__))
     })
 
-    W_VectorizedFastDiffInMeans <<- jax$jit( jax$vmap(function(y_, w_, n0, n1){
-      FastDiffInMeans(y_, w_, n0, n1)},
+    W_VectorizedFastDiffInMeans <<- jax$jit( W_VectorizedFastDiffInMeans_R <<- jax$vmap(function(y_, w_, n0, n1){
+      FastDiffInMeans_R(y_, w_, n0, n1)},
       in_axes = list(NULL, 0L, NULL, NULL)) )
 
-    Y_VectorizedFastDiffInMeans <<- jax$jit( jax$vmap(function(y_, w_, n0, n1){
-      FastDiffInMeans(y_, w_, n0, n1)},
+    Y_VectorizedFastDiffInMeans <<- jax$jit( Y_VectorizedFastDiffInMeans_R <<- jax$vmap(function(y_, w_, n0, n1){
+      FastDiffInMeans_R(y_, w_, n0, n1)},
       in_axes = list(0L, NULL, NULL, NULL)) )
 
-    YW_VectorizedFastDiffInMeans <<- jax$jit( jax$vmap(function(y_, w_, n0, n1){
+    YW_VectorizedFastDiffInMeans <<- jax$jit( YW_VectorizedFastDiffInMeans_R <<- jax$vmap(function(y_, w_, n0, n1){
       W_VectorizedFastDiffInMeans(y_, w_, n0, n1)},
       in_axes = list(0L, NULL, NULL, NULL)) )
 
@@ -192,16 +119,15 @@ InitializeJAX <- function(conda_env = NULL, conda_env_required = T){
       FastDiffInMeans(y_, w_, n0, n1)},
       in_axes = list(NULL, 0L, NULL, NULL)) )
 
-    GreaterEqualMagCompare <<- jax$jit(function(NULL_, OBS_){
+    GreaterEqualMagCompare <<- jax$jit(GreaterEqualMagCompare_R <<- function(NULL_, OBS_){
       jnp$mean(jnp$greater_equal(jnp$abs(NULL_),  jnp$expand_dims(OBS_,1L)), 1L)
     })
 
     if(T == F){
-      # tests
+      # checks
       y_ <- jnp$array(rnorm(10))
       w_ <-  jnp$array(rbinom(10,size=1, prob = 0.5))
-      n0 <- jnp$array(10.)
-      n1 <- jnp$array(3.)
+      n0 <- jnp$array(10.); n1 <- jnp$array(3.)
       w_mat <- jnp$array( matrix(rbinom(100*10, size = 1, prob = 0.5),nrow = 100) )
       FastDiffInMeans(y_, w_, n0, n1)
       np$array( VectorizedFastDiffInMeans(y_, w_mat, n0, n1) )

@@ -98,8 +98,8 @@ RandomizationTest <- function(
       prior_coef_draw <- coef_prior()
       Y_0 <- X %*% prior_coef_draw
 
-      tau_samp <- rnorm(n=n_units, mean=prior_treatment_effect_mean, sd = prior_treatment_effect_SD) # assumes tau_i
-      # tau_samp <- rnorm(n=1, mean=prior_treatment_effect_mean, sd = prior_treatment_effect_SD) # assumes one tau
+      #tau_samp <- rnorm(n=n_units, mean=prior_treatment_effect_mean, sd = prior_treatment_effect_SD) # assumes tau_i
+      tau_samp <- rnorm(n=1, mean=prior_treatment_effect_mean, sd = prior_treatment_effect_SD) # assumes one tau
       Y_1 <- Y_0 + tau_samp
 
       return(cbind(Y_0, Y_1))
@@ -116,34 +116,33 @@ RandomizationTest <- function(
     M_results <- np$array( M_results )
     #if(chi_squared_approx==T){ a_threshold <- qchisq(p=prob_accept_randomization_seq[ii], df=k_covars) }
 
-    browser()
-    p_value <- sapply(np$array(a_threshold_vec), function(a_){
-          # a_ <- np$array(a_threshold_vec)[[30]]
+    GetPvals_vmapped <- jax$jit(jax$vmap( function( sampledIndex, acceptedWs_array ){
+      obsW_ <- VectorizedTakeAxis0_R(acceptedWs_array, sampledIndex)
+      obsY_array <- Potential2Obs_R(obsY0_array, obsY1_array, obsW_)
+      tau_obs <- Y_VectorizedFastDiffInMeans_R(obsY_array, obsW_, n0_array, n1_array)
+      tau_perm_null_0 <-  YW_VectorizedFastDiffInMeans_R(
+        obsY_array,  # y_ =
+        acceptedWs_array, # w_ =
+        n0_array, # n0 =
+        n1_array) # n1 =
+      p_value_inner <- GreaterEqualMagCompare_R(tau_perm_null_0, tau_obs) # pvals across yhat
+      return( p_value_inner ) #  mean here is over Yhat
+    }, in_axes = list(0L,NULL)))
+    p_value <- sapply(np$array(a_threshold_vec),   function(a_){
+      print(a_ / max(np$array(a_threshold_vec)))
+      # a_ <- np$array(a_threshold_vec)[[30]]
+      py_gc$collect()
 
-          # select acceptable randomizations based on threshold
-          acceptedWs_array <- candidate_randomizations_array[jnp$less_equal( M_results,  a_),]
-          AcceptedRandomizations <- acceptedWs_array$shape[[1]]
-          sampTheseIndices <- 0L:(AcceptedRandomizations-1L)
-          sampledIndices <- jnp$array( sample(sampTheseIndices, nSimulate_obsW, replace = T) )
-
-          p_value_outer_vec <-  jax$vmap( function( sampledIndex ){
-                obsW_ <- VectorizedTakeAxis0(acceptedWs_array, sampledIndex)
-                obsY_array <- Potentisl2Obs(obsY0_array, obsY1_array, obsW_)
-                tau_obs <- Y_VectorizedFastDiffInMeans(obsY_array,
-                                                       obsW_,
-                                                       n0_array, n1_array)
-                tau_perm_null_0 <-  YW_VectorizedFastDiffInMeans(
-                    obsY_array,  # y_ =
-                    acceptedWs_array, # t_ =
-                    n0_array, # n0 =
-                    n1_array # n1 =
-                  )
-                p_value_inner_vec <- GreaterEqualMagCompare(tau_perm_null_0, tau_obs)
-                return( jnp$mean(p_value_inner_vec) ) #  mean here is over Yhat
-          }, in_axes = 0L)(sampledIndices)
-      } )
-    suggested_randomization_accept_prob <- prob_accept_randomization_seq[ which.min(colMeans(p_value))[1] ]
-    # plot(colMeans(p_value))
+      # select acceptable randomizations based on threshold
+      acceptedWs_array <- candidate_randomizations_array[jnp$less_equal( M_results,  a_),]
+      sampTheseIndices <- 0L:((AcceptedRandomizations <- acceptedWs_array$shape[[1]])  - 1L)
+      sampledIndices <- jnp$expand_dims(jnp$array( as.integer(as.numeric(
+                              sample(as.character(sampTheseIndices), nSimulate_obsW, replace = T) ))),1L)
+      p_value_outer <-  jnp$mean(GetPvals_vmapped(sampledIndices, acceptedWs_array))
+    })
+    p_value <- np$array( p_value )
+    suggested_randomization_accept_prob <- prob_accept_randomization_seq[ which.min(p_value)[1] ]
+    plot( p_value )
   }
 
   # perform randomization inference using input data
@@ -253,8 +252,7 @@ RandomizationTest <- function(
                  tau_obs = tau_obs) )
   }
   if( simulate ){
-    return( list(p_value = colMeans( p_value ),
-                 p_value_full =  p_value ,
+    return( list(p_value = p_value,
                  suggested_randomization_accept_prob = suggested_randomization_accept_prob,
                  FI = FI,
                  tau_obs = tau_obs) )

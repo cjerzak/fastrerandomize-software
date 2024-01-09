@@ -17,8 +17,8 @@ library(  fastrerandomize  )
 t0 <- Sys.time()
 
 # Before running any code, you'll need to initialize the JAX environment
-fastrerandomize::InitializeJAX(conda_env = "tensorflow_m1", conda_env_required = T) # CPU
-#fastrerandomize::InitializeJAX(conda_env = "jax_gpu_py3.11", conda_env_required = T) # GPU - fails on METAL backend
+#fastrerandomize::InitializeJAX(conda_env = "tensorflow_m1", conda_env_required = T) # CPU
+fastrerandomize::InitializeJAX(conda_env = "jax_gpu_py3.11", conda_env_required = T) # GPU - fails on METAL backend
 
 # If you didn't use a conda environment in which to install JAX, try:
 # fastrerandomize::InitializeJAX(  conda_env = NULL )
@@ -26,8 +26,8 @@ fastrerandomize::InitializeJAX(conda_env = "tensorflow_m1", conda_env_required =
 # Note: If you leave `conda_env = NULL`, we will search in the default Python environment for JAX.
 
 # First, specify some analysis parameters
-# n_units <- 20L; n_treated <- 10L # accessible on most hardware
-n_units <- 24; n_treated <- 12L
+#n_units <- 20L; n_treated <- 10L # accessible on most hardware
+n_units <- 22; n_treated <- 12L
 
 # Generate covariate data
 X <- matrix(rnorm(n_units*5),nrow = n_units)
@@ -40,7 +40,7 @@ candidate_randomizations_array <- fastrerandomize::GenerateRandomizations(
   n_units = n_units,
   n_treated = n_treated,
   X = X,
-  randomization_accept_prob = 0.000001)
+  randomization_accept_prob = 0.0001)
 candidate_randomizations_array$shape
 
 # You can coerce candidate_randomizations_array into R like this:
@@ -68,7 +68,7 @@ ExactRandomizationTestResults$tau_obs # difference-in-means ATE estimate
 # setup acceptable randomization sequence
 n_randomizations <- choose(n_units, n_treated)
 starting_value = abs( min(log( 2/n_randomizations, base = 10 ), log(0.05,base=10)))
-prob_accept_randomization_seq <- 10^(- seq(from = starting_value, to = 1/3, length.out = 32L ) )
+prob_accept_randomization_seq <- 10^(- seq(from = starting_value, to = 1/9, length.out = 32L ) )
 
 # perform pre-design analysis (runtime: ~20 seconds)
 PreAnalysisEvaluation <- fastrerandomize::RandomizationTest(
