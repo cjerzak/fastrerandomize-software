@@ -4,7 +4,26 @@
 \alias{RandomizationTest}
 \title{Fast randomization test}
 \usage{
-RandomizationTest(X, ...)
+RandomizationTest(
+  obsW = NULL,
+  obsY = NULL,
+  X = NULL,
+  alpha = 0.05,
+  candidate_randomizations = NULL,
+  candidate_randomizations_array = NULL,
+  n0_array = NULL,
+  n1_array = NULL,
+  prior_treatment_effect_mean = NULL,
+  prior_treatment_effect_SD = NULL,
+  true_treatment_effect = NULL,
+  simulate = F,
+  coef_prior = NULL,
+  nSimulate_obsW = 50L,
+  nSimulate_obsY = 50L,
+  randomization_accept_prob = 1,
+  findFI = F,
+  c_initial = 2
+)
 }
 \arguments{
 \item{obsW}{A numeric vector where \code{0}'s correspond to control units and \code{1}'s to treated units.}

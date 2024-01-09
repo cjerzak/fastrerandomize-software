@@ -1,10 +1,6 @@
 #!/usr/bin/env Rscript
 #' This function generates simulated causal data based on specified parameters.
 #'
-#' @usage
-#'
-#' GenerateCausalData(n_units)
-#'
 #' @param n_units A numeric value specifying the total number of units in the sample.
 #' @param proportion_treated A numeric value between 0 and 1 indicating the proportion of units that receive treatment.
 #' @param k_covars A numeric value indicating the number of covariates to be generated.

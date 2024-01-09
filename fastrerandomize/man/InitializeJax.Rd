@@ -4,7 +4,7 @@
 \alias{InitializeJAX}
 \title{Initialize JAX}
 \usage{
-InitializeJax(conda_env, conda_env_required)
+InitializeJAX(conda_env = NULL, conda_env_required = T)
 }
 \arguments{
 \item{conda_env}{An optioanl character string representing the conda environment to activate. A version of JAX should live in that environment. If NULL, we look in the default Python environment for JAX.}

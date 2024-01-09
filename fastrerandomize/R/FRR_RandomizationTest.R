@@ -1,10 +1,6 @@
 #!/usr/bin/env Rscript
 #' Fast randomization test
 #'
-#' @usage
-#'
-#' RandomizationTest(X, ...)
-#'
 #' @param obsW A numeric vector where `0`'s correspond to control units and `1`'s to treated units.
 #' @param X A numeric matrix of covariates.
 #' @param obsY An optional numeric vector of observed outcomes. If not provided, the function assumes a NULL value.
@@ -97,20 +93,20 @@ RandomizationTest <- function(
   }
 
   # simulate generates new (synthetic values) of Y_obs
-  if(simulate==T){
+  if( simulate ){
     obsY1_array <- jnp$array( replicate(nSimulate_obsY, {
       prior_coef_draw <- coef_prior()
       Y_0 <- X %*% prior_coef_draw
 
-      #tau_samp <- rnorm(n=n_units, mean=prior_treatment_effect_mean, sd = prior_treatment_effect_SD)
-      tau_samp <- rnorm(n=1, mean=prior_treatment_effect_mean, sd = prior_treatment_effect_SD)
+      tau_samp <- rnorm(n=n_units, mean=prior_treatment_effect_mean, sd = prior_treatment_effect_SD) # assumes tau_i
+      # tau_samp <- rnorm(n=1, mean=prior_treatment_effect_mean, sd = prior_treatment_effect_SD) # assumes one tau
       Y_1 <- Y_0 + tau_samp
 
       return(cbind(Y_0, Y_1))
     }) )
     obsY1_array <- jnp$transpose(obsY1_array, axes = c(2L,0L,1L))
-    obsY0_array <- jnp$take(obsY1_array,0L, axis = 2L)
-    obsY1_array <- jnp$take(obsY1_array,1L, axis = 2L)
+    obsY0_array <- jnp$take(obsY1_array, 0L, axis = 2L)
+    obsY1_array <- jnp$take(obsY1_array, 1L, axis = 2L)
 
     chi_squared_approx <- F
     M_results <- jnp$squeeze(VectorizedFastHotel2T2(jnp$array( X ),
@@ -120,39 +116,38 @@ RandomizationTest <- function(
     M_results <- np$array( M_results )
     #if(chi_squared_approx==T){ a_threshold <- qchisq(p=prob_accept_randomization_seq[ii], df=k_covars) }
 
+    browser()
     p_value <- sapply(np$array(a_threshold_vec), function(a_){
-          acceptedWs_array <- jnp$take( candidate_randomizations_array,
-                                        jnp$where( jnp$less_equal( M_results,  a_))[[1]], axis = 0L)
+          # a_ <- np$array(a_threshold_vec)[[30]]
+
+          # select acceptable randomizations based on threshold
+          acceptedWs_array <- candidate_randomizations_array[jnp$less_equal( M_results,  a_),]
           AcceptedRandomizations <- acceptedWs_array$shape[[1]]
           sampTheseIndices <- 0L:(AcceptedRandomizations-1L)
+          sampledIndices <- jnp$array( sample(sampTheseIndices, nSimulate_obsW, replace = T) )
 
-          p_value_outer_vec <- c(replicate(nSimulate_obsW, {
-            obsW_ <- VectorizedTakeAxis0(acceptedWs_array,
-                                         jnp$array(sample(sampTheseIndices,1)))
-            obsY_array <- Potentisl2Obs(obsY0_array, obsY1_array, obsW_)
-            tau_obs <- Y_VectorizedFastDiffInMeans(obsY_array,
-                                                   obsW_,
-                                                   n0_array,
-                                                   n1_array)
-
-            tau_perm_null_0 <-  YW_VectorizedFastDiffInMeans(
-                obsY_array,  # y_ =
-                acceptedWs_array, # t_ =
-                n0_array, # n0 =
-                n1_array # n1 =
-              )
-            p_value_inner_vec <- np$array( GreaterEqualMagCompare(tau_perm_null_0, tau_obs) )
-            mean( p_value_inner_vec )
-          }))
+          p_value_outer_vec <-  jax$vmap( function( sampledIndex ){
+                obsW_ <- VectorizedTakeAxis0(acceptedWs_array, sampledIndex)
+                obsY_array <- Potentisl2Obs(obsY0_array, obsY1_array, obsW_)
+                tau_obs <- Y_VectorizedFastDiffInMeans(obsY_array,
+                                                       obsW_,
+                                                       n0_array, n1_array)
+                tau_perm_null_0 <-  YW_VectorizedFastDiffInMeans(
+                    obsY_array,  # y_ =
+                    acceptedWs_array, # t_ =
+                    n0_array, # n0 =
+                    n1_array # n1 =
+                  )
+                p_value_inner_vec <- GreaterEqualMagCompare(tau_perm_null_0, tau_obs)
+                return( jnp$mean(p_value_inner_vec) ) #  mean here is over Yhat
+          }, in_axes = 0L)(sampledIndices)
       } )
-    suggested_randomization_accept_prob <- prob_accept_randomization_seq[
-                                                which.min(colMeans(p_value))[1]
-                                              ]
+    suggested_randomization_accept_prob <- prob_accept_randomization_seq[ which.min(colMeans(p_value))[1] ]
     # plot(colMeans(p_value))
   }
 
   # perform randomization inference using input data
-  if(simulate == F){
+  if( !simulate ){
     tau_obs <- c(np$array( FastDiffInMeans(jnp$array(obsY),
                                            jnp$array(obsW),
                                            n0_array,
@@ -166,7 +161,7 @@ RandomizationTest <- function(
     ))
     p_value <- mean( abs(tau_perm_null_0) >= abs(tau_obs) )
 
-    if(findFI == T){
+    if( findFI ){
       obsY_array <- jnp$array( obsY )
       obsW_array <- jnp$array( obsW )
 
@@ -252,17 +247,17 @@ RandomizationTest <- function(
     }
   }
 
-  if(simulate == F){
+  if( !simulate ){
     return( list(p_value = p_value,
-                  FI = FI,
-                  tau_obs = tau_obs ))
+                 FI = FI,
+                 tau_obs = tau_obs) )
   }
-  if(simulate == T){
+  if( simulate ){
     return( list(p_value = colMeans( p_value ),
                  p_value_full =  p_value ,
                  suggested_randomization_accept_prob = suggested_randomization_accept_prob,
                  FI = FI,
-                 tau_obs = tau_obs ))
+                 tau_obs = tau_obs) )
   }
 }
 
@@ -271,10 +266,6 @@ RandomizationTest <- function(
 
 #!/usr/bin/env Rscript
 #' Fast generation of all possible complete randomizations given target number of experimental units.
-#'
-#' @usage
-#'
-#' GenerateRandomizations(n_units, n_treated)
 #'
 #' @param n_units A integer specifying total number of experimental units.
 #' @param n_treated An integer specifying total number of treated units.
@@ -299,10 +290,10 @@ GenerateRandomizations <- function(n_units, n_treated,
   if(!is.null(X)){
     n0_array <- jnp$array(  (n_units - n_treated) )
     n1_array <- jnp$array(  n_treated )
+    # samp_ <- jnp$array( X ); w_ <- jnp$array(candidate_randomizations, dtype = jnp$float32); n0 <- n1 <- n0_array
     M_results <-  VectorizedFastHotel2T2(jnp$array( X ) ,
                                          jnp$array(candidate_randomizations, dtype = jnp$float32),
-                                         n0_array,
-                                         n1_array)
+                                         n0_array, n1_array)
     a_threshold <- np$array(jnp$quantile( M_results,  jnp$array(randomization_accept_prob)))[[1]]
     M_results <- c(np$array( M_results ))
     candidate_randomizations <- jnp$take(candidate_randomizations,

@@ -1,4 +1,5 @@
-# Tutorial with an agricutlure experiment
+{
+# Agricutlure experiment tutorial
 
 # Install devtools if needed
 # install.packages("devtools")
@@ -12,9 +13,12 @@
 # Load the package
 library(  fastrerandomize  )
 
+# start timer
+t0 <- Sys.time()
+
 # Before running any code, you'll need to initialize the JAX environment
 fastrerandomize::InitializeJAX(conda_env = "tensorflow_m1", conda_env_required = T) # CPU
-#fastrerandomize::InitializeJAX(conda_env = "jax_gpu_py3.11", conda_env_required = T) # GPU
+#fastrerandomize::InitializeJAX(conda_env = "jax_gpu_py3.11", conda_env_required = T) # GPU - fails on METAL backend
 
 # If you didn't use a conda environment in which to install JAX, try:
 # fastrerandomize::InitializeJAX(  conda_env = NULL )
@@ -22,7 +26,8 @@ fastrerandomize::InitializeJAX(conda_env = "tensorflow_m1", conda_env_required =
 # Note: If you leave `conda_env = NULL`, we will search in the default Python environment for JAX.
 
 # First, specify some analysis parameters
-n_units <- 20; n_treated <- 10
+# n_units <- 20L; n_treated <- 10L # accessible on most hardware
+n_units <- 24; n_treated <- 12L
 
 # Generate covariate data
 X <- matrix(rnorm(n_units*5),nrow = n_units)
@@ -35,7 +40,7 @@ candidate_randomizations_array <- fastrerandomize::GenerateRandomizations(
   n_units = n_units,
   n_treated = n_treated,
   X = X,
-  randomization_accept_prob = 0.001)
+  randomization_accept_prob = 0.000001)
 candidate_randomizations_array$shape
 
 # You can coerce candidate_randomizations_array into R like this:
@@ -81,3 +86,7 @@ PreAnalysisEvaluation$suggested_randomization_accept_prob
 # expected p-values for all values of randomization_accept_prob input
 PreAnalysisEvaluation$p_value
 
+# final print message
+print(  "Agricultural experiment tutorial complete! Timing details:"  )
+print(  Sys.time() - t0  )
+}

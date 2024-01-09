@@ -88,3 +88,9 @@ v_a_plus_p_a_derivative <- function(p_a, n, k_covars , epsilon=0.0001){
   return_value <- numerator / denominator
   return( return_value )
 }
+
+print2 <- function(text, quiet = F){
+  if(!quiet){
+    print( sprintf("[%s] %s" ,format(Sys.time(), "%Y-%m-%d %H:%M:%S"),text) )
+  }
+}

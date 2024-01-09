@@ -1,10 +1,6 @@
 #!/usr/bin/env Rscript
 #' Initialize JAX
 #'
-#' @usage
-#'
-#' InitializeJax(conda_env, conda_env_required)
-#'
 #' @param conda_env An optioanl character string representing the conda environment to activate. A version of JAX should live in that environment. If NULL, we look in the default Python environment for JAX.
 #' @param conda_env_required A logical representing whether to force use the specified conda environment. Used only if `conda_env` specified.
 #'
@@ -18,7 +14,7 @@
 #' @md
 
 InitializeJAX <- function(conda_env = NULL, conda_env_required = T){
-  print("Loading JAX...")
+  print2("Loading JAX...")
   {
   #library(fastmatch);
   library(reticulate)
@@ -106,9 +102,9 @@ InitializeJAX <- function(conda_env = NULL, conda_env_required = T){
     return(NList)
   }
   }
-  print("Success loading JAX!")
+  print2("Success loading JAX!")
 
-  print("Attempting setup of core JAX functions...")
+  print2("Attempting setup of core JAX functions...")
   {
     expand_grid_JAX <<- function(n_treated, n_control){
       #grid <- jnp$meshgrid(jnp$array(c(0,1L)), jnp$array(c(0,1L)), jnp$array(c(0,1L)), indexing = "ij")
@@ -136,22 +132,19 @@ InitializeJAX <- function(conda_env = NULL, conda_env_required = T){
       dim( tmp2 )
     }
 
-    FastHotel2T2 <<- jax$jit( function(samp_, w_, n0, n1){
+    RowBroadcast <- jax$vmap(function(mat, vec){
+        jnp$multiply(mat, vec)}, in_axes = list(1L, NULL))
+    FastHotel2T2 <<- ( function(samp_, w_, n0, n1){
       # set up calc
-      RowBroadcast <- jax$vmap(function(mat, vec){
-        jnp$multiply(mat, vec)},
-        in_axes = list(1L, NULL))
       xbar1 <- jnp$divide(jnp$sum(RowBroadcast(samp_,w_),1L,keepdims = T), n1)
       xbar2 <- jnp$divide(jnp$sum(RowBroadcast(samp_,jnp$subtract(1.,w_)),1L,keepdims = T), n0)
-      CovPooled <- jnp$cov(samp_, rowvar = F)
       CovWts <- jnp$add(jnp$reciprocal(n0), jnp$reciprocal(n1))
+      # CovPooled <- jnp$cov(samp_, rowvar = F); CovInv <- jnp$linalg$inv( jnp$multiply(CovPooled,CovWts) ) # for CPU, tranpose fails on GPU
+      CovPooled <- jnp$var(samp_,0L); CovInv <- jnp$diag( jnp$reciprocal( jnp$multiply(CovPooled,CovWts) )) # for GPU
+
       xbar_diff <- jnp$subtract(xbar1, xbar2)
 
-      # perform calc
-      Tstat <- jnp$matmul(
-        jnp$matmul(jnp$transpose(xbar_diff),
-                   jnp$linalg$inv( jnp$multiply(CovPooled,CovWts) )),
-        xbar_diff)
+      Tstat <- jnp$matmul(jnp$matmul(jnp$transpose(xbar_diff), CovInv) , xbar_diff)
     })
 
     VectorizedFastHotel2T2 <<- jax$jit( jax$vmap(function(samp_, w_, n0, n1){
@@ -159,7 +152,7 @@ InitializeJAX <- function(conda_env = NULL, conda_env_required = T){
       in_axes = list(NULL, 0L, NULL, NULL)) )
 
     if(T == F){
-      # tests
+      # checks
       Compositional::hotel2T2()
       samp_ <- jnp$array(matrix(rnorm(10*100),nrow=100))
       w_ <- jnp$array(sample(c(0,1), size = 100, replace =T))
@@ -227,7 +220,7 @@ InitializeJAX <- function(conda_env = NULL, conda_env_required = T){
       Y1_under_null_pseudo <- jnp$add(Y0_under_null,  jnp$multiply(treatment_pseudo, tau_pseudo))
 
       #Yobs_pseudo <- Y1_under_null_pseudo*treatment_pseudo + Y0_under_null * (1-treatment_pseudo)
-      Yobs_pseudo <- jnp$add(jnp$multiply(Y1_under_null_pseudo,treatment_pseudo),
+      Yobs_pseudo <- jnp$add(jnp$multiply(Y1_under_null_pseudo, treatment_pseudo),
                              jnp$multiply(Y0_under_null, jnp$subtract(1., treatment_pseudo)))
 
       #stat_ <- mean(Yobs_pseudo[treatment_pseudo == 1]) - mean(Yobs_pseudo[treatment_pseudo == 0])
@@ -248,5 +241,5 @@ InitializeJAX <- function(conda_env = NULL, conda_env_required = T){
                                  n1_array)
     }, in_axes = list(0L, NULL, NULL, NULL, NULL, NULL)) )
   }
-  print("Success setting up core JAX functions!")
+  print2("Success setting up core JAX functions!")
 }

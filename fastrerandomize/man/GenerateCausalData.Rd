@@ -4,7 +4,18 @@
 \alias{GenerateCausalData}
 \title{This function generates simulated causal data based on specified parameters.}
 \usage{
-GenerateCausalData(n_units)
+GenerateCausalData(
+  n_units,
+  proportion_treated,
+  k_covars,
+  rho,
+  SD_inherent,
+  treatment_effect_mean,
+  treatment_effect_SD,
+  covariates_SD,
+  Y0_coefficients = NULL,
+  Y1_coefficients = NULL
+)
 }
 \arguments{
 \item{n_units}{A numeric value specifying the total number of units in the sample.}
