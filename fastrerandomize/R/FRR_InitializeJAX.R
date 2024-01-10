@@ -23,10 +23,10 @@ InitializeJAX <- function(conda_env = NULL, conda_env_required = T){
 
   # setup packages
   Sys.sleep(0.25)
-  if("jax" %in% ls()){  jax <<- reticulate::import("jax") }
-  if("jmp" %in% ls()){  jmp <<- reticulate::import("jax.numpy") }
-  if("np" %in% ls()){  np <<- reticulate::import("numpy") }
-  if("py_gc" %in% ls()){  py_gc <<- reticulate::import("jax") }
+  if(!"jax" %in% ls()){  jax <<- reticulate::import("jax") }
+  if(!"jnp" %in% ls()){  jnp <<- reticulate::import("jax.numpy") }
+  if(!"np" %in% ls()){  np <<- reticulate::import("numpy") }
+  if(!"py_gc" %in% ls()){  py_gc <<- reticulate::import("gc") }
 
   # enable 64 bit computations
   jax$config$update("jax_enable_x64", FALSE); jaxFloatType <<- jnp$float32 # use float64

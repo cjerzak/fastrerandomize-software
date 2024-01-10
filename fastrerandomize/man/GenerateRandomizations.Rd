@@ -4,7 +4,12 @@
 \alias{GenerateRandomizations}
 \title{Fast generation of all possible complete randomizations given target number of experimental units.}
 \usage{
-GenerateRandomizations(n_units, n_treated)
+GenerateRandomizations(
+  n_units,
+  n_treated,
+  X = NULL,
+  randomization_accept_prob = 1
+)
 }
 \arguments{
 \item{n_units}{A integer specifying total number of experimental units.}
