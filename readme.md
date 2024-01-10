@@ -7,6 +7,8 @@
 | [**References**](#references)
 | [**Documentation**](https://github.com/cjerzak/fastrerandomize-software/blob/main/fastrerandomize.pdf)
 
+*Note:* `fastrerandomize` has been successfully tested on CPU, CUDA, and METAL backends. 
+
 # What is `fastrerandomize`?<a id="description"></a>
 The `fastrerandomize` contains functions such as `RandomizationTest`, which offers a streamlined approach for performing randomization tests after using rerandomization in the research design. 
 
