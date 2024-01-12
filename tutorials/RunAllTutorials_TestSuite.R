@@ -14,7 +14,7 @@
     t_ <- try(source("~/Documents/fastrerandomize-software/tutorials/AgExperiment_Tutorial.R"),T)
     if("try-error" %in% class(t_)){ stop("Failed at Ag experiment tutorial...") }
 
-    print("Starting geo-rerandomization tutorial..."); setwd("~");
+    Sys.sleep(1L);print("Starting geo-rerandomization tutorial..."); setwd("~");
     t_ <- try(source("~/Documents/fastrerandomize-software/tutorials/GeoRR_Tutorial.R"),T)
     if("try-error" %in% class(t_)){ stop("Failed at geo-rerandomization tutorial...") }
   }, T)

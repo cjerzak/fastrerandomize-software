@@ -117,6 +117,7 @@ RandomizationTest <- function(
     #if(chi_squared_approx==T){ a_threshold <- qchisq(p=prob_accept_randomization_seq[ii], df=k_covars) }
 
     GetPvals_vmapped <- jax$jit(jax$vmap( function( sampledIndex, acceptedWs_array ){
+      print2("Jitting...")
       obsW_ <- VectorizedTakeAxis0_R(acceptedWs_array, sampledIndex)
       obsY_array <- Potential2Obs_R(obsY0_array, obsY1_array, obsW_)
       tau_obs <- Y_VectorizedFastDiffInMeans_R(obsY_array, obsW_, n0_array, n1_array)
