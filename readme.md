@@ -133,3 +133,5 @@ Connor T. Jerzak and Rebecca Goldstein. "Degrees of Randomness in Rerandomizatio
          journal={ArXiv Preprint},
          year={2023}}
 ```
+
+[<img src="https://i0.wp.com/connorjerzak.com/wp-content/uploads/2024/08/RerandomViz2.png?w=1280&ssl=1" width="500" height="400">](https://arxiv.org/abs/2310.00861.pdf)
