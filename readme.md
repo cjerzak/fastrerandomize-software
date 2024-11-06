@@ -26,7 +26,7 @@ We employ a [JAX backend](https://en.wikipedia.org/wiki/Google_JAX) to make exac
 library(  fastrerandomize  )  
 
 # Before running any code, you'll need to initialize the JAX environment 
-fastrerandomize::InitializeJAX(conda_env = "tensorflow_m1", conda_env_required = T)
+fastrerandomize::InitializeJAX(conda_env = "jax_cpu", conda_env_required = T)
 
 # If JAX is not in a conda environment, try: 
 # fastrerandomize::InitializeJAX(conda_env = NULL)
