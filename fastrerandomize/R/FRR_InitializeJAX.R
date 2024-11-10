@@ -62,6 +62,7 @@ InitializeJAX <- function(conda_env = NULL, conda_env_required = T){
 
     RowBroadcast <- jax$vmap(function(mat, vec){
         jnp$multiply(mat, vec)}, in_axes = list(1L, NULL))
+
     FastHotel2T2 <<- ( function(samp_, w_, n0, n1){
       # set up calc
       xbar1 <- jnp$divide(jnp$sum(RowBroadcast(samp_,w_),1L,keepdims = T), n1)
