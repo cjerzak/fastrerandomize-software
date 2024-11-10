@@ -261,17 +261,52 @@ RandomizationTest <- function(
 }
 
 
-
-
 #!/usr/bin/env Rscript
-#' Fast generation of all possible complete randomizations given target number of experimental units.
+#' Generate All Possible Complete Randomizations
 #'
-#' @param n_units A integer specifying total number of experimental units.
-#' @param n_treated An integer specifying total number of treated units.
+#' This function generates all possible complete randomizations for an experiment given the total number of units and number of treated units. 
+#' It can optionally filter randomizations based on covariate balance using a threshold function.
 #'
-#' @return A JAX array containing all possible complete randomizations.
+#' @param n_units An integer specifying the total number of experimental units
+#' @param n_treated An integer specifying the number of units to be assigned to treatment
+#' @param X A numeric matrix of covariates used for balance checking. Default is NULL
+#' @param randomization_accept_prob A numeric value between 0 and 1 specifying the probability threshold for accepting randomizations based on balance. Default is 1
+#' @param threshold_func A JAX function that computes a balance measure for each randomization. Must be vectorized using jax$vmap with in_axes = list(NULL, 0L, NULL, NULL), and inputs covariates (matrix of X), treatment_assignment (vector of 0s and 1s), n0 (scalar), n1 (scalar). Default is VectorizedFastHotel2T2 which uses Hotelling's T^2 statistic
+#'
+#' @return A JAX array containing the accepted randomizations, where each row represents one possible treatment assignment vector
+#'
 #' @examples
-#' # For a tutorial, see
+#' Example threshold function for covariate balance
+#' 
+#' @param covariates A JAX array of covariates (matrix)
+#' @param treatment_assignment A JAX array of treatment assignments (0/1 vector)
+#' @param n0 A JAX array containing number of control units
+#' @param n1 A JAX array containing number of treated units
+#' @return A JAX array containing the Euclidean distance between treatment/control means
+#' 
+#' @examples
+#' covariates <- jnp$array(matrix(rnorm(100),nrow=10))
+#' treatment_assignment <- jnp$array(sample(c(0,1), size = 10, replace =T))
+#' n0 <- jnp$array(5)
+#' n1 <- jnp$array(5)
+#'
+#' my_threshold_func <- function(covariates, treatment_assignment, n0, n1){
+#'   # Create boolean masks
+#'   mask_c <- treatment_assignment == 0
+#'   mask_t <- treatment_assignment == 1
+#' 
+#'   xbar_c <- jnp$mean(jnp$where(mask_c$reshape(c(-1L,1L)), covariates, 0L), axis=0L)
+#'   xbar_t <- jnp$mean(jnp$where(mask_t$reshape(c(-1L,1L)), covariates, 0L), axis=0L)
+#' 
+#'   dist_ <- jnp$linalg$norm(xbar_t - xbar_c, axis=0L)
+#'   return(dist_)
+#' }
+#' Vectorized version of threshold function
+#' @note Uses JAX vmap to vectorize the threshold function
+#' my_threshold_func_vec <- jax$vmap(my_threshold_func, in_axes = list(NULL, 0L, NULL, NULL))
+#' Example usage of GenerateRandomizations with custom threshold function
+#' rand <- GenerateRandomizations(10L, 5L, X = X, randomization_accept_prob = 0.5, threshold_func = my_threshold_func_vec)
+#' # For examples, see:
 #' # github.com/cjerzak/fastrerandomization-software
 #'
 #' @export
@@ -279,7 +314,8 @@ RandomizationTest <- function(
 
 GenerateRandomizations <- function(n_units, n_treated,
                                    X = NULL,
-                                   randomization_accept_prob = 1){
+                                   randomization_accept_prob = 1,
+                                   threshold_func = VectorizedFastHotel2T2){
   # Get all combinations of positions to set to 1
   combinations <- jnp$array(  combn(n_units, n_treated) - 1L )
   ZerosHolder <- jnp$zeros(as.integer(n_units), dtype=jnp$int32)
@@ -287,17 +323,33 @@ GenerateRandomizations <- function(n_units, n_treated,
                                              ZerosHolder)
 
   if(!is.null(X)){
-    n0_array <- jnp$array(  (n_units - n_treated) )
-    n1_array <- jnp$array(  n_treated )
-    # samp_ <- jnp$array( X ); w_ <- jnp$array(candidate_randomizations, dtype = jnp$float32); n0 <- n1 <- n0_array
-    M_results <-  VectorizedFastHotel2T2(jnp$array( X ) ,
-                                         jnp$array(candidate_randomizations, dtype = jnp$float32),
-                                         n0_array, n1_array)
-    a_threshold <- np$array(jnp$quantile( M_results,  jnp$array(randomization_accept_prob)))[[1]]
-    M_results <- c(np$array( M_results ))
-    candidate_randomizations <- jnp$take(candidate_randomizations,
-                                         indices = jnp$array(which(M_results <= a_threshold)-1L),
-                                         axis = 0L)
+      # Set up sample sizes for treatment/control
+      n0_array <- jnp$array(  (n_units - n_treated) )
+      n1_array <- jnp$array(  n_treated )
+      
+      # Calculate balance measure (Hotelling T²) for each candidate randomization
+      M_results <-  threshold_func(
+          jnp$array( X ),                    # Covariates
+          jnp$array(candidate_randomizations, dtype = jnp$float32),  # Possible assignments
+          n0_array, 
+          n1_array                 # Sample sizes
+      )
+      
+      # Find acceptance threshold based on specified quantile
+      a_threshold <- np$array(jnp$quantile( 
+          M_results,  
+          jnp$array(randomization_accept_prob)
+      ))[[1]]
+      
+      # Convert to regular array
+      M_results <- c(np$array( M_results ))
+      
+      # Keep only randomizations with balance measure below threshold
+      candidate_randomizations <- jnp$take(
+          candidate_randomizations,
+          indices = jnp$array(which(M_results <= a_threshold)-1L),
+          axis = 0L
+      )
   }
 
   return( candidate_randomizations )
