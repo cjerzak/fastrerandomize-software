@@ -339,7 +339,8 @@ GenerateRandomizations <- function(n_units, n_treated,
 #' @param threshold_func A JAX function that computes a balance measure for each randomization. Must be vectorized using jax$vmap with in_axes = list(NULL, 0L, NULL, NULL), and inputs covariates (matrix of X), treatment_assignment (vector of 0s and 1s), n0 (scalar), n1 (scalar). Default is VectorizedFastHotel2T2 which uses Hotelling's T^2 statistic
 #' @param max_draws An integer specifying the maximum number of randomizations to draw. Default is 10000
 #' @return A JAX array containing the accepted randomizations, where each row represents one possible treatment assignment vector
-
+#' @export
+#' @md
 GenerateRandomizations_MonteCarlo <- function(n_units, n_treated,
                                               X = NULL,
                                               randomization_accept_prob = 1,
