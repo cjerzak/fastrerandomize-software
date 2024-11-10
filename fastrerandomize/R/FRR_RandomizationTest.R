@@ -57,7 +57,8 @@ RandomizationTest <- function(
                                nSimulate_obsY = 50L,
                                randomization_accept_prob = 1.,
                                findFI = F,
-                               c_initial = 2){
+                               c_initial = 2
+                               ){
   tau_obs <- FI <- covers_truth <- NULL
 
   if(!simulate){
@@ -261,7 +262,6 @@ RandomizationTest <- function(
 }
 
 
-#!/usr/bin/env Rscript
 #' Generate All Possible Complete Randomizations
 #'
 #' This function generates all possible complete randomizations for an experiment given the total number of units and number of treated units. 
@@ -274,35 +274,7 @@ RandomizationTest <- function(
 #' @param threshold_func A JAX function that computes a balance measure for each randomization. Must be vectorized using jax$vmap with in_axes = list(NULL, 0L, NULL, NULL), and inputs covariates (matrix of X), treatment_assignment (vector of 0s and 1s), n0 (scalar), n1 (scalar). Default is VectorizedFastHotel2T2 which uses Hotelling's T^2 statistic
 #'
 #' @return A JAX array containing the accepted randomizations, where each row represents one possible treatment assignment vector
-#'
-#' @examples
-#' Example threshold function for covariate balance
-#' 
-#' @param covariates A JAX array of covariates (matrix)
-#' @param treatment_assignment A JAX array of treatment assignments (0/1 vector)
-#' @param n0 A JAX array containing number of control units
-#' @param n1 A JAX array containing number of treated units
-#' @return A JAX array containing the Euclidean distance between treatment/control means
-#' 
-#' @examples
-#' covariates <- jnp$array(matrix(rnorm(100),nrow=10))
-#' treatment_assignment <- jnp$array(sample(c(0,1), size = 10, replace =T))
-#' n0 <- jnp$array(5)
-#' n1 <- jnp$array(5)
-#'
-#' my_threshold_func <- function(covariates, treatment_assignment, n0, n1){
-#'   # Create boolean masks
-#'   mask_c <- treatment_assignment == 0
-#'   mask_t <- treatment_assignment == 1
-#' 
-#'   xbar_c <- jnp$mean(jnp$where(mask_c$reshape(c(-1L,1L)), covariates, 0L), axis=0L)
-#'   xbar_t <- jnp$mean(jnp$where(mask_t$reshape(c(-1L,1L)), covariates, 0L), axis=0L)
-#' 
-#'   dist_ <- jnp$linalg$norm(xbar_t - xbar_c, axis=0L)
-#'   return(dist_)
-#' }
-#' Vectorized version of threshold function
-#' @note Uses JAX vmap to vectorize the threshold function
+
 #' my_threshold_func_vec <- jax$vmap(my_threshold_func, in_axes = list(NULL, 0L, NULL, NULL))
 #' Example usage of GenerateRandomizations with custom threshold function
 #' rand <- GenerateRandomizations(10L, 5L, X = X, randomization_accept_prob = 0.5, threshold_func = my_threshold_func_vec)
@@ -353,4 +325,100 @@ GenerateRandomizations <- function(n_units, n_treated,
   }
 
   return( candidate_randomizations )
+}
+
+#' Draws a Random Sample of Acceptable Randomizations from All Possible Complete Randomizations
+#' 
+#' This function is the stochastic version of GenerateRandomizations. It generates max_draws number of complete randomizations for an experiment given the total number of units and number of treated units. 
+#' It can optionally filter randomizations based on covariate balance using a threshold function.
+#'
+#' @param n_units An integer specifying the total number of experimental units
+#' @param n_treated An integer specifying the number of units to be assigned to treatment
+#' @param X A numeric matrix of covariates used for balance checking. Default is NULL
+#' @param randomization_accept_prob A numeric value between 0 and 1 specifying the probability threshold for accepting randomizations based on balance. Default is 1
+#' @param threshold_func A JAX function that computes a balance measure for each randomization. Must be vectorized using jax$vmap with in_axes = list(NULL, 0L, NULL, NULL), and inputs covariates (matrix of X), treatment_assignment (vector of 0s and 1s), n0 (scalar), n1 (scalar). Default is VectorizedFastHotel2T2 which uses Hotelling's T^2 statistic
+#' @param max_draws An integer specifying the maximum number of randomizations to draw. Default is 10000
+#' @return A JAX array containing the accepted randomizations, where each row represents one possible treatment assignment vector
+
+GenerateRandomizations_MonteCarlo <- function(n_units, n_treated,
+                                              X = NULL,
+                                              randomization_accept_prob = 1,
+                                              threshold_func = VectorizedFastHotel2T2, 
+                                              max_draws = 100000, seed = 42){
+py_run_string("
+import jax
+import jax.numpy as jnp
+
+def batch_permutation(key, base_vector, num_perms):
+    # Broadcast base_vector to match the number of permutations
+    # Shape becomes (num_perms, len(base_vector))
+    base_vector = jnp.broadcast_to(base_vector, (num_perms, len(base_vector)))
+    
+    # Generate permutations
+    keys = jax.random.split(key, num_perms)
+    perms = jax.vmap(jax.random.permutation)(keys, base_vector)
+    return perms
+")
+    max_rand_num = choose(n_units, n_treated)
+    assert_that(max_draws <= max_rand_num, msg = paste0("max_draws must be less than or equal to the number of possible randomizations, which is ", max_rand_num, "."))
+
+    # Define the base vector: 1s for treated, 0s for control
+    base_vector <- c(rep(1L, n_treated), rep(0L, n_units - n_treated))
+
+    # Convert base_vector to a JAX array
+    base_vector_jax <- jnp$array(as.integer(base_vector), dtype = jnp$int32)
+    
+    # Initialize JAX random key
+    # You can set a seed for reproducibility
+    key <- jax$random$PRNGKey(as.integer(seed))
+    
+    # Call the batch_permutation function
+    perms <- py$batch_permutation(key, base_vector_jax, as.integer(max_draws))
+    assert_that(all(dim(perms) == c(max_draws, n_units)), msg = paste0("perms must have dimensions ", max_draws, " x ", n_units, "."))
+
+    if (!is.null(X)){
+        # Set up sample sizes for treatment/control
+        n0_array <- jnp$array(as.integer(n_units - n_treated))
+        n1_array <- jnp$array(as.integer(n_treated))
+        
+        # Convert X to JAX array
+        X_jax <- jnp$array(as.matrix(X), dtype = jnp$float32)
+        
+        
+        # Calculate balance measure (Hotelling T²) for each candidate randomization
+        M_results <- threshold_func(
+        X_jax,                     # Covariates
+        perms,  # Possible assignments
+        n0_array, 
+        n1_array                 # Sample sizes
+        )
+        
+        # Find acceptance threshold based on specified quantile
+        a_threshold <- jnp$quantile( 
+        M_results,  
+        jnp$array(randomization_accept_prob)
+        )
+
+        float_num_to_accept = max_draws * randomization_accept_prob
+        if (float_num_to_accept < 1){
+            warning("randomization_accept_prob is less than 1, so we will accept at least one randomization.")
+        }
+
+        num_to_accept = ceiling(float_num_to_accept)
+        if (num_to_accept < 1){
+            num_to_accept = 1
+        }
+        
+        # Get indices of M_results sorted in ascending order and select top randomizations
+        M_results <- jnp$squeeze(M_results)
+        sorted_indices <- jnp$argsort(M_results)
+        indices_to_keep <- jnp$array(sorted_indices[0:num_to_accept])
+        indices_to_keep <- jnp$array(indices_to_keep, dtype = jnp$int32)
+        candidate_randomizations = jnp$take(perms, indices_to_keep, axis=0L)
+        assert_that(all(dim(candidate_randomizations) == c(num_to_accept, n_units)), 
+                    msg = paste0("candidate_randomizations must have dimensions ", 
+                               num_to_accept, " x ", n_units, "."))
+    }
+    
+    return(candidate_randomizations)
 }
