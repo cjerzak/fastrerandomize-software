@@ -24,7 +24,7 @@
 #' @param Y1_coefficients An optional numeric vector specifying the coefficients for the treated outcome model. If not provided, the function assumes a NULL value, and the coefficients are drawn from a normal distribution with decreasing variance.
 #'
 #' @return A list consisting of \itemize{
-#'   \item `data_matrix` A data frame containing the simulated covariates and outcomes for both control (Y0) and treatment (Y1) groups.
+#'   \item `data_matrix` A data frame containing the simulated covariates and outcomes for both control (Y0) and treatment (Y1) groups. Access them through `data_matrix$Y0` and `data_matrix$Y1`.
 #'   \item `Y0_coefficients` A numeric vector representing the coefficients used for the control outcome model.
 #'   \item `Y1_coefficients` A numeric vector representing the coefficients used for the treated outcome model.
 #' }
@@ -76,3 +76,83 @@ GenerateCausalData <- function(n_units, proportion_treated, k_covars, rho, SD_in
               "Y0_coefficients" = Y0_coefficients,
               "Y1_coefficients" = Y1_coefficients))
 }
+
+
+
+#' Perform sanity checks on synthetic data
+#'
+#' This function performs several sanity checks on synthetic data to ensure the quality
+#' of the generated dataset and the strength of relationships between variables.
+#'
+#' @param synthetic_data A list containing:
+#'   \itemize{
+#'     \item data_matrix - Matrix containing the synthetic data
+#'     \item Y0_coefficients - Coefficients for potential outcome Y0
+#'     \item Y1_coefficients - Coefficients for potential outcome Y1
+#'   }
+#'
+#' @return A list of 4 linear models:
+#'   \itemize{
+#'     \item lm_model_Y0 - Linear model for Y0 ~ X
+#'     \item lm_model_Y1 - Linear model for Y1 ~ X
+#'     \item lm_model_obsY - Linear model for observed Y ~ X
+#'     \item lm_model_obsY_obsW - Linear model for treatment effect
+#'   }
+#'
+#' @details
+#' The function performs the following checks:
+#' 1. Verifies R-squared > 0.1 for Y0 and Y1 regressed on X
+#' 2. Checks out-of-sample R-squared > 0.1 for Y0 and Y1 predictions
+#' 3. Confirms treatment effect is statistically significant (p < 0.05)
+#'
+#' @examples
+#' \dontrun{
+#' synthetic_data <- generate_synthetic_data()
+#' models <- sanity_check_synthetic_data(synthetic_data)
+#' }
+#' @md
+#' @export
+sanity_check_synthetic_data <- function(synthetic_data) {
+            data_matrix <- synthetic_data$data_matrix
+            Y0_coefficients <- synthetic_data$Y0_coefficients
+            Y1_coefficients <- synthetic_data$Y1_coefficients
+            Y0 <- data_matrix$Y0
+            Y1 <- data_matrix$Y1
+            obsW <- sample(c(rep(0, length(Y0)/2), rep(1, length(Y0)/2)), replace = FALSE)
+            obsY <- Y0 * (1 - obsW) + Y1 * obsW
+            X <- data_matrix[,1:ncol(X)]
+            X <- as.matrix(X)
+            data_matrix <- synthetic_data$data_matrix
+            Y0_coefficients <- synthetic_data$Y0_coefficients
+            Y1_coefficients <- synthetic_data$Y1_coefficients
+            Y0 <- data_matrix$Y0
+            Y1 <- data_matrix$Y1
+            obsW <- sample(c(rep(0, length(Y0)/2), rep(1, length(Y0)/2)), replace = FALSE)
+            obsY <- Y0 * (1 - obsW) + Y1 * obsW
+            X <- data_matrix[,1:ncol(X)]
+            X <- as.matrix(X)
+
+            lm_model_Y0 <- lm(Y0 ~ X)
+            assert_that(summary(lm_model_Y0)$r.squared > 0.1, msg = "R-squared for Y0 is not greater than 0.1")
+            lm_model_Y1 <- lm(Y1 ~ X)
+            assert_that(summary(lm_model_Y1)$r.squared > 0.1, msg = "R-squared for Y1 is not greater than 0.1")
+            lm_model_obsY <- lm(obsY ~ X)
+            assert_that(summary(lm_model_obsY)$r.squared > 0.1, msg = "R-squared for obsY is not greater than 0.1")
+            
+            # Calculate Out of Sample R-squared for Y0 and Y1
+            Y0_mean <- mean(Y0)
+            Y1_mean <- mean(Y1)
+            Y0_pred <- X %*% Y0_coefficients
+            Y1_pred <- X %*% Y1_coefficients + 0.5
+            Y0_r2 <- 1 - sum((Y0 - Y0_pred)^2) / sum((Y0 - Y0_mean)^2)
+            Y1_r2 <- 1 - sum((Y1 - Y1_pred)^2) / sum((Y1 - Y1_mean)^2)
+            assert_that(Y0_r2 > 0.1, msg = "R-squared for Y0 is not greater than 0.1")
+            assert_that(Y1_r2 > 0.1, msg = "R-squared for Y1 is not greater than 0.1")
+
+            # Fit linear model and extract p-value for treatment effect
+            lm_model_obsY_obsW <- lm(obsY ~ obsW)
+            treatment_pval <- summary(lm_model_obsY_obsW)$coefficients["obsW", "Pr(>|t|)"]
+            assert_that(!is.na(treatment_pval), msg = "Treatment effect p-value is NA")
+            assert_that(treatment_pval < 0.05, msg = "Treatment effect p-value is not less than 0.05")
+            return c(lm_model_Y0, lm_model_Y1, lm_model_obsY, lm_model_obsY_obsW)
+        }
