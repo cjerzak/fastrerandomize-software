@@ -2,7 +2,18 @@
 % Please edit documentation in R/FRR_GenerateData.R
 \name{GenerateCausalData}
 \alias{GenerateCausalData}
-\title{This function generates simulated causal data based on specified parameters.}
+\title{This function generates simulated causal data based on specified parameters. The functional form of the outcome models is:
+\deqn{Y_0 = X \beta_0 + \epsilon_0}
+\deqn{Y_1 = X \beta_1 + \tau + \epsilon_1}
+where \eqn{\tau} is the treatment effect, which is drawn from a normal distribution with mean \code{treatment_effect_mean} and standard deviation \code{treatment_effect_SD}.
+The dimension of \eqn{\beta_0} and \eqn{\beta_1} is \code{k_covars}.
+The correlation coefficient of the covariates is \code{rho}.
+Y0_coefficients and Y1_coefficients are optional arguments that can be provided to specify the coefficients for the control and treated outcome models, and they determine \eqn{\beta_0} and \eqn{\beta_1}.
+If they are not provided, the function assumes a NULL value, and the coefficients are drawn from a normal distribution with decreasing variance.
+Example usage:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{GenerateCausalData(n_units = 100, proportion_treated = 0.5, k_covars = 3, rho = 0.5, SD_inherent = 1, treatment_effect_mean = 0, treatment_effect_SD = 1, covariates_SD = 1)
+}\if{html}{\out{</div>}}}
 \usage{
 GenerateCausalData(
   n_units,
@@ -24,7 +35,7 @@ GenerateCausalData(
 
 \item{k_covars}{A numeric value indicating the number of covariates to be generated.}
 
-\item{rho}{A numeric value representing the correlation coefficient.}
+\item{rho}{A numeric value representing the correlation coefficient of the covariates.}
 
 \item{SD_inherent}{A numeric value indicating the standard deviation inherent to the data.}
 
@@ -34,19 +45,30 @@ GenerateCausalData(
 
 \item{covariates_SD}{A numeric value or vector specifying the standard deviation of the covariates.}
 
-\item{Y0_coefficients}{An optional numeric vector specifying the coefficients for the control outcome model. If not provided, the function assumes a NULL value.}
+\item{Y0_coefficients}{An optional numeric vector specifying the coefficients for the control outcome model. If not provided, the function assumes a NULL value, and the coefficients are drawn from a normal distribution with decreasing variance.}
 
-\item{Y1_coefficients}{An optional numeric vector specifying the coefficients for the treated outcome model. If not provided, the function assumes a NULL value.}
+\item{Y1_coefficients}{An optional numeric vector specifying the coefficients for the treated outcome model. If not provided, the function assumes a NULL value, and the coefficients are drawn from a normal distribution with decreasing variance.}
 }
 \value{
 A list consisting of \itemize{
-\item \code{data_matrix} A data frame containing the simulated covariates and outcomes for both control (Y0) and treatment (Y1) groups.
+\item \code{data_matrix} A data frame containing the simulated covariates and outcomes for both control (Y0) and treatment (Y1) groups. Access them through \code{data_matrix$Y0} and \code{data_matrix$Y1}.
 \item \code{Y0_coefficients} A numeric vector representing the coefficients used for the control outcome model.
 \item \code{Y1_coefficients} A numeric vector representing the coefficients used for the treated outcome model.
 }
 }
 \description{
-This function generates simulated causal data based on specified parameters.
+This function generates simulated causal data based on specified parameters. The functional form of the outcome models is:
+\deqn{Y_0 = X \beta_0 + \epsilon_0}
+\deqn{Y_1 = X \beta_1 + \tau + \epsilon_1}
+where \eqn{\tau} is the treatment effect, which is drawn from a normal distribution with mean \code{treatment_effect_mean} and standard deviation \code{treatment_effect_SD}.
+The dimension of \eqn{\beta_0} and \eqn{\beta_1} is \code{k_covars}.
+The correlation coefficient of the covariates is \code{rho}.
+Y0_coefficients and Y1_coefficients are optional arguments that can be provided to specify the coefficients for the control and treated outcome models, and they determine \eqn{\beta_0} and \eqn{\beta_1}.
+If they are not provided, the function assumes a NULL value, and the coefficients are drawn from a normal distribution with decreasing variance.
+Example usage:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{GenerateCausalData(n_units = 100, proportion_treated = 0.5, k_covars = 3, rho = 0.5, SD_inherent = 1, treatment_effect_mean = 0, treatment_effect_SD = 1, covariates_SD = 1)
+}\if{html}{\out{</div>}}
 }
 \examples{
 # For a tutorial, see

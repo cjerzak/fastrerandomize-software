@@ -158,5 +158,5 @@ sanity_check_synthetic_data <- function(synthetic_data, InSampleR_threshold = 0.
             treatment_pval <- summary(lm_model_obsY_obsW)$coefficients["obsW", "Pr(>|t|)"]
             assert_that(!is.na(treatment_pval), msg = "Treatment effect p-value is NA")
             assert_that(treatment_pval < treatment_pval_threshold, msg = "Treatment effect p-value is not less than 0.05")
-            return c(lm_model_Y0, lm_model_Y1, lm_model_obsY, lm_model_obsY_obsW)
+            return(list(lm_model_Y0, lm_model_Y1, lm_model_obsY, lm_model_obsY_obsW))
         }

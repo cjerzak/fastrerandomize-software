@@ -2,5 +2,7 @@
 
 export(GenerateCausalData)
 export(GenerateRandomizations)
+export(GenerateRandomizations_MonteCarlo)
 export(InitializeJAX)
 export(RandomizationTest)
+export(sanity_check_synthetic_data)
