@@ -91,6 +91,10 @@ GenerateCausalData <- function(n_units, proportion_treated, k_covars, rho, SD_in
 #'     \item Y1_coefficients - Coefficients for potential outcome Y1
 #'   }
 #'
+#' @param InSampleR_threshold A numeric value indicating the threshold for in-sample R-squared.
+#' @param OOS_R_threshold A numeric value indicating the threshold for out-of-sample R-squared.
+#' @param treatment_pval_threshold A numeric value indicating the threshold for treatment effect p-value.
+#'
 #' @return A list of 4 linear models:
 #'   \itemize{
 #'     \item lm_model_Y0 - Linear model for Y0 ~ X
