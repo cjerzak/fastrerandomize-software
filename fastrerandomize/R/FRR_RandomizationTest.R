@@ -262,32 +262,7 @@ RandomizationTest <- function(
 }
 
 
-#' Generate All Possible Complete Randomizations
-#'
-#' This function generates all possible complete randomizations for an experiment given the total number of units and number of treated units. 
-#' It can optionally filter randomizations based on covariate balance using a threshold function.
-#'
-#' @param n_units An integer specifying the total number of experimental units
-#' @param n_treated An integer specifying the number of units to be assigned to treatment
-#' @param X A numeric matrix of covariates used for balance checking. Default is NULL
-#' @param randomization_accept_prob A numeric value between 0 and 1 specifying the probability threshold for accepting randomizations based on balance. Default is 1
-#' @param threshold_func A JAX function that computes a balance measure for each randomization. Must be vectorized using jax$vmap with in_axes = list(NULL, 0L, NULL, NULL), and inputs covariates (matrix of X), treatment_assignment (vector of 0s and 1s), n0 (scalar), n1 (scalar). Default is VectorizedFastHotel2T2 which uses Hotelling's T^2 statistic
-#'
-#' @return A JAX array containing the accepted randomizations, where each row represents one possible treatment assignment vector. Properties:
-#'   - Each row is a binary vector of length n_units
-#'   - The number of 1s in each row equals n_treated
-#'   - If X is provided, only randomizations meeting the balance threshold are included
-#'   - The array dimensions are [n_accepted_randomizations, n_units]
-#'
-#' @examples
-#' my_threshold_func_vec <- jax$vmap(my_threshold_func, in_axes = list(NULL, 0L, NULL, NULL))
-#' rand <- GenerateRandomizations(10L, 5L, X = X, randomization_accept_prob = 0.5, 
-#'                               threshold_func = my_threshold_func_vec)
-#' # For examples, see:
-#' # github.com/cjerzak/fastrerandomization-software
-#'
-#' @export
-#' @md
+
 
 GenerateRandomizations <- function(n_units, n_treated,
                                    X = NULL,
