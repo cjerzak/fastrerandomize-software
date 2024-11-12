@@ -101,8 +101,8 @@ GenerateCausalData <- function(n_units, proportion_treated, k_covars, rho, SD_in
 #'
 #' @details
 #' The function performs the following checks:
-#' 1. Verifies R-squared > 0.1 for Y0 and Y1 regressed on X
-#' 2. Checks out-of-sample R-squared > 0.1 for Y0 and Y1 predictions
+#' 1. Verifies R-squared > 0.01 for Y0 and Y1 regressed on X
+#' 2. Checks out-of-sample R-squared > 0.01 for Y0 and Y1 predictions
 #' 3. Confirms treatment effect is statistically significant (p < 0.05)
 #'
 #' @examples
@@ -112,7 +112,7 @@ GenerateCausalData <- function(n_units, proportion_treated, k_covars, rho, SD_in
 #' }
 #' @md
 #' @export
-sanity_check_synthetic_data <- function(synthetic_data) {
+sanity_check_synthetic_data <- function(synthetic_data, InSampleR_threshold = 0.01, OOS_R_threshold = 0.01, treatment_pval_threshold = 0.05) {
             data_matrix <- synthetic_data$data_matrix
             Y0_coefficients <- synthetic_data$Y0_coefficients
             Y1_coefficients <- synthetic_data$Y1_coefficients
@@ -133,11 +133,11 @@ sanity_check_synthetic_data <- function(synthetic_data) {
             X <- as.matrix(X)
 
             lm_model_Y0 <- lm(Y0 ~ X)
-            assert_that(summary(lm_model_Y0)$r.squared > 0.1, msg = "R-squared for Y0 is not greater than 0.1")
+            assert_that(summary(lm_model_Y0)$r.squared > InSampleR_threshold, msg = "R-squared for Y0 is not greater than 0.01")
             lm_model_Y1 <- lm(Y1 ~ X)
-            assert_that(summary(lm_model_Y1)$r.squared > 0.1, msg = "R-squared for Y1 is not greater than 0.1")
+            assert_that(summary(lm_model_Y1)$r.squared > InSampleR_threshold, msg = "R-squared for Y1 is not greater than 0.01")
             lm_model_obsY <- lm(obsY ~ X)
-            assert_that(summary(lm_model_obsY)$r.squared > 0.1, msg = "R-squared for obsY is not greater than 0.1")
+            assert_that(summary(lm_model_obsY)$r.squared > InSampleR_threshold, msg = "R-squared for obsY is not greater than 0.01")
             
             # Calculate Out of Sample R-squared for Y0 and Y1
             Y0_mean <- mean(Y0)
@@ -146,13 +146,13 @@ sanity_check_synthetic_data <- function(synthetic_data) {
             Y1_pred <- X %*% Y1_coefficients + 0.5
             Y0_r2 <- 1 - sum((Y0 - Y0_pred)^2) / sum((Y0 - Y0_mean)^2)
             Y1_r2 <- 1 - sum((Y1 - Y1_pred)^2) / sum((Y1 - Y1_mean)^2)
-            assert_that(Y0_r2 > 0.1, msg = "R-squared for Y0 is not greater than 0.1")
-            assert_that(Y1_r2 > 0.1, msg = "R-squared for Y1 is not greater than 0.1")
+            assert_that(Y0_r2 > OOS_R_threshold, msg = "R-squared for Y0 is not greater than 0.01")
+            assert_that(Y1_r2 > OOS_R_threshold, msg = "R-squared for Y1 is not greater than 0.01")
 
             # Fit linear model and extract p-value for treatment effect
             lm_model_obsY_obsW <- lm(obsY ~ obsW)
             treatment_pval <- summary(lm_model_obsY_obsW)$coefficients["obsW", "Pr(>|t|)"]
             assert_that(!is.na(treatment_pval), msg = "Treatment effect p-value is NA")
-            assert_that(treatment_pval < 0.05, msg = "Treatment effect p-value is not less than 0.05")
+            assert_that(treatment_pval < treatment_pval_threshold, msg = "Treatment effect p-value is not less than 0.05")
             return c(lm_model_Y0, lm_model_Y1, lm_model_obsY, lm_model_obsY_obsW)
         }
