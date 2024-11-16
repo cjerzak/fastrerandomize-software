@@ -132,7 +132,6 @@ RandomizationTest <- function(
     }, in_axes = list(0L,NULL)))
     p_value <- sapply(np$array(a_threshold_vec),   function(a_){
       print(a_ / max(np$array(a_threshold_vec)))
-      # a_ <- np$array(a_threshold_vec)[[30]]
       py_gc$collect()
 
       # select acceptable randomizations based on threshold
@@ -149,10 +148,11 @@ RandomizationTest <- function(
 
   # perform randomization inference using input data
   if( !simulate ){
-    tau_obs <- c(np$array( FastDiffInMeans(jnp$array(obsY),
-                                           jnp$array(obsW),
-                                           n0_array,
-                                           n1_array) ))
+    tau_obs <- c(np$array( FastDiffInMeans(jnp$array(obsY), # 
+                                           jnp$array(obsW), # 
+                                           n0_array, #
+                                           n1_array # 
+                                           ) ))
     tau_perm_null_0 <- np$array(
       W_VectorizedFastDiffInMeans(
           jnp$array(obsY),  # y_ =
@@ -192,7 +192,6 @@ RandomizationTest <- function(
             lower_Y_0_under_null[obsW == 1] <- obsY[obsW == 1] - lowerBound_estimate_step_t
             lower_Y_obs_perm[permutation_treatment_vec==0] <- lower_Y_0_under_null[permutation_treatment_vec==0]
             lower_Y_obs_perm[permutation_treatment_vec==1] <- lower_Y_0_under_null[permutation_treatment_vec==1] + lowerBound_estimate_step_t
-            #lower_tau_at_step_t <- mean(lower_Y_obs_perm[permutation_treatment_vec == 1]) - mean(lower_Y_obs_perm[permutation_treatment_vec == 0])
             lower_tau_at_step_t <- np$array( FastDiffInMeans(jnp$array(lower_Y_obs_perm), jnp$array(permutation_treatment_vec),
                                                              n0_array, n1_array) )
 
