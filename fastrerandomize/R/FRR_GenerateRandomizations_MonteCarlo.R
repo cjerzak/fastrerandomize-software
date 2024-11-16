@@ -46,8 +46,6 @@ GenerateRandomizations_MonteCarlo <- function(n_units, n_treated,
                                              threshold_func = VectorizedFastHotel2T2, 
                                              max_draws = 100000, seed = 42,
                                              batch_size = 10000, verbose = FALSE){
-  # Initialize JAX via reticulate
-  jax <- reticulate::import("jax")
   jnp <- jax$numpy
   
   # Define the batch_permutation function in Python using JAX

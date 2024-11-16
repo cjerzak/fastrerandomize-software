@@ -12,7 +12,8 @@ GenerateRandomizations_MonteCarlo(
   threshold_func = VectorizedFastHotel2T2,
   max_draws = 1e+05,
   seed = 42,
-  batch_size = 10000
+  batch_size = 10000,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ GenerateRandomizations_MonteCarlo(
 \item{seed}{An integer seed for random number generation. Default is 42}
 
 \item{batch_size}{An integer specifying how many randomizations to process at once. Default is 10000. Lower values use less memory but may be slower}
+
+\item{verbose}{A logical value indicating whether to print detailed information about batch processing progress, and GPU memory usage. Default is FALSE}
 }
 \value{
 A JAX array containing the accepted randomizations, where each row represents one possible treatment assignment vector

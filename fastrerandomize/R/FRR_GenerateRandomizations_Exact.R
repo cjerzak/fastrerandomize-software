@@ -46,7 +46,7 @@
 #'   randomization_accept_prob = 0.25  # Keep top 25% most balanced
 #' )
 #'
-#' @importFrom stats combn quantile
+#' @importFrom utils combn
 #' @import reticulate
 #'
 #' @note
@@ -68,7 +68,7 @@ GenerateRandomizations_Exact <- function(n_units, n_treated,
                                    randomization_accept_prob = 1,
                                    threshold_func = VectorizedFastHotel2T2){
   # Get all combinations of positions to set to 1
-  combinations <- jnp$array(  combn(n_units, n_treated) - 1L )
+  combinations <- jnp$array(  utils::combn(n_units, n_treated) - 1L )
   ZerosHolder <- jnp$zeros(as.integer(n_units), dtype=jnp$int32)
   candidate_randomizations <- InsertOnesVectorized(combinations,
                                                    ZerosHolder)
