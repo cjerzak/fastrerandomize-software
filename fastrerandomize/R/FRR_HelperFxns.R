@@ -95,4 +95,5 @@ print2 <- function(text, quiet = F){
 }
 
 JaxKey <- function(int_){ jax$random$PRNGKey(int_)}
+
 SoftPlus_r <- function(x){ log(exp(x)+1) }
