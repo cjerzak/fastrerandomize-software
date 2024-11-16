@@ -36,7 +36,6 @@ jth_derivative_log_min_p_val_OLD <- function(p_a, n_randomizations, derivative){
   if(derivative==4){return(  6/p_a^4  )}
 }
 
-
 jth_derivative_min_p_val_OLD <- function(p_a, n_randomizations, derivative){
   if(derivative==1){return(  -1/( (n_randomizations+1)*p_a^2) )}
   if(derivative==2){return(   2/( (n_randomizations+1)*p_a^3) )}
@@ -94,3 +93,7 @@ print2 <- function(text, quiet = F){
     print( sprintf("[%s] %s" ,format(Sys.time(), "%Y-%m-%d %H:%M:%S"),text) )
   }
 }
+
+JaxKey <- function(int_){ jax$random$PRNGKey(int_)}
+
+SoftPlus_r <- function(x){ log(exp(x)+1) }
