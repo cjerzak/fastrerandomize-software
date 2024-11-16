@@ -21,21 +21,18 @@ InitializeJAX <- function(conda_env = NULL, conda_env_required = T){
     try(reticulate::use_condaenv(condaenv = conda_env, required = conda_env_required),T)
   }
 
-  # setup packages
-  Sys.sleep(0.25)
+  # import Python packages
   if(!"jax" %in% ls()){  jax <<- reticulate::import("jax") }
   if(!"jnp" %in% ls()){  jnp <<- reticulate::import("jax.numpy") }
   if(!"np" %in% ls()){  np <<- reticulate::import("numpy") }
   if(!"py_gc" %in% ls()){  py_gc <<- reticulate::import("gc") }
 
-  # enable 64 bit computations
-  jax$config$update("jax_enable_x64", FALSE); jaxFloatType <<- jnp$float32 # use float64
-  JaxKey <<- function(int_){ jax$random$PRNGKey(int_)}
-  SoftPlus_r <<- function(x){ log(exp(x)+1) }
+  # disable 64 bit computations  
+  jax$config$update("jax_enable_x64", FALSE); jaxFloatType <<- jnp$float32 
   }
   print2("Success loading JAX!")
 
-  print2("Attempting setup of core JAX functions...")
+  print2("Setup of core JAX functions...")
   {
     expand_grid_JAX <<- function(n_treated, n_control){
       expand_grid_jax_text <- paste(rep("jnp$array(0L:1L)",times = n_units), collapse = ", ")
@@ -53,7 +50,7 @@ InitializeJAX <- function(conda_env = NULL, conda_env_required = T){
       InsertOnes(treat_indices_, zeros_)
     }, list(1L,NULL)))
 
-    if(T == F){ # checks
+    if(T == F){ # sanity checks
       expand_grid_text <- paste(rep("0L:1L",times = n_units <- 20), collapse = ", ")
       expand_grid_jax_text <- paste(rep("jnp$array(0L:1L)",times = n_units), collapse = ", ")
       system.time( tmp1 <- eval(parse(text = sprintf("expand_grid_JAX(n_units,n_units/2)",expand_grid_jax_text))) )
@@ -68,7 +65,7 @@ InitializeJAX <- function(conda_env = NULL, conda_env_required = T){
       xbar1 <- jnp$divide(jnp$sum(RowBroadcast(samp_,w_),1L,keepdims = T), n1)
       xbar2 <- jnp$divide(jnp$sum(RowBroadcast(samp_,jnp$subtract(1.,w_)),1L,keepdims = T), n0)
       CovWts <- jnp$add(jnp$reciprocal(n0), jnp$reciprocal(n1))
-      # CovPooled <- jnp$cov(samp_, rowvar = F); CovInv <- jnp$linalg$inv( jnp$multiply(CovPooled,CovWts) ) # for CPU, tranpose fails on GPU
+      # CovPooled <- jnp$cov(samp_, rowvar = F); CovInv <- jnp$linalg$inv( jnp$multiply(CovPooled,CovWts) ) # for CPU, tranpose fails on Metal GPU
       CovPooled <- jnp$var(samp_,0L); CovInv <- jnp$diag( jnp$reciprocal( jnp$multiply(CovPooled,CovWts) )) # for GPU
 
       xbar_diff <- jnp$subtract(xbar1, xbar2)
@@ -80,7 +77,7 @@ InitializeJAX <- function(conda_env = NULL, conda_env_required = T){
       FastHotel2T2(samp_, w_, n0, n1)},
       in_axes = list(NULL, 0L, NULL, NULL)) )
 
-    if(T == F){ # checks
+    if(T == F){ # sanity checks
       Compositional::hotel2T2()
       samp_ <- jnp$array(matrix(rnorm(10*100),nrow=100))
       w_ <- jnp$array(sample(c(0,1), size = 100, replace =T))
@@ -124,8 +121,7 @@ InitializeJAX <- function(conda_env = NULL, conda_env_required = T){
       jnp$mean(jnp$greater_equal(jnp$abs(NULL_),  jnp$expand_dims(OBS_,1L)), 1L)
     })
 
-    if(T == F){
-      # checks
+    if(T == F){ # sanity checks
       y_ <- jnp$array(rnorm(10))
       w_ <-  jnp$array(rbinom(10,size=1, prob = 0.5))
       n0 <- jnp$array(10.); n1 <- jnp$array(3.)
