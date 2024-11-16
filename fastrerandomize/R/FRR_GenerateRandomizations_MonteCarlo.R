@@ -37,7 +37,9 @@
 #' @seealso
 #' \code{\link{GenerateRandomizations}} for the non-Monte Carlo version
 #' \code{\link{VectorizedFastHotel2T2}} for the default threshold function
-#'
+#' 
+#' @import reticulate
+#' @importFrom assertthat assert_that
 #' @export
 #' @md
 GenerateRandomizations_MonteCarlo <- function(n_units, n_treated,
