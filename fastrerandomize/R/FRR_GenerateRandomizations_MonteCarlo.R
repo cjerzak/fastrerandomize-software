@@ -13,7 +13,7 @@
 #' @param max_draws An integer specifying the maximum number of randomizations to draw. Default is 100000
 #' @param seed An integer seed for random number generation. Default is 42
 #' @param batch_size An integer specifying how many randomizations to process at once. Default is 10000. Lower values use less memory but may be slower
-#'
+#' @param verbose A logical value indicating whether to print detailed information about batch processing progress, and GPU memory usage. Default is FALSE
 #' @details
 #' The function works by:
 #' 1. Generating batches of random permutations using JAX's random permutation functionality
@@ -41,13 +41,13 @@
 #' @export
 #' @md
 GenerateRandomizations_MonteCarlo <- function(n_units, n_treated,
-                                              X,
-                                              randomization_accept_prob = 1,
-                                              threshold_func = VectorizedFastHotel2T2, 
-                                              max_draws = 100000, seed = 42,
-                                              batch_size = 10000){
+                                             X,
+                                             randomization_accept_prob = 1,
+                                             threshold_func = VectorizedFastHotel2T2, 
+                                             max_draws = 100000, seed = 42,
+                                             batch_size = 10000, verbose = FALSE){
   # Initialize JAX via reticulate
-  jax <- import("jax")
+  jax <- reticulate::import("jax")
   jnp <- jax$numpy
   
   # Define the batch_permutation function in Python using JAX
@@ -88,14 +88,14 @@ batch_permutation = jax.jit(batch_permutation, static_argnums=2)
   # Set up sample sizes for treatment/control
   n0_array <- jnp$array(as.integer(n_units - n_treated))
   n1_array <- jnp$array(as.integer(n_treated))
-  
+    
   # Calculate the number of batches
   num_batches <- ceiling(max_draws / batch_size)
-  
+    
   # Initialize variables to store top permutations and their balance measures
   top_perms <- NULL
   top_M_results <- NULL
-  
+    
   # Determine the number of permutations to accept based on the acceptance probability
   float_num_to_accept <- max_draws * randomization_accept_prob
   if (float_num_to_accept < 1){
@@ -105,7 +105,29 @@ batch_permutation = jax.jit(batch_permutation, static_argnums=2)
   num_to_accept <- max(num_to_accept, 1) # Ensure at least one
   
   # Batch processing to prevent memory issues
+  if (verbose){
+    print(paste0("Starting batch processing with ", num_batches, " batches."))
+  }
   for (batch_idx in seq_len(num_batches)){
+    if (verbose){
+      print(paste0("At batch_idx ", batch_idx, " of ", num_batches, "."))
+      # Run nvidia-smi and capture the output
+      tryCatch({
+        # Try to get GPU info
+        gpu_info <- system("nvidia-smi --query-compute-apps=pid,process_name,used_memory --format=csv,noheader,nounits", intern = TRUE)
+        if (length(gpu_info) > 0) {
+          print("Running on GPU:")
+          # Parse and format GPU info
+          gpu_processes <- lapply(strsplit(gpu_info, ","), trimws)
+          gpu_table <- do.call(rbind, lapply(gpu_processes, function(x) {
+            sprintf("PID: %s | Process: %s | Memory: %s MB", x[1], x[2], x[3])
+          }))
+          print(gpu_table)
+        }
+      }, error = function(e){
+        warning("No GPU detected - running on CPU only")
+      })
+    }
     # Determine the number of permutations in this batch
     perms_in_batch <- min(batch_size, max_draws - (batch_idx - 1) * batch_size)
     
@@ -127,28 +149,28 @@ batch_permutation = jax.jit(batch_permutation, static_argnums=2)
     M_results_batch <- jnp$squeeze(M_results_batch)
     
     if (is.null(top_M_results)){
-      combined_M_results <- M_results_batch
-      combined_perms <- perms_batch
+        combined_M_results <- M_results_batch
+        combined_perms <- perms_batch
     } else {
-      combined_M_results <- jnp$concatenate(list(top_M_results, M_results_batch))
-      combined_perms <- jnp$concatenate(list(top_perms, perms_batch), axis=0L)
+        combined_M_results <- jnp$concatenate(list(top_M_results, M_results_batch))
+        combined_perms <- jnp$concatenate(list(top_perms, perms_batch), axis=0L)
     }
-    
+
     # Limit the size of combined arrays
     combined_length <- combined_M_results$shape[[1]]
     if (combined_length > num_to_accept){
-      # Get indices of combined_M_results sorted in ascending order
-      sorted_indices <- jnp$argsort(combined_M_results)
-      # Keep only top num_to_accept permutations
-      indices_to_keep <- sorted_indices[0:num_to_accept]
-      top_M_results <- jnp$take(combined_M_results, indices_to_keep)
-      top_perms <- jnp$take(combined_perms, indices_to_keep, axis=0L)
+        # Get indices of combined_M_results sorted in ascending order
+        sorted_indices <- jnp$argsort(combined_M_results)
+        # Keep only top num_to_accept permutations
+        indices_to_keep <- sorted_indices[0:num_to_accept]
+        top_M_results <- jnp$take(combined_M_results, indices_to_keep)
+        top_perms <- jnp$take(combined_perms, indices_to_keep, axis=0L)
     } else {
-      # Keep combined results as top results
-      top_M_results <- combined_M_results
-      top_perms <- combined_perms
+        # Keep combined results as top results
+        top_M_results <- combined_M_results
+        top_perms <- combined_perms
     }
-    
+
     assert_that(top_M_results$shape[[1]] <= num_to_accept, msg = paste0("top_M_results must have dimensions ", num_to_accept, " x 1."))
     assert_that(top_perms$shape[[1]] <= num_to_accept, msg = paste0("top_perms must have dimensions ", num_to_accept, " x ", n_units, "."))
     rm(perms_batch)
@@ -158,15 +180,15 @@ batch_permutation = jax.jit(batch_permutation, static_argnums=2)
     jax$clear_caches()
     gc()  # Force garbage collection
     py_run_string("import gc; gc.collect()")
-    
+
     # Update the key for the next batch
     key <- jax$random$fold_in(key, batch_idx)
   }
-  
+    
   # After processing all batches, the candidate_randomizations are the top_perms
   candidate_randomizations <- top_perms
   assert_that(all(candidate_randomizations$shape == c(num_to_accept, n_units)), 
               msg = paste0("candidate_randomizations must have dimensions ", 
-                           num_to_accept, " x ", n_units, "."))
+                            num_to_accept, " x ", n_units, "."))
   return(candidate_randomizations)
 }
