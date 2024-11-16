@@ -36,11 +36,12 @@
 #'
 #' @export
 #' @md
-
+#' @importFrom assertthat assert_that
 # 
 GenerateCausalData <- function(n_units, proportion_treated, k_covars, rho, SD_inherent,
                           treatment_effect_mean, treatment_effect_SD, covariates_SD,
                           Y0_coefficients = NULL, Y1_coefficients = NULL){
+  assert_that(n_units > k_covars, msg = "n_units must be greater than k_covars")
   if(is.null(Y0_coefficients)){
     Y0_coefficients <- as.matrix(rnorm(k_covars, sd = 1/1:k_covars))
     Y1_coefficients <- Y0_coefficients #as.matrix( c(c(1:k_covars)/2)  )

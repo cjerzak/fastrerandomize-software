@@ -8,5 +8,5 @@ License: Creative Commons Attribution-Noncommercial-No Derivative Works 4.0, for
 Encoding: UTF-8
 LazyData: false
 Maintainer: 'Connor Jerzak' <connor.jerzak@gmail.com>
-Imports: reticulate
+Imports: reticulate, assertthat
 RoxygenNote: 7.3.2

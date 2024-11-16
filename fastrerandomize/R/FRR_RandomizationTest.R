@@ -354,6 +354,9 @@ GenerateRandomizations_MonteCarlo <- function(n_units, n_treated,
                                              threshold_func = VectorizedFastHotel2T2, 
                                              max_draws = 100000, seed = 42,
                                              batch_size = 10000){
+  if (batch_size > 500000){
+    warning("batch_size is greater than 500000, which may cause memory issues. Consider decreasing batch_size.")
+  }
   # Initialize JAX via reticulate
   jax <- import("jax")
   jnp <- jax$numpy
