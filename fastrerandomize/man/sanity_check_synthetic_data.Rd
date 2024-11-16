@@ -41,9 +41,9 @@ of the generated dataset and the strength of relationships between variables.
 \details{
 The function performs the following checks:
 \enumerate{
-\item Verifies R-squared > 0.01 for Y0 and Y1 regressed on X
-\item Checks out-of-sample R-squared > 0.01 for Y0 and Y1 predictions
-\item Confirms treatment effect is statistically significant (p < 0.05)
+\item Verifies R-squared > InSampleR_threshold for Y0 and Y1 regressed on X
+\item Checks out-of-sample R-squared > OOS_R_threshold for Y0 and Y1 predictions
+\item Confirms treatment effect is statistically significant (p < treatment_pval_threshold)
 }
 }
 \examples{
