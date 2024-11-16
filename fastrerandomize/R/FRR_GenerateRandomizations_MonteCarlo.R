@@ -116,7 +116,6 @@ batch_permutation = jax.jit(batch_permutation, static_argnums=2)
         # Try to get GPU info
         gpu_info <- system("nvidia-smi --query-compute-apps=pid,process_name,used_memory --format=csv,noheader,nounits", intern = TRUE)
         if (length(gpu_info) > 0) {
-          print("Running on GPU:")
           # Parse and format GPU info
           gpu_processes <- lapply(strsplit(gpu_info, ","), trimws)
           gpu_table <- do.call(rbind, lapply(gpu_processes, function(x) {
