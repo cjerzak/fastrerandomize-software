@@ -11,7 +11,6 @@
 #' It initializes JAX and defines several core functions used throughout the package:
 #' \itemize{
 #'   \item expand_grid_JAX: Creates treatment combinations
-#'   \item FastHotel2T2: Computes Hotelling's T² statistic
 #'   \item FastDiffInMeans: Computes difference in means
 #'   \item Various vectorized versions of these functions
 #' }
@@ -70,35 +69,6 @@ InitializeJAX <- function(conda_env = NULL, conda_env_required = T){
       expand_grid_jax_text <- paste(rep("jnp$array(0L:1L)",times = n_units), collapse = ", ")
       system.time( tmp1 <- eval(parse(text = sprintf("expand_grid_JAX(n_units,n_units/2)",expand_grid_jax_text))) )
       system.time( tmp2 <- eval(parse(text = sprintf("expand.grid(%s)",expand_grid_text))) )
-    }
-
-    RowBroadcast <- jax$vmap(function(mat, vec){
-        jnp$multiply(mat, vec)}, in_axes = list(1L, NULL))
-
-    FastHotel2T2 <<- ( function(samp_, w_, n0, n1){
-      # set up calc
-      xbar1 <- jnp$divide(jnp$sum(RowBroadcast(samp_,w_),1L,keepdims = T), n1)
-      xbar2 <- jnp$divide(jnp$sum(RowBroadcast(samp_,jnp$subtract(1.,w_)),1L,keepdims = T), n0)
-      CovWts <- jnp$add(jnp$reciprocal(n0), jnp$reciprocal(n1))
-      # CovPooled <- jnp$cov(samp_, rowvar = F); CovInv <- jnp$linalg$inv( jnp$multiply(CovPooled,CovWts) ) # for CPU, tranpose fails on Metal GPU
-      CovPooled <- jnp$var(samp_,0L); CovInv <- jnp$diag( jnp$reciprocal( jnp$multiply(CovPooled,CovWts) )) # for GPU
-
-      xbar_diff <- jnp$subtract(xbar1, xbar2)
-
-      Tstat <- jnp$matmul(jnp$matmul(jnp$transpose(xbar_diff), CovInv) , xbar_diff)
-    })
-
-    VectorizedFastHotel2T2 <<- jax$jit( jax$vmap(function(samp_, w_, n0, n1){
-      FastHotel2T2(samp_, w_, n0, n1)},
-      in_axes = list(NULL, 0L, NULL, NULL)) )
-
-    if(T == F){ # sanity checks
-      Compositional::hotel2T2()
-      samp_ <- jnp$array(matrix(rnorm(10*100),nrow=100))
-      w_ <- jnp$array(sample(c(0,1), size = 100, replace =T))
-      w_full <- jnp$array(matrix(rbinom(100*34,size = 1, prob = 0.5),nrow = 100))
-      FastHotel2T2(samp_ = samp_, w_ = w_, n0 = n0, n1 = n1)
-      VectorizedFastHotel2T2(samp_, w_full, n0, n1)
     }
 
     FastDiffInMeans <<- jax$jit( FastDiffInMeans_R <<- function(y_,w_, n0, n1){

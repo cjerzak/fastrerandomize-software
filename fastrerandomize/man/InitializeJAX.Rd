@@ -23,7 +23,6 @@ This function must be run before using any other functions in the package.
 It initializes JAX and defines several core functions used throughout the package:
 \itemize{
   \item expand_grid_JAX: Creates treatment combinations
-  \item FastHotel2T2: Computes Hotelling's T² statistic
   \item FastDiffInMeans: Computes difference in means
   \item Various vectorized versions of these functions
 }
