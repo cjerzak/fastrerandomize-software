@@ -37,11 +37,14 @@
       
       t_RRTest <- try({
         RRTest_ <- fastrerandomize::RandomizationTest(
-          obsW = as.integer(np$array(RandomizationSet_[1,])),
-          obsY = rnorm(RandomizationSet_$shape[[2]]),
+          obsW = (W_<-as.integer(np$array(RandomizationSet_[1,]))),
+          obsY = rnorm(RandomizationSet_$shape[[2]])+2*W_,
           candidate_randomizations_array = RandomizationSet_,
           findFI = findFI, 
           X = X)
+        if(!is.null(RRTest_$FI)){ 
+          print(sprintf("FI: {%s}", paste(round(RRTest_$FI,2),collapse = ", " )))
+        }
       },T)
       if("try-error" %in% class(t_RRTest)){ stop(sprintf("Failed at t_RRTest: [%s, %s]...",type_, findFI)) }
     }
