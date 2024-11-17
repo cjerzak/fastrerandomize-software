@@ -9,9 +9,9 @@ GenerateRandomizations(
   n_treated,
   X,
   randomization_accept_prob,
-  max_draws,
   threshold_func = NULL,
-  batch_size = 1e+05,
+  max_draws = 10^6,
+  batch_size = 10^5,
   randomization_type = "monte_carlo",
   approximate_inv = TRUE,
   seed = NULL,
@@ -27,9 +27,9 @@ GenerateRandomizations(
 
 \item{randomization_accept_prob}{A numeric value between 0 and 1 specifying the probability threshold for accepting randomizations based on balance}
 
-\item{max_draws}{An integer specifying the maximum number of randomizations to draw in Monte Carlo sampling}
-
 \item{threshold_func}{A JAX function that computes a balance measure for each randomization. Only used for Monte Carlo sampling.}
+
+\item{max_draws}{An integer specifying the maximum number of randomizations to draw in Monte Carlo sampling}
 
 \item{batch_size}{An integer specifying batch size for Monte Carlo processing}
 
