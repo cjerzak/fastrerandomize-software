@@ -112,15 +112,13 @@ v_a_plus_p_a_derivative <- function(p_a, n, k_covars , epsilon=0.0001){
 #'
 #' @details
 #' The function prepends the current timestamp in "YYYY-MM-DD HH:MM:SS" format
-#' to the provided message. Output format is: [timestamp] message
+#' to the provided message. 
 #'
 #' @seealso
-#' \code{\link{Sys.time}} for the underlying timestamp functionality
+#' \code{Sys.time} for the underlying timestamp functionality
 #'
-#' @importFrom base sprintf
 #' @export
 #' @md
-
 print2 <- function(text, quiet = F){
   if(!quiet){
     print( sprintf("[%s] %s" ,format(Sys.time(), "%Y-%m-%d %H:%M:%S"),text) )
