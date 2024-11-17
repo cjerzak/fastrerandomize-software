@@ -66,6 +66,7 @@
 GenerateRandomizations_Exact <- function(n_units, n_treated,
                                    X = NULL,
                                    randomization_accept_prob = 1,
+                                   approximate_inv = TRUE, 
                                    threshold_func = VectorizedFastHotel2T2){
   # Get all combinations of positions to set to 1
   combinations <- jnp$array(  utils::combn(n_units, n_treated) - 1L )
@@ -83,7 +84,8 @@ GenerateRandomizations_Exact <- function(n_units, n_treated,
       jnp$array( X ),                    # Covariates
       jnp$array(candidate_randomizations, dtype = jnp$float32),  # Possible assignments
       n0_array, 
-      n1_array                 # Sample sizes
+      n1_array,                # Sample sizes
+      approximate_inv
     )
     
     # Find acceptance threshold based on specified quantile

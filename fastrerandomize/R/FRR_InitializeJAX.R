@@ -155,23 +155,24 @@ InitializeJAX <- function(conda_env = NULL, conda_env_required = T){
   
   FastHotel2T2 <<- ( function(samp_, w_, n0, n1, approximate_inv = FALSE){
     # Assert statements to ensure valid inputs
-    assert(n0 > 0, "Number of control units (n0) must be greater than 0.")
-    assert(n1 > 0, "Number of treated units (n1) must be greater than 0.")
-    assert(samp_.ndim == 2, "samp_ must be a 2D array.")
-    assert(w_.ndim == 1, "w_ must be a 1D array.")
-    assert(samp_.shape[0] == w_.shape[0], "samp_ and w_ must have the same number of rows.")
+    #assertthat::assert_that(n0 > 0, "Number of control units (n0) must be greater than 0.")
+    #assertthat::assert_that(n1 > 0, "Number of treated units (n1) must be greater than 0.")
+    #assertthat::assert_that(samp_.ndim == 2, "samp_ must be a 2D array.")
+    #assertthat::assert_that(w_.ndim == 1, "w_ must be a 1D array.")
+    #assertthat::assert_that(samp_.shape[0] == w_.shape[0], "samp_ and w_ must have the same number of rows.")
     
     # set up calc
     xbar1 <- jnp$divide(jnp$sum(RowBroadcast(samp_,w_),1L,keepdims = T), n1)
     xbar2 <- jnp$divide(jnp$sum(RowBroadcast(samp_,jnp$subtract(1.,w_)),1L,keepdims = T), n0)
     CovWts <- jnp$add(jnp$reciprocal(n0), jnp$reciprocal(n1))
-    if (!approximate_inv){
-      CovInv <- jnp$diag( jnp$reciprocal( jnp$multiply(CovPooled,CovWts) )) # for GPU
-    } else {
-      CovPooled <- jnp$var(samp_,0L); CovInv <- jnp$diag( jnp$reciprocal( jnp$multiply(CovPooled,CovWts) ))
-    }
+    CovInv <- jax$lax$cond(pred = approximate_inv,
+                 true_fun = function(){CovPooled <- jnp$cov(samp_,rowvar = FALSE); 
+                                       CovInv <-jnp$reciprocal( jnp$multiply(CovPooled, CovWts) ) ;
+                                       return(CovInv)},
+                 false_fun = function(){CovPooled <- jnp$var(samp_, 0L); 
+                                        CovInv <- jnp$diag( jnp$reciprocal( jnp$multiply(CovPooled,CovWts) ));
+                                        return(CovInv)})
     xbar_diff <- jnp$subtract(xbar1, xbar2)
-    
     Tstat <- jnp$matmul(jnp$matmul(jnp$transpose(xbar_diff), CovInv) , xbar_diff)
   })
   

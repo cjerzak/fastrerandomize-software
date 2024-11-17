@@ -50,8 +50,11 @@ GenerateRandomizations_MonteCarlo <- function(n_units, n_treated,
                                              X,
                                              randomization_accept_prob = 1,
                                              threshold_func = VectorizedFastHotel2T2, 
-                                             max_draws = 100000, seed = 42,
-                                             batch_size = 10000, verbose = FALSE){
+                                             max_draws = 100000, 
+                                             seed = NULL,
+                                             batch_size = 10000, 
+                                             approximate_inv = TRUE,
+                                             verbose = FALSE){
   jnp <- jax$numpy
   
   # Define the batch_permutation function in Python using JAX
@@ -145,7 +148,8 @@ batch_permutation = jax.jit(batch_permutation, static_argnums=2)
       X_jax,
       perms_batch,
       n0_array, 
-      n1_array
+      n1_array, 
+      approximate_inv
     )
     
     # Flatten M_results_batch to 1D array

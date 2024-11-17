@@ -47,7 +47,17 @@
 #'
 #' @export
 #' @md
-GenerateRandomizations <- function(n_units, n_treated, X, randomization_accept_prob, threshold_func, max_draws, seed, batch_size, randomization_type, verbose = TRUE){
+GenerateRandomizations <- function(n_units, 
+                                   n_treated, 
+                                   X, 
+                                   randomization_accept_prob, 
+                                   threshold_func, 
+                                   max_draws, 
+                                   seed, 
+                                   batch_size, 
+                                   randomization_type, 
+                                   approximate_inv = TRUE, 
+                                   verbose = TRUE){
     if (randomization_type == "exact"){
         if (verbose){
             print("Using exact randomization")

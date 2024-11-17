@@ -3,8 +3,6 @@
   ##########################################
   # code for testing functionalities of fastrerandomize on your hardware
   ##########################################
-  options(error = NULL)
-  
   tryTests <- try({
     # remote install latest version of the package
     # devtools::install_github(repo = "cjerzak/fastrerandomize-software/fastrerandomize")
@@ -12,7 +10,7 @@
     # local install for development team
     # install.packages("~/Documents/fastrerandomize-software/fastrerandomize",repos = NULL, type = "source",force = F)
     
-    t_Initialize <- try({
+    options(error = NULL); t_Initialize <- try({
       fastrerandomize::InitializeJAX(conda_env = "jax_cpu", conda_env_required = T)
     },T)
     if("try-error" %in% class(t_Initialize)){ stop("Failed at t_Initialize...") }
@@ -23,6 +21,15 @@
     },T)
     if("try-error" %in% class(t_GenData)){ stop("Failed at t_GenData...") }
     
+    RandomizationSet_ <- fastrerandomize::GenerateRandomizations(
+      n_units = 20,
+      n_treated = 10,
+      X = X,
+      randomization_accept_prob=0.1,
+      randomization_type="exact",
+      max_draws=1000)
+    
+    
     for(type_ in c("exact","monte_carlo")){ 
       print(sprintf("On type: %s", type_))
       t_GetSet <- try({
@@ -31,7 +38,7 @@
           n_treated = 10,
           X = X,
           randomization_accept_prob=0.1,
-          randomization_type="exact",
+          randomization_type=type_,
           max_draws=1000)
       },T)
       if("try-error" %in% class(t_GetSet)){ stop(sprintf("Failed at t_GetSet: %s...",type_)) }
