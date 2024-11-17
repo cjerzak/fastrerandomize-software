@@ -39,7 +39,7 @@
 #'
 #' # Generate balanced randomizations with covariates
 #' X <- matrix(rnorm(60), nrow = 10)  # 10 units, 6 covariates
-#' balanced_rand <- GenerateRandomizations(
+#' BalancedRandomizations <- GenerateRandomizations(
 #'   n_units = 10,
 #'   n_treated = 5,
 #'   X = X,

@@ -61,8 +61,12 @@ X <- matrix(rnorm(100*5), 100, 5) # 5 covariates
 rand <- GenerateRandomizations_MonteCarlo(100, 50, X, max_draws=1000)
 
 # Use a stricter balance criterion
-rand_strict <- GenerateRandomizations_MonteCarlo(100, 50, X, 
-               randomization_accept_prob=0.1, max_draws=1000)
+rand_strict <- GenerateRandomizations_MonteCarlo(
+               n_units = 100, 
+               n_treated = 50, 
+               X = X, 
+               randomization_accept_prob=0.1, 
+               max_draws=1000)
 
 }
 \seealso{
