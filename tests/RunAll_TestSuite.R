@@ -21,6 +21,7 @@
     },T)
     if("try-error" %in% class(t_GenData)){ stop("Failed at t_GenData...") }
     
+    for(findFI in c(FALSE, TRUE)){ 
     for(type_ in c("exact","monte_carlo")){ 
       fastrerandomize::print2(sprintf("On type: %s", type_))
       t_GetSet <- try({
@@ -35,13 +36,15 @@
       if("try-error" %in% class(t_GetSet)){ stop(sprintf("Failed at t_GetSet: %s...",type_)) }
       
       t_RRTest <- try({
-        RandomizationSet_ <- fastrerandomize::RandomizationTest(
+        RRTest_ <- fastrerandomize::RandomizationTest(
           obsW = as.integer(np$array(RandomizationSet_[1,])),
           obsY = rnorm(RandomizationSet_$shape[[2]]),
-          candidate_randomizations = RandomizationSet_,
+          candidate_randomizations_array = RandomizationSet_,
+          findFI = findFI, 
           X = X)
       },T)
-      if("try-error" %in% class(t_RRTest)){ stop(sprintf("Failed at t_RRTest: %s...",type_)) }
+      if("try-error" %in% class(t_RRTest)){ stop(sprintf("Failed at t_RRTest: [%s, %s]...",type_, findFI)) }
+    }
     }
   }, T)
     
