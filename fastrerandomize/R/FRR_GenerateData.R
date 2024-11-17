@@ -117,7 +117,7 @@ GenerateCausalData <- function(n_units, proportion_treated, k_covars, rho, SD_in
 #' }
 #' @md
 #' @export
-sanity_check_synthetic_data <- function(synthetic_data, InSampleR_threshold = 0.01, OOS_R_threshold = 0.01, treatment_pval_threshold = 0.05) {
+SanityCheckSyntheticData <- function(synthetic_data, InSampleR_threshold = 0.01, OOS_R_threshold = 0.01, treatment_pval_threshold = 0.05) {
             data_matrix <- synthetic_data$data_matrix
             Y0_coefficients <- synthetic_data$Y0_coefficients
             Y1_coefficients <- synthetic_data$Y1_coefficients
