@@ -12,7 +12,14 @@ Y0_coefficients and Y1_coefficients are optional arguments that can be provided 
 If they are not provided, the function assumes a NULL value, and the coefficients are drawn from a normal distribution with decreasing variance.
 Example usage:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{GenerateCausalData(n_units = 100, proportion_treated = 0.5, k_covars = 3, rho = 0.5, SD_inherent = 1, treatment_effect_mean = 0, treatment_effect_SD = 1, covariates_SD = 1)
+\if{html}{\out{<div class="sourceCode">}}\preformatted{GenerateCausalData(n_units = 100, 
+                   proportion_treated = 0.5, 
+                   k_covars = 3, 
+                   rho = 0.5, 
+                   SD_inherent = 1, 
+                   treatment_effect_mean = 0, 
+                   treatment_effect_SD = 1, 
+                   covariates_SD = 1)
 }\if{html}{\out{</div>}}}
 \usage{
 GenerateCausalData(
@@ -67,7 +74,14 @@ Y0_coefficients and Y1_coefficients are optional arguments that can be provided 
 If they are not provided, the function assumes a NULL value, and the coefficients are drawn from a normal distribution with decreasing variance.
 Example usage:
 
-\if{html}{\out{<div class="sourceCode">}}\preformatted{GenerateCausalData(n_units = 100, proportion_treated = 0.5, k_covars = 3, rho = 0.5, SD_inherent = 1, treatment_effect_mean = 0, treatment_effect_SD = 1, covariates_SD = 1)
+\if{html}{\out{<div class="sourceCode">}}\preformatted{GenerateCausalData(n_units = 100, 
+                   proportion_treated = 0.5, 
+                   k_covars = 3, 
+                   rho = 0.5, 
+                   SD_inherent = 1, 
+                   treatment_effect_mean = 0, 
+                   treatment_effect_SD = 1, 
+                   covariates_SD = 1)
 }\if{html}{\out{</div>}}
 }
 \examples{
