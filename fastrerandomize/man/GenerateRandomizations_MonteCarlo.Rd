@@ -11,8 +11,9 @@ GenerateRandomizations_MonteCarlo(
   randomization_accept_prob = 1,
   threshold_func = VectorizedFastHotel2T2,
   max_draws = 1e+05,
-  seed = 42,
+  seed = NULL,
   batch_size = 10000,
+  approximate_inv = TRUE,
   verbose = FALSE
 )
 }

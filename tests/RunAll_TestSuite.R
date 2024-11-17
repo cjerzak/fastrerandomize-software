@@ -22,7 +22,7 @@
     if("try-error" %in% class(t_GenData)){ stop("Failed at t_GenData...") }
     
     for(type_ in c("exact","monte_carlo")){ 
-      print(sprintf("On type: %s", type_))
+      fastrerandomize::print2(sprintf("On type: %s", type_))
       t_GetSet <- try({
         RandomizationSet_ <- fastrerandomize::GenerateRandomizations(
           n_units = 20,
@@ -45,6 +45,6 @@
     }
   }, T)
     
-  if('try-error' %in% class(tryTests)){ print("At least one test failed..."); print( tryTests ) }
-  if(!'try-error' %in% class(tryTests)){ print("All tests succeeded!") }
+  if('try-error' %in% class(tryTests)){ fastrerandomize::print2("At least one test failed..."); print( tryTests ) }
+  if(!'try-error' %in% class(tryTests)){ fastrerandomize::print2("All tests succeeded!") }
 }

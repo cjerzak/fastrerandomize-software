@@ -88,6 +88,39 @@ v_a_plus_p_a_derivative <- function(p_a, n, k_covars , epsilon=0.0001){
   return( return_value )
 }
 
+#' Print timestamped messages with optional quieting
+#'
+#' This function prints messages prefixed with the current timestamp in a standardized format.
+#' Messages can be suppressed using the quiet parameter.
+#'
+#' @param text A character string containing the message to be printed
+#' @param quiet A logical value indicating whether to suppress output. Default is FALSE
+#'
+#' @return No return value, called for side effect of printing
+#'
+#' @examples
+#' # Print a basic message with timestamp
+#' print2("Processing started")
+#'
+#' # Suppress output
+#' print2("This won't show", quiet = TRUE)
+#'
+#' # Use in a loop
+#' for(i in 1:3) {
+#'   print2(sprintf("Processing item %d", i))
+#' }
+#'
+#' @details
+#' The function prepends the current timestamp in "YYYY-MM-DD HH:MM:SS" format
+#' to the provided message. Output format is: [timestamp] message
+#'
+#' @seealso
+#' \code{\link{Sys.time}} for the underlying timestamp functionality
+#'
+#' @importFrom base sprintf
+#' @export
+#' @md
+
 print2 <- function(text, quiet = F){
   if(!quiet){
     print( sprintf("[%s] %s" ,format(Sys.time(), "%Y-%m-%d %H:%M:%S"),text) )
