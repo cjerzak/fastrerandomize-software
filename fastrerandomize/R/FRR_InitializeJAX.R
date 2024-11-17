@@ -150,10 +150,10 @@ InitializeJAX <- function(conda_env = NULL, conda_env_required = T){
     }, in_axes = list(0L, NULL, NULL, NULL, NULL, NULL)) )
   }
   
-  RowBroadcast <- jax$vmap(function(mat, vec){
+  RowBroadcast <<- jax$vmap(function(mat, vec){
     jnp$multiply(mat, vec)}, in_axes = list(1L, NULL))
   
-  FastHotel2T2 <- ( function(samp_, w_, n0, n1, approximate_inv = FALSE){
+  FastHotel2T2 <<- ( function(samp_, w_, n0, n1, approximate_inv = FALSE){
     # Assert statements to ensure valid inputs
     assert(n0 > 0, "Number of control units (n0) must be greater than 0.")
     assert(n1 > 0, "Number of treated units (n1) must be greater than 0.")
@@ -175,7 +175,7 @@ InitializeJAX <- function(conda_env = NULL, conda_env_required = T){
     Tstat <- jnp$matmul(jnp$matmul(jnp$transpose(xbar_diff), CovInv) , xbar_diff)
   })
   
-  VectorizedFastHotel2T2 <- jax$jit( jax$vmap(function(samp_, w_, n0, n1, approximate_inv = FALSE){
+  VectorizedFastHotel2T2 <<- jax$jit( jax$vmap(function(samp_, w_, n0, n1, approximate_inv = FALSE){
     FastHotel2T2(samp_, w_, n0, n1, approximate_inv)},
     in_axes = list(NULL, 0L, NULL, NULL, NULL)) )
   print2("Success setting up core JAX functions!")

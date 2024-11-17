@@ -3,6 +3,8 @@
   ##########################################
   # code for testing functionalities of fastrerandomize on your hardware
   ##########################################
+  options(error = NULL)
+  
   tryTests <- try({
     # remote install latest version of the package
     # devtools::install_github(repo = "cjerzak/fastrerandomize-software/fastrerandomize")
@@ -17,15 +19,15 @@
     
     t_GenData <- try({
       set.seed(999L, kind = "Wichmann-Hill")
-      X <- matrix(rnorm(100*5), 100, 5)
+      X <- matrix(rnorm(20*5), 20, 5)
     },T)
     if("try-error" %in% class(t_GenData)){ stop("Failed at t_GenData...") }
     
     for(type_ in c("exact","monte_carlo")){ 
       t_GetSet <- try({
         RandomizationSet_ <- fastrerandomize::GenerateRandomizations(
-          n_units = 100,
-          n_treated = 50,
+          n_units = 20,
+          n_treated = 10,
           X = X,
           randomization_accept_prob=0.1,
           randomization_type="exact",
