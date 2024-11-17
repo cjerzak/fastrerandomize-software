@@ -26,7 +26,8 @@
       n_treated = 10,
       X = X,
       randomization_accept_prob=0.1,
-      randomization_type="exact",
+      randomization_type="monte_carlo",
+      seed = NULL ,
       max_draws=1000)
     
     

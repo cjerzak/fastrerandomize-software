@@ -51,13 +51,14 @@ GenerateRandomizations <- function(n_units,
                                    n_treated, 
                                    X, 
                                    randomization_accept_prob, 
-                                   threshold_func, 
                                    max_draws, 
-                                   seed, 
-                                   batch_size, 
+                                   threshold_func = NULL, 
+                                   batch_size = 100000, 
                                    randomization_type, 
                                    approximate_inv = TRUE, 
+                                   seed = NULL, 
                                    verbose = TRUE){
+    if(is.null(threshold_func)){ threshold_func <- VectorizedFastHotel2T2}
     if (randomization_type == "exact"){
         if (verbose){
             print("Using exact randomization")

@@ -56,6 +56,7 @@ GenerateRandomizations_MonteCarlo <- function(n_units, n_treated,
                                              approximate_inv = TRUE,
                                              verbose = FALSE){
   jnp <- jax$numpy
+  if(is.null(seed)){ seed <- as.integer(runif(1, 0, 100000)) }
   
   # Define the batch_permutation function in Python using JAX
   # Uses vmap to vectorize the permutation operation over the batch size
