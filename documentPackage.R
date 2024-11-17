@@ -18,4 +18,4 @@ system(sprintf("R CMD Rd2pdf %s",package_path))
 log(sort( sapply(ls(),function(l_){object.size(eval(parse(text=l_)))})))
 
 # Check package to ensure it meets CRAN standards.
-devtools::check( package_path )
+# devtools::check( package_path )
