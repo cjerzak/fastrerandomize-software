@@ -1,30 +1,47 @@
 Package: fastrerandomize
-Title: FastRerandomize: An R Package for Hardware-accelerated Rerandomization for Improved Balance
+Title: FastRerandomize: An R Package for Hardware-accelerated Rerandomization
+    for Improved Balance
 Version: 0.1
-Authors@R: c(
-  person(given = "Fucheng Warren", family = "Zhu", 
-         role = c("aut", "cre"),
-         email = "wzhu@college.harvard.edu",
-         comment = c(ORCID = "0009-0001-5692-7572")),
-  person(given = "Aniket Sachin", family = "Kamat", 
-         role = c("aut", "cre"),
-         email = "aniketkamat@berkeley.edu",
-         comment = c(ORCID = "XXX")),
-  person(given = "Connor", family = "Jerzak", 
-         role = c("aut", "cre"),
-         email = "connor.jerzak@gmail.com",
-         comment = c(ORCID = "0000-0003-1914-8905")),
-  person(given = "Rebecca", family = "Goldstein", 
-         role = "aut",
-         email = "rgoldstein@berkeley.edu",
-         comment = c(ORCID = "0000-0002-9944-8440"))
-)
-Description: Provides hardware-accelerated tools for performing rerandomization and randomization testing in experimental research. Using a JAX backend, the package enables exact rerandomization inference even for large experiments with hundreds of millions of possible randomizations. Key functionalities include generating pools of acceptable rerandomizations based on covariate balance, conducting exact randomization tests, and performing pre-analysis evaluations to determine optimal rerandomization acceptance thresholds. The package supports various hardware acceleration frameworks including CPU, CUDA, and METAL, making it versatile across computing environments. This allows researchers to efficiently implement rerandomization designs and conduct valid inference even with large sample sizes.
+Authors@R: 
+    c(person(given = "Fucheng Warren",
+             family = "Zhu",
+             role = c("aut", "cre"),
+             email = "wzhu@college.harvard.edu",
+             comment = c(ORCID = "0009-0001-5692-7572")),
+      person(given = "Aniket Sachin",
+             family = "Kamat",
+             role = "aut",
+             email = "aniketkamat@berkeley.edu",
+             comment = c(ORCID = "XXX")),
+      person(given = "Connor",
+             family = "Jerzak",
+             role = "aut",
+             email = "connor.jerzak@gmail.com",
+             comment = c(ORCID = "0000-0003-1914-8905")),
+      person(given = "Rebecca",
+             family = "Goldstein",
+             role = "aut",
+             email = "rgoldstein@berkeley.edu",
+             comment = c(ORCID = "0000-0002-9944-8440")))
+Description: Provides hardware-accelerated tools for performing rerandomization
+    and randomization testing in experimental research. Using a JAX backend, the
+    package enables exact rerandomization inference even for large experiments
+    with hundreds of millions of possible randomizations. Key functionalities
+    include generating pools of acceptable rerandomizations based on covariate
+    balance, conducting exact randomization tests, and performing pre-analysis
+    evaluations to determine optimal rerandomization acceptance thresholds. The
+    package supports various hardware acceleration frameworks including CPU,
+    CUDA, and METAL, making it versatile across computing environments. This
+    allows researchers to efficiently implement rerandomization designs and
+    conduct valid inference even with large sample sizes.
 URL: https://github.com/cjerzak/fastrerandomize-software
 BugReports: https://github.com/cjerzak/fastrerandomize-software/issues
 Depends: R (>= 3.3.3)
-License: Creative Commons Attribution-Noncommercial-No Derivative Works 4.0, for academic use only.
+License: Creative Commons Attribution-Noncommercial-No Derivative Works 4.0,
+    for academic use only.
 Encoding: UTF-8
 LazyData: false
-Imports: reticulate, assertthat
+Imports: 
+    reticulate,
+    assertthat
 RoxygenNote: 7.3.2
