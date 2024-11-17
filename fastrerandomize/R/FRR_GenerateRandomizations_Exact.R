@@ -29,7 +29,7 @@
 #' 2. If covariates (X) are provided, filters these combinations based on balance
 #'    criteria using the specified threshold function
 #'
-#' The balance filtering process uses Hotelling's T² statistic by default to measure
+#' The balance filtering process uses Hotelling's T-squared statistic by default to measure
 #' multivariate balance between treatment and control groups. Randomizations are
 #' accepted if their balance measure is below the specified quantile threshold.
 #'
@@ -78,7 +78,7 @@ GenerateRandomizations_Exact <- function(n_units, n_treated,
     n0_array <- jnp$array(  (n_units - n_treated) )
     n1_array <- jnp$array(  n_treated )
     
-    # Calculate balance measure (Hotelling T²) for each candidate randomization
+    # Calculate balance measure (Hotelling T-squared) for each candidate randomization
     M_results <-  threshold_func(
       jnp$array( X ),                    # Covariates
       jnp$array(candidate_randomizations, dtype = jnp$float32),  # Possible assignments

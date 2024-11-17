@@ -47,7 +47,7 @@ The function works in two main steps:
 2. If covariates (X) are provided, filters these combinations based on balance
    criteria using the specified threshold function
 
-The balance filtering process uses Hotelling's T² statistic by default to measure
+The balance filtering process uses Hotelling's T-squared statistic by default to measure
 multivariate balance between treatment and control groups. Randomizations are
 accepted if their balance measure is below the specified quantile threshold.
 }
