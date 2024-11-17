@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 #' This function generates simulated causal data based on specified parameters. The functional form of the outcome models is:
-#' \deqn{Y_0 = X \beta_0 + \epsilon_0}
+#' \deqn{Y_{0} = X\boldsymbol{\beta}_{0} + \epsilon_{0}}
 #' \deqn{Y_1 = X \beta_1 + \tau + \epsilon_1}
 #' where \eqn{\tau} is the treatment effect, which is drawn from a normal distribution with mean `treatment_effect_mean` and standard deviation `treatment_effect_SD`.
 #' The dimension of \eqn{\beta_0} and \eqn{\beta_1} is `k_covars`.

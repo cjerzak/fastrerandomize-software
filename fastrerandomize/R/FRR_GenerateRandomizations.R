@@ -28,12 +28,15 @@
 #' @examples
 #' # Generate randomizations using exact enumeration
 #' X <- matrix(rnorm(100*5), 100, 5)
-#' rand_exact <- GenerateRandomizations(100, 50, X, 
+#' RandomizationSet_Exact <- GenerateRandomizations(100, 50, X, 
 #'                randomization_accept_prob=0.1,
 #'                randomization_type="exact")
 #'
 #' # Generate randomizations using Monte Carlo sampling
-#' rand_mc <- GenerateRandomizations(100, 50, X,
+#' RandomizationSet_MC <- GenerateRandomizations(
+#'                n_units = 100, 
+#'                n_treated = 50, 
+#'                X = X,
 #'                randomization_accept_prob=0.1,
 #'                randomization_type="monte_carlo",
 #'                max_draws=1000)
