@@ -9,7 +9,14 @@
 #' If they are not provided, the function assumes a NULL value, and the coefficients are drawn from a normal distribution with decreasing variance.
 #' Example usage: 
 #' ```
-#' GenerateCausalData(n_units = 100, proportion_treated = 0.5, k_covars = 3, rho = 0.5, SD_inherent = 1, treatment_effect_mean = 0, treatment_effect_SD = 1, covariates_SD = 1)
+#' GenerateCausalData(n_units = 100, 
+#'                    proportion_treated = 0.5, 
+#'                    k_covars = 3, 
+#'                    rho = 0.5, 
+#'                    SD_inherent = 1, 
+#'                    treatment_effect_mean = 0, 
+#'                    treatment_effect_SD = 1, 
+#'                    covariates_SD = 1)
 #' ```
 #' 
 #' @param n_units A numeric value specifying the total number of units in the sample.
@@ -29,7 +36,6 @@
 #'   \item `Y1_coefficients` A numeric vector representing the coefficients used for the treated outcome model.
 #' }
 #'
-#'
 #' @examples
 #' # For a tutorial, see
 #' # github.com/cjerzak/fastrerandomization-software
@@ -38,9 +44,16 @@
 #' @md
 #' @importFrom assertthat assert_that
 # 
-GenerateCausalData <- function(n_units, proportion_treated, k_covars, rho, SD_inherent,
-                          treatment_effect_mean, treatment_effect_SD, covariates_SD,
-                          Y0_coefficients = NULL, Y1_coefficients = NULL){
+GenerateCausalData <- function(n_units, 
+                               proportion_treated, 
+                               k_covars, 
+                               rho,
+                               SD_inherent, 
+                               treatment_effect_mean, 
+                               treatment_effect_SD, 
+                               covariates_SD,
+                               Y0_coefficients = NULL, 
+                               Y1_coefficients = NULL){
   assert_that(n_units > k_covars, msg = "n_units must be greater than k_covars")
   if(is.null(Y0_coefficients)){
     Y0_coefficients <- as.matrix(rnorm(k_covars, sd = 1/1:k_covars))
@@ -73,7 +86,7 @@ GenerateCausalData <- function(n_units, proportion_treated, k_covars, rho, SD_in
   Y0 <- data_matrix[,1:k_covars] %*%  Y0_coefficients + rnorm(n=n_units, 0, sd=SD_inherent)
   Y1 <- data_matrix[,1:k_covars] %*%  Y1_coefficients + rnorm(n=n_units, mean=treatment_effect_mean, sd=treatment_effect_SD) + rnorm(n=n_units, 0, sd=SD_inherent)
   data_matrix <- as.data.frame( cbind(as.data.frame(data_matrix), Y0, Y1) )
-  return(list("data_matrix"=data_matrix,
+  return(list("data_matrix" = data_matrix,
               "Y0_coefficients" = Y0_coefficients,
               "Y1_coefficients" = Y1_coefficients))
 }
@@ -160,4 +173,4 @@ SanityCheckSyntheticData <- function(synthetic_data, InSampleR_threshold = 0.01,
             assert_that(!is.na(treatment_pval), msg = "Treatment effect p-value is NA")
             assert_that(treatment_pval < treatment_pval_threshold, msg = "Treatment effect p-value is not less than treatment_pval_threshold")
             return(list(lm_model_Y0, lm_model_Y1, lm_model_obsY, lm_model_obsY_obsW))
-        }
+}
