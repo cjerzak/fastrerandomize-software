@@ -12,7 +12,7 @@ GenerateRandomizations(
   max_draws,
   threshold_func = NULL,
   batch_size = 1e+05,
-  randomization_type,
+  randomization_type = "monte_carlo",
   approximate_inv = TRUE,
   seed = NULL,
   verbose = TRUE

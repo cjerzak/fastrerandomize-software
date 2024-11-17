@@ -54,7 +54,7 @@ GenerateRandomizations <- function(n_units,
                                    max_draws, 
                                    threshold_func = NULL, 
                                    batch_size = 100000, 
-                                   randomization_type, 
+                                   randomization_type = "monte_carlo", 
                                    approximate_inv = TRUE, 
                                    seed = NULL, 
                                    verbose = TRUE){
