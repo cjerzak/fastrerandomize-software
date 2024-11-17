@@ -177,6 +177,6 @@ InitializeJAX <- function(conda_env = NULL, conda_env_required = T){
   
   VectorizedFastHotel2T2 <- jax$jit( jax$vmap(function(samp_, w_, n0, n1, approximate_inv = FALSE){
     FastHotel2T2(samp_, w_, n0, n1, approximate_inv)},
-    in_axes = list(NULL, 0L, NULL, NULL, FALSE)) )
+    in_axes = list(NULL, 0L, NULL, NULL, NULL)) )
   print2("Success setting up core JAX functions!")
 }
