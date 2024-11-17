@@ -24,6 +24,7 @@
     if("try-error" %in% class(t_GenData)){ stop("Failed at t_GenData...") }
     
     for(type_ in c("exact","monte_carlo")){ 
+      print(sprintf("On type: %s", type_))
       t_GetSet <- try({
         RandomizationSet_ <- fastrerandomize::GenerateRandomizations(
           n_units = 20,
