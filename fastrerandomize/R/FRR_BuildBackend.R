@@ -21,8 +21,7 @@ BuildBackend <- function(conda_env = "fastrerandomize", conda = "auto", tryMetal
                            python_version = "3.11")
   
   # Install Python packages within the environment
-  Packages2Install <- c(
-                        "numpy==1.26.4",
+  Packages2Install <- c("numpy==1.26.4",
                         "jax==0.4.26",
                         "jaxlib==0.4.26")
   if(tryMetal){ 
@@ -30,20 +29,8 @@ BuildBackend <- function(conda_env = "fastrerandomize", conda = "auto", tryMetal
       Packages2Install <- c(Packages2Install,"jax-metal==0.1.0")
     }
   }
-  if(Sys.info()["sysname"] == "Darwin"){
-    for(pack_ in Packages2Install){
-      try_ <- reticulate::py_install(pack_, conda = conda, pip = TRUE, envname = conda_env)
-    }
-  }
-  if(Sys.info()["sysname"] == "Windows"){
-    for(pack_ in Packages2Install){
-      reticulate::py_install(pack_, conda = conda, pip = TRUE, envname = conda_env)
-    }
-  }
-  if(Sys.info()["sysname"] == "Linux"){
-    for(pack_ in Packages2Install){
-      reticulate::py_install(pack_, conda = conda, pip = TRUE, envname = conda_env)
-    }
+  for(pack_ in Packages2Install){
+      try_ <- try(reticulate::py_install(pack_, conda = conda, pip = TRUE, envname = conda_env),T)
   }
   print("Done building fastrerandomize backend!")
 }
