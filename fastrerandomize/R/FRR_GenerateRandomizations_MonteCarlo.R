@@ -81,7 +81,15 @@ def batch_permutation(key, base_vector, num_perms):
 # Apply jit after function definition
 batch_permutation = jax.jit(batch_permutation, static_argnums=2)
 "
-  py_run_string(jax_code)
+  # py_run_string(jax_code)
+  batch_permutation <- jax$jit( function(key, base_vector, num_perms){
+    base_vector = jnp$broadcast_to(base_vector, list(num_perms, base_vector$shape[[1]] ))
+    keys = jax$random$split(key, num_perms)
+    perms = jax$vmap(jax$random$permutation)(keys, base_vector)
+    #assert perms.dtype == jnp.int8, 'perms must be a boolean array'
+    return(perms)
+  }, static_argnums=2L)
+  
   
   # Calculate the maximum number of possible randomizations
   max_rand_num <- choose(n_units, n_treated)
@@ -148,7 +156,8 @@ batch_permutation = jax.jit(batch_permutation, static_argnums=2)
     batch_key <- jax$random$fold_in(key, batch_idx)
     
     # Generate permutations for the current batch
-    perms_batch <- py$batch_permutation(batch_key, base_vector_jax, as.integer(perms_in_batch))
+    #perms_batch <- py$batch_permutation(batch_key, base_vector_jax, as.integer(perms_in_batch))
+    perms_batch <- batch_permutation(batch_key, base_vector_jax, as.integer(perms_in_batch))
     
     # Calculate balance measures (e.g., Hotelling T²) for each permutation in the batch
     M_results_batch <- threshold_func(
