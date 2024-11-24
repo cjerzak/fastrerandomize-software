@@ -14,7 +14,7 @@
 #' @export
 #' @md
 
-BuildBackend <- function(conda_env = "fastrerandomize", conda = "auto", tryMetal = T){
+build_backend <- function(conda_env = "fastrerandomize", conda = "auto", tryMetal = T){
   # Create a new conda environment
   reticulate::conda_create(envname = conda_env,
                            conda = conda,

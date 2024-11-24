@@ -47,7 +47,7 @@
 #'
 #' @export
 #' @md
-GenerateRandomizations <- function(n_units, 
+generate_randomizations <- function(n_units, 
                                    n_treated, 
                                    X, 
                                    randomization_accept_prob, 
@@ -66,7 +66,7 @@ GenerateRandomizations <- function(n_units,
         if (ncol(X) > 20){
             print("Warning: X has more than 20 columns. This may cause memory issues.")
         }
-        candidate_randomizations <- fastrerandomize::GenerateRandomizations_Exact(
+        candidate_randomizations <- fastrerandomize::generate_randomizations_exact(
                                                 n_units = n_units,
                                                 n_treated = n_treated,
                                                 X = X, 
@@ -75,7 +75,7 @@ GenerateRandomizations <- function(n_units,
         if (verbose){
             print("Using monte carlo randomization")
         }
-        candidate_randomizations <- fastrerandomize::GenerateRandomizations_MonteCarlo(n_units, 
+        candidate_randomizations <- fastrerandomize::generate_randomizations_mc(n_units, 
                                                                     n_treated, 
                                                                     X, 
                                                                     randomization_accept_prob, 

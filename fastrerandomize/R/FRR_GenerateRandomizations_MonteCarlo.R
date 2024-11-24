@@ -45,7 +45,7 @@
 #' @importFrom assertthat assert_that
 #' @export
 #' @md
-GenerateRandomizations_MonteCarlo <- function(n_units, n_treated,
+generate_randomizations_mc <- function(n_units, n_treated,
                                              X,
                                              randomization_accept_prob = 1,
                                              threshold_func = VectorizedFastHotel2T2, 

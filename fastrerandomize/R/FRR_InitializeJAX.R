@@ -27,7 +27,7 @@
 #' @importFrom reticulate import use_condaenv
 #' @export
 
-InitializeJAX <- function(conda_env = NULL, conda_env_required = T){
+initialize_jax <- function(conda_env = NULL, conda_env_required = T){
   print2("Loading JAX...")
   {
   library(reticulate)

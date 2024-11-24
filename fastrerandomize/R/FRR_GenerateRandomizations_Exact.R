@@ -63,7 +63,7 @@
 #' \code{\link{InsertOnesVectorized}} for the treatment assignment generation
 #'
 #' @export
-GenerateRandomizations_Exact <- function(n_units, n_treated,
+generate_randomizations_exact <- function(n_units, n_treated,
                                    X = NULL,
                                    randomization_accept_prob = 1,
                                    approximate_inv = TRUE, 
