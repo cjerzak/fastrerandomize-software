@@ -61,18 +61,18 @@ GenerateRandomizations_MonteCarlo <- function(n_units, n_treated,
   # Uses vmap to vectorize the permutation operation over the batch size
   # Uses jit to compile the function
   jax_code <- "
-import jax
-import jax.numpy as jnp
-
-def batch_permutation(key, base_vector, num_perms):
-    base_vector = jnp.broadcast_to(base_vector, (num_perms, len(base_vector)))
-    keys = jax.random.split(key, num_perms)
-    perms = jax.vmap(jax.random.permutation)(keys, base_vector)
-    assert perms.dtype == jnp.int8, 'perms must be a boolean array'
-    return perms
-
-# Apply jit after function definition
-batch_permutation = jax.jit(batch_permutation, static_argnums=2)
+          import jax
+          import jax.numpy as jnp
+          
+          def batch_permutation(key, base_vector, num_perms):
+              base_vector = jnp.broadcast_to(base_vector, (num_perms, len(base_vector)))
+              keys = jax.random.split(key, num_perms)
+              perms = jax.vmap(jax.random.permutation)(keys, base_vector)
+              assert perms.dtype == jnp.int8, 'perms must be a boolean array'
+              return perms
+          
+          # Apply jit after function definition
+          batch_permutation = jax.jit(batch_permutation, static_argnums=2)
   "
   py_run_string(jax_code)
   
@@ -180,10 +180,7 @@ batch_permutation = jax.jit(batch_permutation, static_argnums=2)
 
     assert_that(top_M_results$shape[[1]] <= num_to_accept, msg = paste0("top_M_results must have dimensions ", num_to_accept, " x 1."))
     assert_that(top_perms$shape[[1]] <= num_to_accept, msg = paste0("top_perms must have dimensions ", num_to_accept, " x ", n_units, "."))
-    rm(perms_batch)
-    rm(M_results_batch)
-    rm(combined_M_results)
-    rm(combined_perms)
+    rm(perms_batch,combined_M_results,M_results_batch,combined_perms)
     jax$clear_caches()
     gc()  # Force garbage collection
     py_run_string("import gc; gc.collect()")
