@@ -57,9 +57,16 @@ randomization_test <- function(
                                nSimulate_obsY = 50L,
                                randomization_accept_prob = 1.,
                                findFI = F,
-                               c_initial = 2
+                               c_initial = 2,
+                               conda_env = "fastrerandomize", conda_env_required = T
                                ){
   tau_obs <- FI <- covers_truth <- NULL
+  
+  if(!"jax" %in% ls()){
+    initialize_jax_code <- paste(deparse(initialize_jax),collapse="\n")
+    initialize_jax_code <- gsub(initialize_jax_code,pattern="function \\(\\)",replace="")
+    eval( parse( text = initialize_jax_code ), envir = evaluation_environment )
+  }
 
   if(!simulate){
     if(is.null(n0_array)){ n0_array <- jnp$array(sum(obsW == 0)) }

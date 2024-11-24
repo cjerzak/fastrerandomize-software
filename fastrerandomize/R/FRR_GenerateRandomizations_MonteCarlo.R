@@ -53,8 +53,15 @@ generate_randomizations_mc <- function(n_units, n_treated,
                                              seed = NULL,
                                              batch_size = 10000, 
                                              approximate_inv = TRUE,
-                                             verbose = FALSE){
-  jnp <- jax$numpy
+                                             verbose = FALSE,
+                                             conda_env = "fastrerandomize", conda_env_required = T
+                                            ){
+  if(!"jax" %in% ls()){
+    initialize_jax_code <- paste(deparse(initialize_jax),collapse="\n")
+    initialize_jax_code <- gsub(initialize_jax_code,pattern="function \\(\\)",replace="")
+    eval( parse( text = initialize_jax_code ), envir = evaluation_environment )
+  }
+
   if(is.null(seed)){ seed <- as.integer(runif(1, 0, 100000)) }
   
   # Define the batch_permutation function in Python using JAX

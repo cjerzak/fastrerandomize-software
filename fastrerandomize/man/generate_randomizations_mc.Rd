@@ -14,7 +14,9 @@ generate_randomizations_mc(
   seed = NULL,
   batch_size = 10000,
   approximate_inv = TRUE,
-  verbose = FALSE
+  verbose = FALSE,
+  conda_env = "fastrerandomize",
+  conda_env_required = T
 )
 }
 \arguments{

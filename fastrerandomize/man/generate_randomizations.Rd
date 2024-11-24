@@ -15,7 +15,9 @@ generate_randomizations(
   randomization_type = "monte_carlo",
   approximate_inv = TRUE,
   seed = NULL,
-  verbose = TRUE
+  verbose = TRUE,
+  conda_env = "fastrerandomize",
+  conda_env_required = T
 )
 }
 \arguments{

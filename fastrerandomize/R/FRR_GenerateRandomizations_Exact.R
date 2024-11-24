@@ -67,7 +67,14 @@ generate_randomizations_exact <- function(n_units, n_treated,
                                    X = NULL,
                                    randomization_accept_prob = 1,
                                    approximate_inv = TRUE, 
-                                   threshold_func = VectorizedFastHotel2T2){
+                                   threshold_func = VectorizedFastHotel2T2,
+                                   conda_env = "fastrerandomize", conda_env_required = T){
+  if(!"jax" %in% ls()){
+    initialize_jax_code <- paste(deparse(initialize_jax),collapse="\n")
+    initialize_jax_code <- gsub(initialize_jax_code,pattern="function \\(\\)",replace="")
+    eval( parse( text = initialize_jax_code ), envir = evaluation_environment )
+  }
+  
   # Get all combinations of positions to set to 1
   combinations <- jnp$array(  utils::combn(n_units, n_treated) - 1L )
   ZerosHolder <- jnp$zeros(as.integer(n_units), dtype=jnp$int32)

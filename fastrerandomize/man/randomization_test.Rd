@@ -22,7 +22,9 @@ randomization_test(
   nSimulate_obsY = 50L,
   randomization_accept_prob = 1,
   findFI = F,
-  c_initial = 2
+  c_initial = 2,
+  conda_env = "fastrerandomize",
+  conda_env_required = T
 )
 }
 \arguments{

@@ -57,8 +57,16 @@ generate_randomizations <- function(n_units,
                                    randomization_type = "monte_carlo", 
                                    approximate_inv = TRUE, 
                                    seed = NULL, 
-                                   verbose = TRUE){
+                                   verbose = TRUE,
+                                   conda_env = "fastrerandomize", conda_env_required = T
+                                   ){
+    if(!"jax" %in% ls()){
+      initialize_jax_code <- paste(deparse(initialize_jax),collapse="\n")
+      initialize_jax_code <- gsub(initialize_jax_code,pattern="function \\(\\)",replace="")
+      eval( parse( text = initialize_jax_code ), envir = evaluation_environment )
+    }
     if(is.null(threshold_func)){ threshold_func <- VectorizedFastHotel2T2}
+  
     if (randomization_type == "exact"){
         if (verbose){
             print("Using exact randomization")

@@ -10,7 +10,9 @@ generate_randomizations_exact(
   X = NULL,
   randomization_accept_prob = 1,
   approximate_inv = TRUE,
-  threshold_func = VectorizedFastHotel2T2
+  threshold_func = VectorizedFastHotel2T2,
+  conda_env = "fastrerandomize",
+  conda_env_required = T
 )
 }
 \arguments{

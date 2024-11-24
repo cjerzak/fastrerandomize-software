@@ -1,33 +1,5 @@
-#' Initialize JAX Environment for Fast Rerandomization
-#'
-#' @param conda_env Character string. The conda environment name containing JAX. If NULL, uses default Python environment.
-#' @param conda_env_required Logical. Whether to force use of the specified conda environment.
-#'
-#' @return Initializes JAX environment and defines core JAX functions globally.
-#'   Returns invisible(NULL).
-#'
-#' @details
-#' This function must be run before using any other functions in the package.
-#' It initializes JAX and defines several core functions used throughout the package:
-#' \itemize{
-#'   \item expand_grid_JAX: Creates treatment combinations
-#'   \item FastDiffInMeans: Computes difference in means
-#'   \item Various vectorized versions of these functions
-#' }
-#'
-#' @examples
-#' \dontrun{
-#' # Basic usage
-#' InitializeJAX()
-#'
-#' # Using specific conda environment
-#' InitializeJAX(conda_env = "my_jax_env")
-#' }
-#'
-#' @importFrom reticulate import use_condaenv
-#' @export
-
-initialize_jax <- function(conda_env = NULL, conda_env_required = T){
+initialize_jax <- function(conda_env = "fastrerandomize", conda_env_required = T){
+  { 
   print2("Loading JAX...")
   {
   library(reticulate)
@@ -180,4 +152,5 @@ initialize_jax <- function(conda_env = NULL, conda_env_required = T){
     FastHotel2T2(samp_, w_, n0, n1, approximate_inv)},
     in_axes = list(NULL, 0L, NULL, NULL, NULL)) )
   print2("Success setting up core JAX functions!")
+  }
 }
