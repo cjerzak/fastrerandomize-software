@@ -11,7 +11,7 @@
     # install.packages("~/Documents/fastrerandomize-software/fastrerandomize",repos = NULL, type = "source",force = F)
     
     options(error = NULL); t_Initialize <- try({
-      fastrerandomize::InitializeJAX(conda_env = "jax_cpu", conda_env_required = T)
+      fastrerandomize::initialize_jax(conda_env = "jax_cpu", conda_env_required = T)
     },T)
     if("try-error" %in% class(t_Initialize)){ stop("Failed at t_Initialize...") }
     
@@ -35,6 +35,7 @@
       },T)
       if("try-error" %in% class(t_GetSet)){ stop(sprintf("Failed at t_GetSet: %s...",type_)) }
       
+      stop("XX")
       t_RRTest <- try({
         RRTest_ <- fastrerandomize::randomization_test(
           obsW = (W_<-as.integer(np$array(RandomizationSet_[1,]))),
