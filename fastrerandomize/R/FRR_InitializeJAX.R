@@ -4,7 +4,6 @@ initialize_jax <- function(){ #initialize_jax <- function(conda_env = "fastreran
   {
   library(reticulate)
   if(!is.null(conda_env)){
-    browser()
     try(reticulate::use_condaenv(condaenv = conda_env, required = conda_env_required),T)
   }
 
