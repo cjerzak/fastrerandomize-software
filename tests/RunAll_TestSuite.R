@@ -10,10 +10,8 @@
     # local install for development team
     # install.packages("~/Documents/fastrerandomize-software/fastrerandomize",repos = NULL, type = "source",force = F)
     
-    options(error = NULL); t_Initialize <- try({
-      fastrerandomize::initialize_jax(conda_env = "jax_cpu", conda_env_required = T)
-    },T)
-    if("try-error" %in% class(t_Initialize)){ stop("Failed at t_Initialize...") }
+    #options(error = NULL); t_Initialize <- try({ fastrerandomize::initialize_jax(conda_env = "jax_cpu", conda_env_required = T) },T)
+    #if("try-error" %in% class(t_Initialize)){ stop("Failed at t_Initialize...") }
     
     t_GenData <- try({
       set.seed(999L, kind = "Wichmann-Hill")

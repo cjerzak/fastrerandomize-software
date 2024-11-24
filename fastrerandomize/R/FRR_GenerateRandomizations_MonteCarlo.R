@@ -58,8 +58,8 @@ generate_randomizations_mc <- function(n_units, n_treated,
                                             ){
   if(!"jax" %in% ls()){
     initialize_jax_code <- paste(deparse(initialize_jax),collapse="\n")
-    initialize_jax_code <- gsub(initialize_jax_code,pattern="function \\(\\)",replace="")
-    eval( parse( text = initialize_jax_code ), envir = evaluation_environment )
+    initialize_jax_code <- gsub(initialize_jax_code, pattern="function \\(\\)",replace="")
+    eval( parse( text = initialize_jax_code ), envir = environment() )
   }
 
   if(is.null(seed)){ seed <- as.integer(runif(1, 0, 100000)) }

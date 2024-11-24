@@ -72,7 +72,7 @@ generate_randomizations_exact <- function(n_units, n_treated,
   if(!"jax" %in% ls()){
     initialize_jax_code <- paste(deparse(initialize_jax),collapse="\n")
     initialize_jax_code <- gsub(initialize_jax_code,pattern="function \\(\\)",replace="")
-    eval( parse( text = initialize_jax_code ), envir = evaluation_environment )
+    eval( parse( text = initialize_jax_code ), envir = environment() )
   }
   
   # Get all combinations of positions to set to 1
