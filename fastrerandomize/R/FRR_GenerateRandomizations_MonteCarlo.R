@@ -61,19 +61,19 @@ generate_randomizations_mc <- function(n_units, n_treated,
   # Uses vmap to vectorize the permutation operation over the batch size
   # Uses jit to compile the function
   jax_code <- "
-          import jax
-          import jax.numpy as jnp
+import jax
+import jax.numpy as jnp
           
-          def batch_permutation(key, base_vector, num_perms):
-              base_vector = jnp.broadcast_to(base_vector, (num_perms, len(base_vector)))
-              keys = jax.random.split(key, num_perms)
-              perms = jax.vmap(jax.random.permutation)(keys, base_vector)
-              assert perms.dtype == jnp.int8, 'perms must be a boolean array'
-              return perms
+def batch_permutation(key, base_vector, num_perms):
+  base_vector = jnp.broadcast_to(base_vector, (num_perms, len(base_vector)))
+  keys = jax.random.split(key, num_perms)
+  perms = jax.vmap(jax.random.permutation)(keys, base_vector)
+  assert perms.dtype == jnp.int8, 'perms must be a boolean array'
+  return perms
           
-          # Apply jit after function definition
-          batch_permutation = jax.jit(batch_permutation, static_argnums=2)
-  "
+# Apply jit after function definition
+batch_permutation = jax.jit(batch_permutation, static_argnums=2)
+"
   py_run_string(jax_code)
   
   # Calculate the maximum number of possible randomizations

@@ -24,6 +24,7 @@
     for(findFI in c(FALSE, TRUE)){ 
     for(type_ in c("exact","monte_carlo")){ 
       fastrerandomize::print2(sprintf("On type: %s", type_))
+      
       t_GetSet <- try({
         RandomizationSet_ <- fastrerandomize::generate_randomizations(
           n_units = 20,
@@ -35,7 +36,6 @@
       },T)
       if("try-error" %in% class(t_GetSet)){ stop(sprintf("Failed at t_GetSet: %s...",type_)) }
       
-      stop("XX")
       t_RRTest <- try({
         RRTest_ <- fastrerandomize::randomization_test(
           obsW = (W_<-as.integer(np$array(RandomizationSet_[1,]))),
