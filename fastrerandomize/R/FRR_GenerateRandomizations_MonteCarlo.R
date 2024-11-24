@@ -67,21 +67,6 @@ generate_randomizations_mc <- function(n_units, n_treated,
   # Define the batch_permutation function in Python using JAX
   # Uses vmap to vectorize the permutation operation over the batch size
   # Uses jit to compile the function
-  jax_code <- "
-import jax
-import jax.numpy as jnp
-          
-def batch_permutation(key, base_vector, num_perms):
-  base_vector = jnp.broadcast_to(base_vector, (num_perms, len(base_vector)))
-  keys = jax.random.split(key, num_perms)
-  perms = jax.vmap(jax.random.permutation)(keys, base_vector)
-  assert perms.dtype == jnp.int8, 'perms must be a boolean array'
-  return perms
-          
-# Apply jit after function definition
-batch_permutation = jax.jit(batch_permutation, static_argnums=2)
-"
-  # py_run_string(jax_code)
   batch_permutation <- jax$jit( function(key, base_vector, num_perms){
     base_vector = jnp$broadcast_to(base_vector, list(num_perms, base_vector$shape[[1]] ))
     keys = jax$random$split(key, num_perms)
@@ -89,7 +74,6 @@ batch_permutation = jax.jit(batch_permutation, static_argnums=2)
     #assert perms.dtype == jnp.int8, 'perms must be a boolean array'
     return(perms)
   }, static_argnums=2L)
-  
   
   # Calculate the maximum number of possible randomizations
   max_rand_num <- choose(n_units, n_treated)
@@ -156,7 +140,6 @@ batch_permutation = jax.jit(batch_permutation, static_argnums=2)
     batch_key <- jax$random$fold_in(key, batch_idx)
     
     # Generate permutations for the current batch
-    #perms_batch <- py$batch_permutation(batch_key, base_vector_jax, as.integer(perms_in_batch))
     perms_batch <- batch_permutation(batch_key, base_vector_jax, as.integer(perms_in_batch))
     
     # Calculate balance measures (e.g., Hotelling T²) for each permutation in the batch
@@ -184,6 +167,7 @@ batch_permutation = jax.jit(batch_permutation, static_argnums=2)
     if (combined_length > num_to_accept){
         # Get indices of combined_M_results sorted in ascending order
         sorted_indices <- jnp$argsort(combined_M_results)
+        
         # Keep only top num_to_accept permutations
         indices_to_keep <- sorted_indices[0:num_to_accept]
         top_M_results <- jnp$take(combined_M_results, indices_to_keep)
@@ -197,8 +181,7 @@ batch_permutation = jax.jit(batch_permutation, static_argnums=2)
     assert_that(top_M_results$shape[[1]] <= num_to_accept, msg = paste0("top_M_results must have dimensions ", num_to_accept, " x 1."))
     assert_that(top_perms$shape[[1]] <= num_to_accept, msg = paste0("top_perms must have dimensions ", num_to_accept, " x ", n_units, "."))
     rm(perms_batch,combined_M_results,M_results_batch,combined_perms)
-    jax$clear_caches()
-    gc()  # Force garbage collection
+    jax$clear_caches(); gc()  # Force garbage collection
     py_run_string("import gc; gc.collect()")
 
     # Update the key for the next batch
