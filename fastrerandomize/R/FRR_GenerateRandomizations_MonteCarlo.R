@@ -189,7 +189,6 @@ generate_randomizations_mc <- function(n_units, n_treated,
     key <- jax$random$fold_in(key, batch_idx)
   }
   print(sprintf("MC Loop Time (s): %.4f", as.numeric(difftime(Sys.time(), t0, units = "secs"))))
-  browser()
     
   # After processing all batches, the candidate_randomizations are the top_perms
   candidate_randomizations <- top_perms
