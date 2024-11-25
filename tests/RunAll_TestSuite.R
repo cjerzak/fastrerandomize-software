@@ -28,9 +28,10 @@
           n_units = 20,
           n_treated = 10,
           X = X,
-          randomization_accept_prob=0.1,
-          randomization_type=type_,
-          max_draws=1000)
+          randomization_accept_prob = 0.1,
+          randomization_type = type_,
+          conda_env = "jax_gpu",
+          max_draws = 1000)
       },T)
       if("try-error" %in% class(t_GetSet)){ stop(sprintf("Failed at t_GetSet: %s...",type_)) }
       
