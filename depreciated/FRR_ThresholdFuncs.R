@@ -55,3 +55,23 @@ FastHotel2T2 <- ( function(samp_, w_, n0, n1, approximate_inv = FALSE){
 VectorizedFastHotel2T2 <- jax$jit( jax$vmap(function(samp_, w_, n0, n1, approximate_inv = FALSE){
     FastHotel2T2(samp_, w_, n0, n1, approximate_inv)},
     in_axes = list(NULL, 0L, NULL, NULL, FALSE)) )
+
+
+if(T == F){ if (verbose){
+  print(paste0("At batch_idx ", batch_idx, " of ", num_batches, "."))
+  # Run nvidia-smi and capture the output
+  tryCatch({
+    # Try to get GPU info
+    gpu_info <- system("nvidia-smi --query-compute-apps=pid,process_name,used_memory --format=csv,noheader,nounits", intern = TRUE)
+    if (length(gpu_info) > 0) {
+      # Parse and format GPU info
+      gpu_processes <- lapply(strsplit(gpu_info, ","), trimws)
+      gpu_table <- do.call(rbind, lapply(gpu_processes, function(x) {
+        sprintf("PID: %s | Process: %s | Memory: %s MB", x[1], x[2], x[3])
+      }))
+      print(gpu_table)
+    }
+  }, error = function(e){
+    warning("No GPU detected - running on CPU only")
+  })
+}} 

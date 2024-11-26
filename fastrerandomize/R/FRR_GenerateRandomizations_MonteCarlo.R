@@ -115,79 +115,45 @@ generate_randomizations_mc <- function(n_units, n_treated,
     print(paste0("Starting batch processing with ", num_batches, " batches."))
   }
   t0 <- Sys.time()
-  for (batch_idx in seq_len(num_batches)){
-    if (verbose){
-      print(paste0("At batch_idx ", batch_idx, " of ", num_batches, "."))
-      # Run nvidia-smi and capture the output
-      tryCatch({
-        # Try to get GPU info
-        gpu_info <- system("nvidia-smi --query-compute-apps=pid,process_name,used_memory --format=csv,noheader,nounits", intern = TRUE)
-        if (length(gpu_info) > 0) {
-          # Parse and format GPU info
-          gpu_processes <- lapply(strsplit(gpu_info, ","), trimws)
-          gpu_table <- do.call(rbind, lapply(gpu_processes, function(x) {
-            sprintf("PID: %s | Process: %s | Memory: %s MB", x[1], x[2], x[3])
-          }))
-          print(gpu_table)
-        }
-      }, error = function(e){
-        warning("No GPU detected - running on CPU only")
-      })
-    }
-    # Determine the number of permutations in this batch
-    perms_in_batch <- min(batch_size, max_draws - (batch_idx - 1) * batch_size)
-    
-    # Update the random key for the current batch to ensure uniqueness
-    batch_key <- jax$random$fold_in(key, batch_idx)
-    
+  
+  top_M_results <- jax$vmap( (function(batch_key){
     # Generate permutations for the current batch - run on CPU? 
-    perms_batch <- batch_permutation(batch_key, base_vector_jax, as.integer(perms_in_batch))
+    perms_batch <- batch_permutation(batch_key, base_vector_jax, as.integer(batch_size))
     #perms_batch <- batch_permutation(batch_key$to_device(jax$devices("cpu")[[1]]), base_vector_jax$to_device(jax$devices("cpu")[[1]]),  as.integer(perms_in_batch))$to_device(jax$devices()[[1]])
     
     # Calculate balance measures (e.g., Hotelling T-squared) for each permutation in the batch
-    M_results_batch <- threshold_func(
+    M_results_batch <- jnp$squeeze( threshold_func(
       X_jax,
       perms_batch,
       n0_array, 
       n1_array, 
       approximate_inv
-    )
+    ) )$astype(jnp$float16)
     
-    # Flatten M_results_batch to 1D array
-    M_results_batch <- jnp$squeeze(M_results_batch)
+    return(list("top_perms"=perms_batch,
+                "top_M_results"=M_results_batch) ) 
+  }),in_axes = 0L,out_axes = 1L)(jax$random$split(key,as.integer(num_batches)))
+  
+  top_perms <- jnp$reshape(top_M_results$top_perms,list(-1L,top_M_results$top_perms$shape[[3]]))
+  top_M_results <- jnp$reshape(top_M_results$top_M_results,list(-1L))
+  
+  # Limit the size of combined arrays
+  combined_length <- top_M_results$shape[[1]]
+  {
+    # Get indices of combined_M_results sorted in ascending order
+    sorted_indices <- jnp$argsort(top_M_results)
     
-    if(is.null(top_M_results)){
-        combined_M_results <- M_results_batch
-        combined_perms <- perms_batch
-    } else {
-        combined_M_results <- jnp$concatenate(list(top_M_results, M_results_batch))
-        combined_perms <- jnp$concatenate(list(top_perms, perms_batch), axis=0L)
-    }
-
-    # Limit the size of combined arrays
-    combined_length <- combined_M_results$shape[[1]]
-    if (combined_length > num_to_accept){
-        # Get indices of combined_M_results sorted in ascending order
-        sorted_indices <- jnp$argsort(combined_M_results)
-        
-        # Keep only top num_to_accept permutations
-        indices_to_keep <- sorted_indices[0:num_to_accept]
-        top_M_results <- jnp$take(combined_M_results, indices_to_keep)
-        top_perms <- jnp$take(combined_perms, indices_to_keep, axis=0L)
-    } else {
-        # Keep combined results as top results
-        top_M_results <- combined_M_results
-        top_perms <- combined_perms
-    }
-
-    assert_that(top_M_results$shape[[1]] <= num_to_accept, msg = paste0("top_M_results must have dimensions ", num_to_accept, " x 1."))
-    assert_that(top_perms$shape[[1]] <= num_to_accept, msg = paste0("top_perms must have dimensions ", num_to_accept, " x ", n_units, "."))
-    rm(perms_batch,combined_M_results,M_results_batch,combined_perms)
-    gc(); py_gc$collect()
-
-    # Update the key for the next batch
-    key <- jax$random$fold_in(key, batch_idx)
+    # Keep only top num_to_accept permutations
+    indices_to_keep <- sorted_indices[0:num_to_accept]
+    top_M_results <- jnp$take(top_M_results, indices_to_keep)
+    top_perms <- jnp$take(top_perms, indices_to_keep, axis=0L)
   }
+  
+  assert_that(top_M_results$shape[[1]] <= num_to_accept, msg = paste0("top_M_results must have dimensions ", num_to_accept, " x 1."))
+  assert_that(top_perms$shape[[1]] <= num_to_accept, msg = paste0("top_perms must have dimensions ", num_to_accept, " x ", n_units, "."))
+  rm(perms_batch,combined_M_results,M_results_batch,combined_perms)
+  gc(); py_gc$collect()
+  
   print(sprintf("MC Loop Time (s): %.4f", as.numeric(difftime(Sys.time(), t0, units = "secs"))))
     
   # After processing all batches, the candidate_randomizations are the top_perms
