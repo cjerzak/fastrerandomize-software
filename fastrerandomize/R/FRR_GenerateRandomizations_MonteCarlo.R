@@ -46,16 +46,16 @@
 #' @export
 #' @md
 generate_randomizations_mc <- function(n_units, n_treated,
-                                             X,
-                                             randomization_accept_prob = 1,
-                                             threshold_func = VectorizedFastHotel2T2, 
-                                             max_draws = 100000, 
-                                             seed = NULL,
-                                             batch_size = 10000, 
-                                             approximate_inv = TRUE,
-                                             verbose = FALSE,
-                                             conda_env = "fastrerandomize", conda_env_required = T
-                                            ){
+                                       X,
+                                       randomization_accept_prob = 1,
+                                       threshold_func = VectorizedFastHotel2T2, 
+                                       max_draws = 100000, 
+                                       seed = NULL,
+                                       batch_size = 10000, 
+                                       approximate_inv = TRUE,
+                                       verbose = FALSE,
+                                       conda_env = "fastrerandomize", conda_env_required = T
+                                      ){
   if(!"jax" %in% ls(envir = .GlobalEnv)){
     initialize_jax_code <- paste(deparse(initialize_jax),collapse="\n")
     initialize_jax_code <- gsub(initialize_jax_code, pattern="function \\(\\)",replace="")
@@ -88,8 +88,8 @@ generate_randomizations_mc <- function(n_units, n_treated,
   # Initialize JAX random key with the provided seed
   key <- jax$random$PRNGKey(as.integer(seed))
   
-  # Convert X to JAX array
-  X_jax <- jnp$array(as.matrix(X), dtype = jnp$float16)
+  # Convert X to JAX array (float16 can cause issues with matrix inverse)
+  X_jax <- jnp$array(as.matrix(X), dtype = jnp$float32)
   
   # Set up sample sizes for treatment/control
   n0_array <- jnp$array(as.integer(n_units - n_treated))
@@ -144,7 +144,7 @@ generate_randomizations_mc <- function(n_units, n_treated,
     perms_batch <- batch_permutation(batch_key, base_vector_jax, as.integer(perms_in_batch))
     #perms_batch <- batch_permutation(batch_key$to_device(jax$devices("cpu")[[1]]), base_vector_jax$to_device(jax$devices("cpu")[[1]]),  as.integer(perms_in_batch))$to_device(jax$devices()[[1]])
     
-    # Calculate balance measures (e.g., Hotelling T²) for each permutation in the batch
+    # Calculate balance measures (e.g., Hotelling T-squared) for each permutation in the batch
     M_results_batch <- threshold_func(
       X_jax,
       perms_batch,
@@ -156,7 +156,7 @@ generate_randomizations_mc <- function(n_units, n_treated,
     # Flatten M_results_batch to 1D array
     M_results_batch <- jnp$squeeze(M_results_batch)
     
-    if (is.null(top_M_results)){
+    if(is.null(top_M_results)){
         combined_M_results <- M_results_batch
         combined_perms <- perms_batch
     } else {
@@ -183,7 +183,7 @@ generate_randomizations_mc <- function(n_units, n_treated,
     assert_that(top_M_results$shape[[1]] <= num_to_accept, msg = paste0("top_M_results must have dimensions ", num_to_accept, " x 1."))
     assert_that(top_perms$shape[[1]] <= num_to_accept, msg = paste0("top_perms must have dimensions ", num_to_accept, " x ", n_units, "."))
     rm(perms_batch,combined_M_results,M_results_batch,combined_perms)
-    py_run_string("import gc; gc.collect()")
+    gc(); py_gc$collect()
 
     # Update the key for the next batch
     key <- jax$random$fold_in(key, batch_idx)

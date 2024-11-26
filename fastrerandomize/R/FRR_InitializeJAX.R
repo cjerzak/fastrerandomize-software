@@ -138,12 +138,12 @@ initialize_jax <- function(){ #initialize_jax <- function(conda_env = "fastreran
     xbar2 <- jnp$divide(jnp$sum(RowBroadcast(samp_,jnp$subtract(1.,w_)),1L,keepdims = T), n0)
     CovWts <- jnp$add(jnp$reciprocal(n0), jnp$reciprocal(n1))
     CovInv <- jax$lax$cond(pred = approximate_inv,
-                 true_fun = function(){CovPooled <- jnp$cov(samp_,rowvar = FALSE); 
-                                       CovInv <-jnp$reciprocal( jnp$multiply(CovPooled, CovWts) ) ;
-                                       return(CovInv)},
-                 false_fun = function(){CovPooled <- jnp$var(samp_, 0L); 
+                 true_fun = function(){CovPooled <- jnp$var(samp_, 0L); 
                                         CovInv <- jnp$diag( jnp$reciprocal( jnp$multiply(CovPooled,CovWts) ));
-                                        return(CovInv)})
+                                        return(CovInv)},
+                 false_fun = function(){CovPooled <- jnp$cov(samp_,rowvar = FALSE); 
+                                        CovInv <- jnp$reciprocal( jnp$multiply(CovPooled, CovWts) ) ;
+                                        return( CovInv )})
     xbar_diff <- jnp$subtract(xbar1, xbar2)
     Tstat <- jnp$matmul(jnp$matmul(jnp$transpose(xbar_diff), CovInv) , xbar_diff)
   })
