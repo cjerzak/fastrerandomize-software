@@ -13,6 +13,7 @@
 #' @param seed An integer seed for random number generation in Monte Carlo sampling
 #' @param batch_size An integer specifying batch size for Monte Carlo processing
 #' @param randomization_type A string specifying the type of randomization: either "exact" or "monte_carlo"
+#' @param file A string specifying where to save candidate randomizations (if saving, not returning)
 #' @param verbose A logical value indicating whether to print progress information. Default is TRUE
 #'
 #' @details
@@ -58,6 +59,7 @@ generate_randomizations <- function(n_units,
                                    approximate_inv = TRUE, 
                                    seed = NULL, 
                                    verbose = TRUE,
+                                   file = NULL, 
                                    conda_env = "fastrerandomize", conda_env_required = T
                                    ){
   if(!"jax" %in% ls(envir = .GlobalEnv)){
@@ -78,22 +80,32 @@ generate_randomizations <- function(n_units,
                                                 n_units = n_units,
                                                 n_treated = n_treated,
                                                 X = X, 
+                                                file = file, 
                                                 randomization_accept_prob = randomization_accept_prob)
     } else if (randomization_type == "monte_carlo"){
         if (verbose){
             print("Using monte carlo randomization")
         }
-        candidate_randomizations <- fastrerandomize::generate_randomizations_mc(n_units, 
-                                                                    n_treated, 
-                                                                    X, 
-                                                                    randomization_accept_prob, 
-                                                                    threshold_func, 
-                                                                    max_draws, 
-                                                                    seed, 
-                                                                    batch_size, 
-                                                                    verbose)
+        candidate_randomizations <- fastrerandomize::generate_randomizations_mc(
+                                                                    n_units = n_units, 
+                                                                    n_treated = n_treated, 
+                                                                    X = X, 
+                                                                    randomization_accept_prob =randomization_accept_prob, 
+                                                                    threshold_func = threshold_func, 
+                                                                    max_draws = max_draws, 
+                                                                    seed = seed, 
+                                                                    batch_size =batch_size, 
+                                                                    file = file, 
+                                                                    verbose = verbose)
     } else {
         stop("Invalid randomization type")
     }
-    return(candidate_randomizations)
+    # gc();py_gc$collect()
+    
+    print2("Returning generate_randomizations...")
+    if(is.null(file)){ return( candidate_randomizations ) } 
+    if(!is.null(file)){ 
+      write.csv(np$array(candidate_randomizations), file = file); 
+      return( sprintf("File saved at %s", file) ) 
+    } 
 }

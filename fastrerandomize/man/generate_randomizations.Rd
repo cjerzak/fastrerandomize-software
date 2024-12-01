@@ -40,6 +40,8 @@ generate_randomizations(
 \item{seed}{An integer seed for random number generation in Monte Carlo sampling}
 
 \item{verbose}{A logical value indicating whether to print progress information. Default is TRUE}
+
+\item{file}{A string specifying where to save candidate randomizations (if saving, not returning)}
 }
 \value{
 A JAX array containing the accepted randomizations, where each row represents

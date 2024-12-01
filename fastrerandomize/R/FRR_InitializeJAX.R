@@ -11,6 +11,7 @@ initialize_jax <- function(){ #initialize_jax <- function(conda_env = "fastreran
   if(!"jax" %in% ls()){  jax <<- reticulate::import("jax") }
   if(!"jnp" %in% ls()){  jnp <<- reticulate::import("jax.numpy") }
   if(!"np" %in% ls()){  np <<- reticulate::import("numpy") }
+  if(!"tf" %in% ls()){ tf <<- reticulate::import("tensorflow") }
   if(!"py_gc" %in% ls()){  py_gc <<- reticulate::import("gc") }
 
   # disable 64 bit computations  
@@ -148,9 +149,42 @@ initialize_jax <- function(){ #initialize_jax <- function(conda_env = "fastreran
     Tstat <- jnp$matmul(jnp$matmul(jnp$transpose(xbar_diff), CovInv) , xbar_diff)
   })
   
-  VectorizedFastHotel2T2 <<- jax$jit( jax$vmap(function(samp_, w_, n0, n1, approximate_inv = FALSE){
+  VectorizedFastHotel2T2 <<- jax$jit(VectorizedFastHotel2T2_R <<- jax$vmap(function(samp_, w_, n0, n1, approximate_inv = FALSE){
     FastHotel2T2(samp_, w_, n0, n1, approximate_inv)},
     in_axes = list(NULL, 0L, NULL, NULL, NULL)) )
+  
+  BatchedVectorizedFastHotel2T2 <<- function(samp_, w_, n0, n1, NWBatch, approximate_inv = FALSE){
+    N_w <- w_$shape[0]  # Total number of w_ vectors
+    num_batches <- as.integer( (N_w + NWBatch - 1) / NWBatch )  # Calculate number of batches
+    
+    # Function to process a single batch
+    process_batch <- function(batch_idx, carry){
+      start_idx <- batch_idx * NWBatch
+      end_idx <- jnp$minimum(start_idx + NWBatch, N_w)
+      w_batch <- w_[start_idx:end_idx, ]
+      
+      # Compute the statistics for the current batch
+      Tstat_batch <- VectorizedFastHotel2T2(samp_, w_batch, n0, n1, approximate_inv)
+      
+      # Accumulate results
+      carry <- jnp$concatenate(list(carry, Tstat_batch), axis=0)
+      carry
+    }
+    
+    # Initialize carry with an empty array
+    carry_init <- jnp$array(NULL, dtype=jnp$float32)
+    
+    # Loop over batches using lax.fori_loop for efficiency
+    Tstats <- jax$lax$fori_loop(
+      lower=0,
+      upper=num_batches,
+      body_fun=function( i, carry ){ process_batch(i, carry)},
+      init_val=carry_init
+    )
+    
+    Tstats
+  }
+  
   print2("Success setting up core JAX functions!")
   }
 }

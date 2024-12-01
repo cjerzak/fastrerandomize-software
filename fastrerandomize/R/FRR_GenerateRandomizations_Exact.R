@@ -68,6 +68,7 @@ generate_randomizations_exact <- function(n_units, n_treated,
                                    randomization_accept_prob = 1,
                                    approximate_inv = TRUE, 
                                    threshold_func = VectorizedFastHotel2T2,
+                                   file = NULL,
                                    conda_env = "fastrerandomize", conda_env_required = T){
   if(!"jax" %in% ls(envir = .GlobalEnv)){
     initialize_jax_code <- paste(deparse(initialize_jax),collapse="\n")
@@ -107,10 +108,12 @@ generate_randomizations_exact <- function(n_units, n_treated,
     # Keep only randomizations with balance measure below threshold
     candidate_randomizations <- jnp$take(
       candidate_randomizations,
-      indices = jnp$array(which(M_results <= a_threshold)-1L),
+      indices = (takeM_ <- jnp$array(which(M_results <= a_threshold)-1L)),
       axis = 0L
     )
+    M_results <- jnp$take( M_results, indices = takeM_, axis = 0L )
   }
   
-  return( candidate_randomizations )
+  return(list("candidate_randomizations"=candidate_randomizations,
+              "M_candidate_randomizations"=M_results))
 }

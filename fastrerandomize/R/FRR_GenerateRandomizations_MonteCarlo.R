@@ -54,6 +54,7 @@ generate_randomizations_mc <- function(n_units, n_treated,
                                        batch_size = 10000, 
                                        approximate_inv = TRUE,
                                        verbose = FALSE,
+                                       file = NULL,
                                        conda_env = "fastrerandomize", conda_env_required = T
                                       ){
   if(!"jax" %in% ls(envir = .GlobalEnv)){
@@ -63,17 +64,6 @@ generate_randomizations_mc <- function(n_units, n_treated,
   }
 
   if(is.null(seed)){ seed <- as.integer(runif(1, 0, 100000)) }
-  
-  # Define the batch_permutation function in Python using JAX
-  # Uses vmap to vectorize the permutation operation over the batch size
-  # Uses jit to compile the function
-  batch_permutation <- jax$jit( function(key, base_vector, num_perms){
-    base_vector = jnp$broadcast_to(base_vector, list(num_perms, base_vector$shape[[1]] ))
-    keys = jax$random$split(key, num_perms)
-    perms = jax$vmap(jax$random$permutation)(keys, base_vector)
-    #assert perms.dtype == jnp.int8, 'perms must be a boolean array'
-    return(perms)
-  }, static_argnums=2L)
   
   # Calculate the maximum number of possible randomizations
   max_rand_num <- choose(n_units, n_treated)
@@ -115,27 +105,45 @@ generate_randomizations_mc <- function(n_units, n_treated,
     print(paste0("Starting batch processing with ", num_batches, " batches."))
   }
   t0 <- Sys.time()
+
+  batch_permutation <- jax$jit( jax$vmap( function(key_, base_vector_){
+      perm_ = jax$random$permutation(key_, base_vector_)
+      return(perm_)
+  }, list(0L, NULL)) )
   
-  top_M_results <- jax$vmap( (function(batch_key){
+  top_M_fxn <- jax$jit(function(key, b_){ 
+    key <- jax$random$fold_in(key, b_)
+    vkey <- jax$random$split(key, as.integer(batch_size))
+    
     # Generate permutations for the current batch - run on CPU? 
-    perms_batch <- batch_permutation(batch_key, base_vector_jax, as.integer(batch_size))
-    #perms_batch <- batch_permutation(batch_key$to_device(jax$devices("cpu")[[1]]), base_vector_jax$to_device(jax$devices("cpu")[[1]]),  as.integer(perms_in_batch))$to_device(jax$devices()[[1]])
+    perms_batch <- batch_permutation(vkey, base_vector_jax)
     
     # Calculate balance measures (e.g., Hotelling T-squared) for each permutation in the batch
-    M_results_batch <- jnp$squeeze( threshold_func(
+    M_results_batch_ <- jnp$squeeze( threshold_func(
       X_jax,
       perms_batch,
       n0_array, 
       n1_array, 
       approximate_inv
     ) )$astype(jnp$float16)
-    
-    return(list("top_perms"=perms_batch,
-                "top_M_results"=M_results_batch) ) 
-  }),in_axes = 0L,out_axes = 1L)(jax$random$split(key,as.integer(num_batches)))
+    return(list("top_keys"=vkey,
+                "top_M_results"=M_results_batch_))
+  })
+  #}, static_argnums = 1L)
   
-  top_perms <- jnp$reshape(top_M_results$top_perms,list(-1L,top_M_results$top_perms$shape[[3]]))
-  top_M_results <- jnp$reshape(top_M_results$top_M_results,list(-1L))
+  #top_M_results <- jax$vmap( (function(key){
+  top_M_results <- sapply(1L:num_batches, function(b_){
+    print(b_)
+    top_M_results_ <- top_M_fxn(key, jnp$array(as.integer(b_)))
+
+    #return(list("top_keys"=vkey, "top_M_results"=M_results_batch_) ) }), in_axes = 0L,out_axes = 1L)(jax$random$split(key,as.integer(num_batches)))
+    #top_keys <- jnp$reshape(top_M_results$top_keys,list(-1L,top_M_results$top_keys$shape[[3]]))
+    #top_M_results <- jnp$reshape(top_M_results$top_M_results,list(-1L))
+  return(list("top_keys"=top_M_results_$top_keys, "top_M_results"=top_M_results_$top_M_results) ) })
+  
+  # concatenate results 
+  top_keys <- jnp$concatenate(top_M_results["top_keys",],0L)
+  top_M_results <- jnp$concatenate(top_M_results["top_M_results",],0L)
   
   # Limit the size of combined arrays
   combined_length <- top_M_results$shape[[1]]
@@ -146,20 +154,22 @@ generate_randomizations_mc <- function(n_units, n_treated,
     # Keep only top num_to_accept permutations
     indices_to_keep <- sorted_indices[0:num_to_accept]
     top_M_results <- jnp$take(top_M_results, indices_to_keep)
-    top_perms <- jnp$take(top_perms, indices_to_keep, axis=0L)
+    top_keys <- jnp$take(top_keys, indices_to_keep, axis=0L)
+    top_perms <- batch_permutation(top_keys, base_vector_jax)
   }
-  
-  assert_that(top_M_results$shape[[1]] <= num_to_accept, msg = paste0("top_M_results must have dimensions ", num_to_accept, " x 1."))
-  assert_that(top_perms$shape[[1]] <= num_to_accept, msg = paste0("top_perms must have dimensions ", num_to_accept, " x ", n_units, "."))
-  rm(perms_batch,combined_M_results,M_results_batch,combined_perms)
-  gc(); py_gc$collect()
+
+  #assert_that(top_M_results$shape[[1]] <= num_to_accept, msg = paste0("top_M_results must have dimensions ", num_to_accept, " x 1."))
+  # assert_that(top_perms$shape[[1]] <= num_to_accept, msg = paste0("top_perms must have dimensions ", num_to_accept, " x ", n_units, "."))
+  # rm( top_keys )
+  # gc(); py_gc$collect()
   
   print(sprintf("MC Loop Time (s): %.4f", as.numeric(difftime(Sys.time(), t0, units = "secs"))))
     
   # After processing all batches, the candidate_randomizations are the top_perms
-  candidate_randomizations <- top_perms
-  assert_that(all(candidate_randomizations$shape == c(num_to_accept, n_units)), 
-              msg = paste0("candidate_randomizations must have dimensions ", 
-                            num_to_accept, " x ", n_units, "."))
-  return(candidate_randomizations)
+  #assert_that(all(top_perms$shape == c(num_to_accept, n_units)), msg = paste0("candidate_randomizations must have dimensions ",  num_to_accept, " x ", n_units, ".") )
+  return(list(
+              "candidate_randomizations"=top_perms,
+              "keys_candidate_randomizations" = top_keys,
+              "M_candidate_randomizations"= top_M_results
+              ))
 }
