@@ -132,13 +132,8 @@ generate_randomizations_mc <- function(n_units, n_treated,
   })
   #}, static_argnums = 1L)
   
-  #top_M_results <- jax$vmap( (function(key){
   top_M_results <- sapply(1L:num_batches, function(b_){
     top_M_results_ <- top_M_fxn(key, jnp$array(as.integer(b_)))
-
-    #return(list("top_keys"=vkey, "top_M_results"=M_results_batch_) ) }), in_axes = 0L,out_axes = 1L)(jax$random$split(key,as.integer(num_batches)))
-    #top_keys <- jnp$reshape(top_M_results$top_keys,list(-1L,top_M_results$top_keys$shape[[3]]))
-    #top_M_results <- jnp$reshape(top_M_results$top_M_results,list(-1L))
   return(list("top_keys"=top_M_results_$top_keys, "top_M_results"=top_M_results_$top_M_results) ) })
   
   # concatenate results 
