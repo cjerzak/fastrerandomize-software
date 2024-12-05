@@ -1,6 +1,8 @@
 {
-# Agricutlure experiment tutorial
 options(error = NULL)
+#######################################
+# AgExperiment_Tutorial.R - An agricutlure experiment tutorial
+#######################################  
 
 # Install devtools if needed
 # install.packages("devtools")
@@ -27,17 +29,18 @@ X <- matrix(rnorm(n_units*5),nrow = n_units)
 # When randomization_accept_prob = 1, all randomizations are accepted.
 # When randomization_accept_prob < 1, only well-balanced randomizations are accepted.
 # When randomization_accept_prob = 1/|Size of cand. randomization set|, 1 randomization is accepted.
-candidate_randomizations_array <- fastrerandomize::generate_randomizations(
+CandRandomizationsPackage <- fastrerandomize::generate_randomizations(
   n_units = n_units,
   n_treated = n_treated,
   X = X,
   randomization_type = "exact", max_draws = 10000L,  # exact sampling 
   #randomization_type = "monte_carlo", max_draws = 50000L, batch_size = 1000L, # monte carlo sampling 
   randomization_accept_prob = 0.0001)
-candidate_randomizations_array$shape
+CandRandomizationsPackage$candidate_randomizations$shape
+CandRandomizationsPackage$M_candidate_randomizations$shape
 
 # You can coerce candidate_randomizations_array into R like this:
-candidate_randomizations <- np$array( candidate_randomizations_array )
+candidate_randomizations <- np$array( CandRandomizationsPackage$candidate_randomizations )
 dim( candidate_randomizations )
 
 # We can also use `fastrerandomize` to perform a randomization test using those acceptable randomizations.
@@ -69,6 +72,9 @@ PreAnalysisEvaluation <- fastrerandomize::randomization_test(
   randomization_accept_prob = prob_accept_randomization_seq,
   prior_treatment_effect_mean = 0.1,
   prior_treatment_effect_SD = 1,
+  randomization_type = "monte_carlo", 
+  max_draws = 10000L, 
+  batch_size = 100L, 
   coef_prior = function(){rnorm(ncol(X), sd = 1)},
   simulate = T
 )

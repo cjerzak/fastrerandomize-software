@@ -58,6 +58,10 @@ randomization_test <- function(
                                randomization_accept_prob = 1.,
                                findFI = F,
                                c_initial = 2,
+                               max_draws = 10^6, 
+                               batch_size = 10^5, 
+                               randomization_type = "monte_carlo", 
+                               approximate_inv = TRUE,
                                conda_env = "fastrerandomize", conda_env_required = T
                                ){
   tau_obs <- FI <- covers_truth <- NULL
@@ -81,15 +85,21 @@ randomization_test <- function(
   if(!is.null(obsY)){obsY <- c(unlist(obsY))}
 
   if(is.null(candidate_randomizations_array) & is.null(candidate_randomizations)){
+    
     n_treated <- ( n_units <- nrow(X) ) / 2
     if(simulate == T){
-      candidate_randomizations_array <- generate_randomizations_exact(n_units, n_treated)
+      candidate_randomizations_array <- generate_randomizations(n_units = n_units, 
+                                                                n_treated = n_treated)
     }
     if(simulate == F){
-      candidate_randomizations_array <- generate_randomizations_exact(
+      candidate_randomizations_array <- generate_randomizations(
                                             n_units = n_units,
                                             n_treated = n_treated,
                                             X = X,
+                                            max_draws = max_draws, 
+                                            batch_size = batch_size, 
+                                            randomization_type = randomization_type, 
+                                            approximate_inv = approximate_inv,
                                             randomization_accept_prob = randomization_accept_prob)
     }
   }

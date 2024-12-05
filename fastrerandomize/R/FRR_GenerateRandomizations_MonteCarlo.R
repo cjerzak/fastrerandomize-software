@@ -67,8 +67,10 @@ generate_randomizations_mc <- function(n_units, n_treated,
   
   # Calculate the maximum number of possible randomizations
   max_rand_num <- choose(n_units, n_treated)
-  assert_that(max_draws <= max_rand_num, msg = paste0("max_draws must be less than or equal to the number of possible randomizations, which is ", max_rand_num, "."))
-  assert_that(max_draws <= 2*batch_size, msg = "max_draws must be at least 2*batch_size")
+  assert_that(max_draws <= max_rand_num, 
+              msg = paste0("max_draws must be less than or equal to the total number of possible randomizations (", max_rand_num, ")."))
+  assert_that(max_draws <= 2*batch_size, 
+              msg = "max_draws must be at least 2*batch_size")
   
   # Define the base vector: 1s for treated, 0s for control
   base_vector <- c(rep(1L, n_treated), rep(0L, n_units - n_treated))
@@ -130,9 +132,8 @@ generate_randomizations_mc <- function(n_units, n_treated,
     return(list("top_keys"=vkey,
                 "top_M_results"=M_results_batch_))
   })
-  #}, static_argnums = 1L)
   
-  top_M_results <- sapply(1L:num_batches, function(b_){
+  top_M_results <- sapply(1L:num_batches, function(b_){ # note: vmapping this causes unacceptable memory overhead 
     top_M_results_ <- top_M_fxn(key, jnp$array(as.integer(b_)))
   return(list("top_keys"=top_M_results_$top_keys, "top_M_results"=top_M_results_$top_M_results) ) })
   

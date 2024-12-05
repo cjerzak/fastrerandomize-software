@@ -76,13 +76,16 @@ generate_randomizations_exact <- function(n_units, n_treated,
     eval( parse( text = initialize_jax_code ), envir = environment() )
   }
   
+  max_rand_num <- choose(n_units, n_treated)
+  assert_that( max_rand_num*min(randomization_accept_prob) > 10, 
+              msg = "Value of min(randomization_accept_prob) indices less than 10 accepted randomizations. Increase min(randomization_accept_prob)!")
+  
   # Get all combinations of positions to set to 1
   combinations <- jnp$array(  utils::combn(n_units, n_treated) - 1L )
-  ZerosHolder <- jnp$zeros(as.integer(n_units), dtype=jnp$int32)
-  candidate_randomizations <- InsertOnesVectorized(combinations,
-                                                   ZerosHolder)
-  
-  if(!is.null(X)){
+  ZerosHolder <- jnp$zeros(as.integer(n_units), dtype=jnp$uint16)
+  candidate_randomizations <- InsertOnesVectorized(combinations, ZerosHolder)
+
+  M_results <- NULL; if(!is.null(X)){
     # Set up sample sizes for treatment/control
     n0_array <- jnp$array(  (n_units - n_treated) )
     n1_array <- jnp$array(  n_treated )
@@ -97,23 +100,22 @@ generate_randomizations_exact <- function(n_units, n_treated,
     )
     
     # Find acceptance threshold based on specified quantile
-    a_threshold <- np$array(jnp$quantile( 
+    a_threshold <- jnp$quantile( 
       M_results,  
       jnp$array(randomization_accept_prob)
-    ))[[1]]
-    
-    # Convert to regular array
-    M_results <- c(np$array( M_results ))
-    
+    )#[[1]]
+
     # Keep only randomizations with balance measure below threshold
     candidate_randomizations <- jnp$take(
       candidate_randomizations,
-      indices = (takeM_ <- jnp$array(which(M_results <= a_threshold)-1L)),
+      indices = (takeM_ <- jnp$where(jnp$less(M_results,a_threshold))[[1]]),
       axis = 0L
     )
     M_results <- jnp$take( M_results, indices = takeM_, axis = 0L )
+    
+    # Convert to regular arrays
+    # M_results <- c(np$array( M_results ))
   }
-  browser()
   
   return(list("candidate_randomizations"=candidate_randomizations,
               "M_candidate_randomizations"=M_results))
