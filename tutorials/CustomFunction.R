@@ -3,6 +3,9 @@
 {
     # Load fastrerandomize
     library(fastrerandomize); options( error = NULL )
+  
+    # build backend if needed 
+    # fastrerandomize::build_backend()
 
     # Generate synthetic data
     covariates <- matrix(rnorm(100),nrow=10)

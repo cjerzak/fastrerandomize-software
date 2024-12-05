@@ -11,7 +11,6 @@ initialize_jax <- function(){ #initialize_jax <- function(conda_env = "fastreran
   if(!"jax" %in% ls()){  jax <<- reticulate::import("jax") }
   if(!"jnp" %in% ls()){  jnp <<- reticulate::import("jax.numpy") }
   if(!"np" %in% ls()){  np <<- reticulate::import("numpy") }
-  if(!"tf" %in% ls()){ tf <<- reticulate::import("tensorflow") }
   if(!"py_gc" %in% ls()){  py_gc <<- reticulate::import("gc") }
 
   # disable 64 bit computations  
