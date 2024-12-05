@@ -23,30 +23,11 @@ We employ a [JAX backend](https://en.wikipedia.org/wiki/Google_JAX) to make exac
 # devtools::install_github(repo = "cjerzak/fastrerandomize-software/fastrerandomize")
 
 # Load the package
-library(  fastrerandomize  )  
+library(  fastrerandomize  ) 
 
-# Before running any code, you'll need to initialize the JAX environment 
-fastrerandomize::InitializeJAX(conda_env = "jax_cpu", conda_env_required = T)
-
-# If JAX is not in a conda environment, try: 
-# fastrerandomize::InitializeJAX(conda_env = NULL)
-
-# Note: If you leave `conda_env = NULL`, we will search in the default Python environment for JAX.
+# Running code the first time, you'll want to create the computational environment 
+fastrerandomize::build_backend()
 ```
-
-## Installing JAX 
-In order to download the JAX backend in a conda environment, see [\[this link\]](https://jax.readthedocs.io/en/latest/installation.html) from the JAX developers.
-
-You can also try downloading `jax` and `jaxlib` via `reticulate` package from within `R`:
-```
-library(reticulate)
-py_install("jax") # install JAX in the default Python environment 
-py_install("jaxlib") # install jaxlib in the default Python environment 
-
-# now, try restarting your R session and running: 
-fastrerandomize::InitializeJAX(conda_env = NULL)
-```
-As noted, it often helps to re-start your `R` session when debugging package installs. Note that this package has been tested successfully on Windows and Apple machines and should run well on Linux. If you're having trouble installing `reticulate`, try installing the latest version of `R`. 
 
 # Tutorial<a id="tutorial"></a>
 Let's get started with a tutorial. We're first going to use the package for generate a pool of acceptable rerandomizations. 
@@ -61,7 +42,7 @@ X <- matrix(rnorm(n_units*5),nrow = n_units)
 # When randomization_accept_prob = 1, all randomizations are accepted. 
 # When randomization_accept_prob < 1, only well-balanced randomizations are accepted. 
 # When randomization_accept_prob = 1/|Size of cand. randomization set|, 1 randomization is accepted.
-candidate_randomizations_array <- fastrerandomize::GenerateRandomizations(
+candidate_randomizations_array <- fastrerandomize::generate_randomizations(
                                             n_units = n_units,
                                             n_treated = n_treated,
                                             X = X,
@@ -81,7 +62,7 @@ tau_true <- 1
 Yobs <- c(X %*% as.matrix(CoefY) + Wobs*tau_true + rnorm(n_units, sd = 0.1))
 
 # Perform exact randomization set based on accepted randomizations 
-ExactRandomizationTestResults <- fastrerandomize::RandomizationTest(
+ExactRandomizationTestResults <- fastrerandomize::randomization_test(
   obsW = Wobs,
   obsY = Yobs,
   candidate_randomizations = candidate_randomizations,
@@ -98,7 +79,7 @@ starting_value = abs( min(log( 2/n_randomizations, base = 10 ), log(0.05,base=10
 prob_accept_randomization_seq <- 10^(- seq(from = starting_value, to = 1/3, length.out = 32L ) )
 
 # perform pre-design analysis (runtime: ~20 seconds)
-PreAnalysisEvaluation <- fastrerandomize::RandomizationTest(
+PreAnalysisEvaluation <- fastrerandomize::randomization_test(
   X = X, 
   randomization_accept_prob = prob_accept_randomization_seq,
   prior_treatment_effect_mean = 0.1,
