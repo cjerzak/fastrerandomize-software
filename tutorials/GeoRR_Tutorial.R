@@ -152,7 +152,7 @@
   fastrerandomize::InitializeJAX(conda_env = "jax_gpu_py3.11", conda_env_required = T) # GPU - fails on METAL backend
 
   # perform rerandomization
-  candidate_randomizations_array <- fastrerandomize::GenerateRandomizations(
+  candidate_randomizations_array <- fastrerandomize::generate_randomizations(
     n_units = nrow(MyImageEmbeddings),
     n_treated = nrow(MyImageEmbeddings) / 2,
     X = MyImageEmbeddings,
