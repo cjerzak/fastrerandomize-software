@@ -31,7 +31,8 @@ candidate_randomizations_array <- fastrerandomize::generate_randomizations(
   n_units = n_units,
   n_treated = n_treated,
   X = X,
-  randomization_type = "exact",
+  randomization_type = "exact", max_draws = 10000L,  # exact sampling 
+  #randomization_type = "monte_carlo", max_draws = 50000L, batch_size = 1000L, # monte carlo sampling 
   randomization_accept_prob = 0.0001)
 candidate_randomizations_array$shape
 

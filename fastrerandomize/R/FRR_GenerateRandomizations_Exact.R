@@ -113,6 +113,7 @@ generate_randomizations_exact <- function(n_units, n_treated,
     )
     M_results <- jnp$take( M_results, indices = takeM_, axis = 0L )
   }
+  browser()
   
   return(list("candidate_randomizations"=candidate_randomizations,
               "M_candidate_randomizations"=M_results))

@@ -50,8 +50,8 @@ generate_randomizations_mc <- function(n_units, n_treated,
                                        randomization_accept_prob = 1,
                                        threshold_func = VectorizedFastHotel2T2, 
                                        max_draws = 100000, 
+                                       batch_size = 1000, 
                                        seed = NULL,
-                                       batch_size = 10000, 
                                        approximate_inv = TRUE,
                                        verbose = FALSE,
                                        file = NULL,
@@ -68,6 +68,7 @@ generate_randomizations_mc <- function(n_units, n_treated,
   # Calculate the maximum number of possible randomizations
   max_rand_num <- choose(n_units, n_treated)
   assert_that(max_draws <= max_rand_num, msg = paste0("max_draws must be less than or equal to the number of possible randomizations, which is ", max_rand_num, "."))
+  assert_that(max_draws <= 2*batch_size, msg = "max_draws must be at least 2*batch_size")
   
   # Define the base vector: 1s for treated, 0s for control
   base_vector <- c(rep(1L, n_treated), rep(0L, n_units - n_treated))
@@ -133,7 +134,6 @@ generate_randomizations_mc <- function(n_units, n_treated,
   
   #top_M_results <- jax$vmap( (function(key){
   top_M_results <- sapply(1L:num_batches, function(b_){
-    print(b_)
     top_M_results_ <- top_M_fxn(key, jnp$array(as.integer(b_)))
 
     #return(list("top_keys"=vkey, "top_M_results"=M_results_batch_) ) }), in_axes = 0L,out_axes = 1L)(jax$random$split(key,as.integer(num_batches)))
