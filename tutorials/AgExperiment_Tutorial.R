@@ -63,18 +63,16 @@ ExactRandomizationTestResults$tau_obs # difference-in-means ATE estimate
 #You can also use `fastrerandomize` to perform a pre-analysis evaluation for what would be an _a priori_ optimal rerandomization acceptance threshold in terms of minimizing the expected exact _p_-value.
 # setup acceptable randomization sequence
 n_randomizations <- choose(n_units, n_treated)
-starting_value = abs( min(log( 2/n_randomizations, base = 10 ), log(0.05,base=10)))
+starting_value = abs( min(log( 100/n_randomizations, base = 10 ), log(0.05,base=10)))
 prob_accept_randomization_seq <- 10^(- seq(from = starting_value, to = 1/9, length.out = 32L ) )
 
-# perform pre-design analysis (runtime: ~20 seconds)
+# perform pre-design analysis 
 PreAnalysisEvaluation <- fastrerandomize::randomization_test(
   X = X,
   randomization_accept_prob = prob_accept_randomization_seq,
   prior_treatment_effect_mean = 0.1,
   prior_treatment_effect_SD = 1,
-  randomization_type = "monte_carlo", 
-  max_draws = 10000L, 
-  batch_size = 100L, 
+  randomization_type = "exact", 
   coef_prior = function(){rnorm(ncol(X), sd = 1)},
   simulate = T
 )

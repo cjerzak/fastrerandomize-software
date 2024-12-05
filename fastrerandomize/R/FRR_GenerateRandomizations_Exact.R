@@ -68,6 +68,7 @@ generate_randomizations_exact <- function(n_units, n_treated,
                                    randomization_accept_prob = 1,
                                    approximate_inv = TRUE, 
                                    threshold_func = VectorizedFastHotel2T2,
+                                   seed = NULL, 
                                    file = NULL,
                                    conda_env = "fastrerandomize", conda_env_required = T){
   if(!"jax" %in% ls(envir = .GlobalEnv)){
@@ -112,9 +113,6 @@ generate_randomizations_exact <- function(n_units, n_treated,
       axis = 0L
     )
     M_results <- jnp$take( M_results, indices = takeM_, axis = 0L )
-    
-    # Convert to regular arrays
-    # M_results <- c(np$array( M_results ))
   }
   
   return(list("candidate_randomizations"=candidate_randomizations,

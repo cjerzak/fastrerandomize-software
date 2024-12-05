@@ -50,7 +50,7 @@
 #' @md
 generate_randomizations <- function(n_units, 
                                    n_treated, 
-                                   X, 
+                                   X = NULL, 
                                    randomization_accept_prob, 
                                    threshold_func = NULL, 
                                    max_draws = 10^6, 
@@ -80,8 +80,10 @@ generate_randomizations <- function(n_units,
                                                 n_units = n_units,
                                                 n_treated = n_treated,
                                                 X = X, 
+                                                randomization_accept_prob = randomization_accept_prob, 
+                                                threshold_func = threshold_func, 
                                                 file = file, 
-                                                randomization_accept_prob = randomization_accept_prob)
+                                                seed = seed)
     } else if (randomization_type == "monte_carlo"){
         if (verbose){
             print("Using monte carlo randomization")
@@ -90,11 +92,11 @@ generate_randomizations <- function(n_units,
                                                                     n_units = n_units, 
                                                                     n_treated = n_treated, 
                                                                     X = X, 
-                                                                    randomization_accept_prob =randomization_accept_prob, 
+                                                                    randomization_accept_prob = randomization_accept_prob, 
                                                                     threshold_func = threshold_func, 
                                                                     max_draws = max_draws, 
+                                                                    batch_size = batch_size, 
                                                                     seed = seed, 
-                                                                    batch_size =batch_size, 
                                                                     file = file, 
                                                                     verbose = verbose)
     } else {

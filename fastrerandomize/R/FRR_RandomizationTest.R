@@ -62,6 +62,7 @@ randomization_test <- function(
                                batch_size = 10^5, 
                                randomization_type = "monte_carlo", 
                                approximate_inv = TRUE,
+                               file = NULL, 
                                conda_env = "fastrerandomize", conda_env_required = T
                                ){
   tau_obs <- FI <- covers_truth <- NULL
@@ -88,19 +89,32 @@ randomization_test <- function(
     
     n_treated <- ( n_units <- nrow(X) ) / 2
     if(simulate == T){
-      candidate_randomizations_array <- generate_randomizations(n_units = n_units, 
-                                                                n_treated = n_treated)
+      candidate_randomizations_array <- generate_randomizations(
+                                            n_units = n_units, 
+                                            n_treated = n_treated, 
+                                            X = X,
+                                            randomization_accept_prob = randomization_accept_prob,
+                                                                
+                                            # hyper parameters
+                                            max_draws = max_draws, 
+                                            batch_size = batch_size, 
+                                            randomization_type = randomization_type, 
+                                            approximate_inv = approximate_inv,
+                                            file = file)
     }
     if(simulate == F){
       candidate_randomizations_array <- generate_randomizations(
                                             n_units = n_units,
                                             n_treated = n_treated,
                                             X = X,
+                                            randomization_accept_prob = randomization_accept_prob,
+                                            
+                                            # hyper parameters
                                             max_draws = max_draws, 
                                             batch_size = batch_size, 
                                             randomization_type = randomization_type, 
                                             approximate_inv = approximate_inv,
-                                            randomization_accept_prob = randomization_accept_prob)
+                                            file = file)
     }
   }
   if(is.null(candidate_randomizations)){

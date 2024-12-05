@@ -10,9 +10,6 @@
     # local install for development team
     # install.packages("~/Documents/fastrerandomize-software/fastrerandomize",repos = NULL, type = "source",force = F)
     
-    #options(error = NULL); t_Initialize <- try({ fastrerandomize::initialize_jax(conda_env = "jax_cpu", conda_env_required = T) },T)
-    #if("try-error" %in% class(t_Initialize)){ stop("Failed at t_Initialize...") }
-    
     t_GenData <- try({
       set.seed(999L, kind = "Wichmann-Hill")
       X <- matrix(rnorm(20*5), 20, 5)
@@ -30,16 +27,15 @@
           X = X,
           randomization_accept_prob = 0.1,
           randomization_type = type_,
-          conda_env = "jax_gpu",
-          max_draws = 1000)
+          max_draws = 10000L, batch_size = 100L)
       },T)
       if("try-error" %in% class(t_GetSet)){ stop(sprintf("Failed at t_GetSet: %s...",type_)) }
       
       t_RRTest <- try({
         RRTest_ <- fastrerandomize::randomization_test(
-          obsW = (W_<-as.integer(np$array(RandomizationSet_[1,]))),
-          obsY = rnorm(RandomizationSet_$shape[[2]])+2*W_,
-          candidate_randomizations_array = RandomizationSet_,
+          obsW = (W_<-as.integer(np$array(RandomizationSet_$candidate_randomizations[1,]))),
+          obsY = rnorm(RandomizationSet_$candidate_randomizations$shape[[2]])+2*W_,
+          candidate_randomizations_array = RandomizationSet_$candidate_randomizations,
           findFI = findFI, 
           X = X)
         if(!is.null(RRTest_$FI)){ 
