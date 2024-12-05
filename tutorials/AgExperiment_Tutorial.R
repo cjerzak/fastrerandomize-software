@@ -9,24 +9,14 @@
 
 # local install for development team
 # install.packages("~/Documents/fastrerandomize-software/fastrerandomize",repos = NULL, type = "source",force = F)
-
-# Load the package
-library(  fastrerandomize  )
+  
+# build backend if needed
+# fastrerandomize::build_backend()
 
 # start timer
 t0 <- Sys.time()
 
-# Before running any code, you'll need to initialize the JAX environment
-#fastrerandomize::InitializeJAX(conda_env = "tensorflow_m1", conda_env_required = T) # CPU
-fastrerandomize::InitializeJAX(conda_env = "jax_gpu_py3.11", conda_env_required = T) # GPU - fails on METAL backend
-
-# If you didn't use a conda environment in which to install JAX, try:
-# fastrerandomize::InitializeJAX(  conda_env = NULL )
-
-# Note: If you leave `conda_env = NULL`, we will search in the default Python environment for JAX.
-
 # First, specify some analysis parameters
-#n_units <- 20L; n_treated <- 10L # accessible on most hardware
 n_units <- 22; n_treated <- 12L
 
 # Generate covariate data
@@ -36,10 +26,11 @@ X <- matrix(rnorm(n_units*5),nrow = n_units)
 # When randomization_accept_prob = 1, all randomizations are accepted.
 # When randomization_accept_prob < 1, only well-balanced randomizations are accepted.
 # When randomization_accept_prob = 1/|Size of cand. randomization set|, 1 randomization is accepted.
-candidate_randomizations_array <- fastrerandomize::GenerateRandomizations(
+candidate_randomizations_array <- fastrerandomize::generate_randomizations(
   n_units = n_units,
   n_treated = n_treated,
   X = X,
+  randomization_type = "exact",
   randomization_accept_prob = 0.0001)
 candidate_randomizations_array$shape
 
@@ -55,7 +46,7 @@ tau_true <- 1
 Yobs <- c(X %*% as.matrix(CoefY) + Wobs*tau_true + rnorm(n_units, sd = 0.1))
 
 # Perform exact randomization set based on accepted randomizations
-ExactRandomizationTestResults <- fastrerandomize::RandomizationTest(
+ExactRandomizationTestResults <- fastrerandomize::randomization_test(
   obsW = Wobs,
   obsY = Yobs,
   candidate_randomizations = candidate_randomizations,
@@ -71,7 +62,7 @@ starting_value = abs( min(log( 2/n_randomizations, base = 10 ), log(0.05,base=10
 prob_accept_randomization_seq <- 10^(- seq(from = starting_value, to = 1/9, length.out = 32L ) )
 
 # perform pre-design analysis (runtime: ~20 seconds)
-PreAnalysisEvaluation <- fastrerandomize::RandomizationTest(
+PreAnalysisEvaluation <- fastrerandomize::randomization_test(
   X = X,
   randomization_accept_prob = prob_accept_randomization_seq,
   prior_treatment_effect_mean = 0.1,
