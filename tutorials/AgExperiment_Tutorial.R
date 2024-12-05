@@ -1,5 +1,6 @@
 {
 # Agricutlure experiment tutorial
+options(error = NULL)
 
 # Install devtools if needed
 # install.packages("devtools")
@@ -17,7 +18,7 @@
 t0 <- Sys.time()
 
 # First, specify some analysis parameters
-n_units <- 22; n_treated <- 12L
+n_units <- 22L; n_treated <- 12L
 
 # Generate covariate data
 X <- matrix(rnorm(n_units*5),nrow = n_units)
