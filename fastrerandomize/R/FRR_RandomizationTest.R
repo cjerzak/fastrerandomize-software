@@ -10,13 +10,7 @@
 #' @param candidate_randomizations_array An optional JAX array of candidate randomizations. If not provided, the function coerces `candidate_randomizations` into a JAX array.
 #' @param n0_array An optional array specifying the number of control units.
 #' @param n1_array An optional array specifying the number of treated units.
-#' @param prior_treatment_effect_mean An optional numeric value for the prior mean of the treatment effect. Default is NULL.
-#' @param prior_treatment_effect_SD An optional numeric value for the prior standard deviation of the treatment effect. Default is NULL.
 #' @param true_treatment_effect An optional numeric value specifying the true treatment effect. Default is NULL.
-#' @param simulate A logical value indicating whether to run `randomization_test` in simulation mode. Default is FALSE.
-#' @param coef_prior An optional function generating coefficients on values of `X` for predicting `Y(0)`.
-#' @param nSimulate_obsW A numeric value specifying the number of simulated values for obsW. Default is `50L`.
-#' @param nSimulate_obsY A numeric value specifying the number of simulated values for obsY. Default is `50L`.
 #' @param randomization_accept_prob An numeric scalar or vector of probabilities for accepting each randomization.
 #' @param findFI A logical value indicating whether to find the fiducial interval. Default is FALSE.
 #'
@@ -48,13 +42,6 @@ randomization_test <- function(
                                candidate_randomizations_array = NULL,
                                n0_array = NULL,
                                n1_array = NULL,
-                               prior_treatment_effect_mean = NULL,
-                               prior_treatment_effect_SD = NULL,
-                               true_treatment_effect = NULL,
-                               simulate = F ,
-                               coef_prior = NULL,
-                               nSimulate_obsW = 50L,
-                               nSimulate_obsY = 50L,
                                randomization_accept_prob = 1.,
                                findFI = F,
                                c_initial = 2,
@@ -73,50 +60,15 @@ randomization_test <- function(
     eval( parse( text = initialize_jax_code ), envir = environment() )
   }
 
-  if(!simulate){
-    if(is.null(n0_array)){ n0_array <- jnp$array(sum(obsW == 0)) }
-    if(is.null(n1_array)){ n1_array <- jnp$array(sum(obsW == 1)) }
-  }
-  if(simulate){
-    if(is.null(n0_array)){ n0_array <- jnp$array(nrow(X)/2) }
-    if(is.null(n1_array)){ n1_array <- jnp$array(nrow(X)/2) }
-  }
+
+  if(is.null(n0_array)){ n0_array <- jnp$array(sum(obsW == 0)) }
+  if(is.null(n1_array)){ n1_array <- jnp$array(sum(obsW == 1)) }
+
   if(!is.null(obsW)){obsW <- c(unlist(obsW))}
   if(!is.null(X)){X <- as.matrix(X)}
   if(!is.null(obsY)){obsY <- c(unlist(obsY))}
 
-  if(is.null(candidate_randomizations_array) & is.null(candidate_randomizations)){
-    
-    n_treated <- ( n_units <- nrow(X) ) / 2
-    if(simulate == T){
-      candidate_randomizations_array <- generate_randomizations(
-                                            n_units = n_units, 
-                                            n_treated = n_treated, 
-                                            X = X,
-                                            randomization_accept_prob = randomization_accept_prob,
-                                                                
-                                            # hyper parameters
-                                            max_draws = max_draws, 
-                                            batch_size = batch_size, 
-                                            randomization_type = randomization_type, 
-                                            approximate_inv = approximate_inv,
-                                            file = file)
-    }
-    if(simulate == F){
-      candidate_randomizations_array <- generate_randomizations(
-                                            n_units = n_units,
-                                            n_treated = n_treated,
-                                            X = X,
-                                            randomization_accept_prob = randomization_accept_prob,
-                                            
-                                            # hyper parameters
-                                            max_draws = max_draws, 
-                                            batch_size = batch_size, 
-                                            randomization_type = randomization_type, 
-                                            approximate_inv = approximate_inv,
-                                            file = file)
-    }
-  }
+  #if(is.null(candidate_randomizations_array) & is.null(candidate_randomizations)){
   if(is.null(candidate_randomizations)){
       candidate_randomizations <- np$array( candidate_randomizations_array )
   }
@@ -124,61 +76,8 @@ randomization_test <- function(
       candidate_randomizations_array <- jnp$array(candidate_randomizations, dtype = jnp$float32)
   }
 
-  # simulate generates new (synthetic values) of Y_obs
-  if( simulate ){
-    obsY1_array <- jnp$array( replicate(nSimulate_obsY, {
-      prior_coef_draw <- coef_prior()
-      Y_0 <- X %*% prior_coef_draw
-
-      #tau_samp <- rnorm(n=n_units, mean=prior_treatment_effect_mean, sd = prior_treatment_effect_SD) # assumes tau_i
-      tau_samp <- rnorm(n=1, mean=prior_treatment_effect_mean, sd = prior_treatment_effect_SD) # assumes one tau
-      Y_1 <- Y_0 + tau_samp
-
-      return(cbind(Y_0, Y_1))
-    }) )
-    obsY1_array <- jnp$transpose(obsY1_array, axes = c(2L,0L,1L))
-    obsY0_array <- jnp$take(obsY1_array, 0L, axis = 2L)
-    obsY1_array <- jnp$take(obsY1_array, 1L, axis = 2L)
-
-    chi_squared_approx <- F
-    M_results <- jnp$squeeze(VectorizedFastHotel2T2(jnp$array( X ),
-                                                    candidate_randomizations_array,
-                                                    n0_array, n1_array), 1L:2L)
-    a_threshold_vec <- jnp$quantile(M_results, jnp$array(prob_accept_randomization_seq))
-    M_results <- np$array( M_results )
-    #if(chi_squared_approx==T){ a_threshold <- qchisq(p=prob_accept_randomization_seq[ii], df=k_covars) }
-
-    GetPvals_vmapped <- jax$jit(jax$vmap( function( sampledIndex, acceptedWs_array ){
-      print2("Jitting...")
-      obsW_ <- VectorizedTakeAxis0_R(acceptedWs_array, sampledIndex)
-      obsY_array <- Potential2Obs_R(obsY0_array, obsY1_array, obsW_)
-      tau_obs <- Y_VectorizedFastDiffInMeans_R(obsY_array, obsW_, n0_array, n1_array)
-      tau_perm_null_0 <-  YW_VectorizedFastDiffInMeans_R(
-        obsY_array,  # y_ =
-        acceptedWs_array, # w_ =
-        n0_array, # n0 =
-        n1_array) # n1 =
-      p_value_inner <- GreaterEqualMagCompare_R(tau_perm_null_0, tau_obs) # pvals across yhat
-      return( p_value_inner ) #  mean here is over Yhat
-    }, in_axes = list(0L,NULL)))
-    p_value <- sapply(np$array(a_threshold_vec),   function(a_){
-      print(a_ / max(np$array(a_threshold_vec)))
-      py_gc$collect()
-
-      # select acceptable randomizations based on threshold
-      acceptedWs_array <- candidate_randomizations_array[jnp$less_equal( M_results,  a_),]
-      sampTheseIndices <- 0L:((AcceptedRandomizations <- acceptedWs_array$shape[[1]])  - 1L)
-      sampledIndices <- jnp$expand_dims(jnp$array( as.integer(as.numeric(
-                              sample(as.character(sampTheseIndices), nSimulate_obsW, replace = T) ))),1L)
-      p_value_outer <-  jnp$mean(GetPvals_vmapped(sampledIndices, acceptedWs_array))
-    })
-    p_value <- np$array( p_value )
-    suggested_randomization_accept_prob <- prob_accept_randomization_seq[ which.min(p_value)[1] ]
-    plot( p_value )
-  }
-
   # perform randomization inference using input data
-  if( !simulate ){
+  {
     tau_obs <- c(np$array( FastDiffInMeans(jnp$array(obsY), # 
                                            jnp$array(obsW), # 
                                            n0_array, #
@@ -278,15 +177,7 @@ randomization_test <- function(
     }
   }
 
-  if( !simulate ){
-    return( list(p_value = p_value,
+  return( list(p_value = p_value,
                  FI = FI,
                  tau_obs = tau_obs) )
-  }
-  if( simulate ){
-    return( list(p_value = p_value,
-                 suggested_randomization_accept_prob = suggested_randomization_accept_prob,
-                 FI = FI,
-                 tau_obs = tau_obs) )
-  }
 }

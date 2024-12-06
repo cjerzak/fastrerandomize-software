@@ -86,6 +86,8 @@ generate_randomizations_exact <- function(n_units, n_treated,
   ZerosHolder <- jnp$zeros(as.integer(n_units), dtype=jnp$uint16)
   candidate_randomizations <- InsertOnesVectorized(combinations, ZerosHolder)
 
+  
+  if(length(randomization_accept_prob) > 1){browser(); browser(); browser()}
   M_results <- NULL; if(!is.null(X)){
     # Set up sample sizes for treatment/control
     n0_array <- jnp$array(  (n_units - n_treated) )
@@ -104,12 +106,12 @@ generate_randomizations_exact <- function(n_units, n_treated,
     a_threshold <- jnp$quantile( 
       M_results,  
       jnp$array(randomization_accept_prob)
-    )#[[1]]
+    )
 
     # Keep only randomizations with balance measure below threshold
     candidate_randomizations <- jnp$take(
       candidate_randomizations,
-      indices = (takeM_ <- jnp$where(jnp$less(M_results,a_threshold))[[1]]),
+      indices = (takeM_ <- jnp$where(jnp$less(M_results,a_threshold))[[1]] ),
       axis = 0L
     )
     M_results <- jnp$take( M_results, indices = takeM_, axis = 0L )
