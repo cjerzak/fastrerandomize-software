@@ -29,9 +29,6 @@
     unzip(download_folder, exdir = "~/Downloads/UgandaAnalysis")
   }
 
-  # load in package
-  library( causalimages  )
-
   # set new wd
   setwd(sprintf('%s/Public Replication Data, YOP Experiment/',
                 gsub(download_folder,pattern="\\.zip",replace="")))
@@ -147,9 +144,6 @@
     nDepth_ImageRep = 1L,
     nWidth_ImageRep = 128L )
   MyImageEmbeddings <- MyImageEmbeddings$ImageRepresentations
-
-  # initialize fastrerandomize
-  fastrerandomize::InitializeJAX(conda_env = "jax_gpu_py3.11", conda_env_required = T) # GPU - fails on METAL backend
 
   # perform rerandomization
   candidate_randomizations_array <- fastrerandomize::generate_randomizations(

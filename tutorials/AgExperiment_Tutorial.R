@@ -54,6 +54,5 @@ ExactRandomizationTestResults <- fastrerandomize::randomization_test(
 ExactRandomizationTestResults$p_value # p-value
 ExactRandomizationTestResults$tau_obs # difference-in-means ATE estimate
 
-# final print message
 print(  "Agricultural experiment tutorial complete!"  )
 }
