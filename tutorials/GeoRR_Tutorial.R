@@ -153,6 +153,6 @@
     conda_env_required = F)
   dim( np$array( candidate_randomizations_array ) )
 
-  print("Done with Geo-rerandomization tutorial!")
+  fastrerandomize::print2("Done with Geo-rerandomization tutorial!")
 }
 
