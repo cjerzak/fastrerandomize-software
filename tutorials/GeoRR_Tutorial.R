@@ -15,7 +15,6 @@
 
   # run code if downloading data for the first time
   download_folder <- "~/Downloads/UgandaAnalysis.zip"
-  reSaveTfRecords <- T
   if( reDownloadRawData <- F  ){
     # specify uganda data URL
     uganda_data_url <- "https://dl.dropboxusercontent.com/s/xy8xvva4i46di9d/Public%20Replication%20Data%2C%20YOP%20Experiment.zip?dl=0"
@@ -87,8 +86,10 @@
         for (band_ in 1:NBANDS) {
           # place the image in the correct place in the array
           array_shell[,,,band_] <-
-            as.matrix(data.table::fread(
-              input = sprintf("./Uganda2000_processed/GeoKey%s_BAND%s.csv", key_, band_), header = FALSE)[-1,])
+            as.matrix(
+              #data.table::fread(input = 
+              read.csv(
+                    sprintf("./Uganda2000_processed/GeoKey%s_BAND%s.csv", key_, band_), header = FALSE)[-1,])
         }
         return(array_shell)
       }, simplify = "array")
@@ -123,14 +124,14 @@
   }
 
   # subset data
-  UgandaDataProcessed <- UgandaDataProcessed[sample(1:24),]
+  # UgandaDataProcessed <- UgandaDataProcessed[sample(1:24),]
 
   # Image heterogeneity example with tfrecords
   # write a tf records repository
   # whenever changes are made to the input data to AnalyzeImageHeterogeneity, WriteTfRecord() should be re-run
   # to ensure correct ordering of data
   tfrecord_loc <- "~/Downloads/GeoRerandomizeTutorial.tfrecord"
-  if( reSaveTfRecords ){
+  if( reSaveTfRecords <- F ){
       causalimages::WriteTfRecord(  file = tfrecord_loc,
                                     uniqueImageKeys = unique(UgandaDataProcessed$geo_long_lat_key),
                                     acquireImageFxn = acquireImageRep )
@@ -141,9 +142,25 @@
     file  = tfrecord_loc,
     imageKeysOfUnits = UgandaDataProcessed$geo_long_lat_key,
     nDepth_ImageRep = 1L,
-    nWidth_ImageRep = 128L )
+    pretrainedModel = "clip-rsicd", 
+    nWidth_ImageRep = 512L,
+    batchSize = 2L,
+    conda_env = "jax_cpu", conda_env_required = T
+  )
   MyImageEmbeddings <- MyImageEmbeddings$ImageRepresentations
 
+  stop("XXX")
+
+  UgandaDataProcessed$geo_lat_center
+  # restart analysis here 
+  # write.csv(data.frame("treated"=UgandaDataProcessed$treated, 
+                        #"obsY"=UgandaDataProcessed$human_capital_index_e,
+                        #"lat"=UgandaDataProcessed$geo_lat_center,"long"=UgandaDataProcessed$geo_long_center), 
+                        #file = "~/Downloads/RCTData.csv")
+  # write.csv(MyImageEmbeddings, file = "~/Downloads/MyImageEmbeddings.csv")
+  # MyImageEmbeddings <- read.csv("~/Downloads/MyImageEmbeddings.csv")[,-1]
+  # MyRCTData <- read.csv("~/Downloads/RCTData.csv")[,-1]
+  
   # perform rerandomization
   candidate_randomizations_array <- fastrerandomize::generate_randomizations(
     n_units = nrow(MyImageEmbeddings),
