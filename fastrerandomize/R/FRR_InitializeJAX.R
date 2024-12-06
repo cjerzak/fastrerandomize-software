@@ -1,6 +1,6 @@
 initialize_jax <- function(){ #initialize_jax <- function(conda_env = "fastrerandomize", conda_env_required = T){
   { 
-  print2("Loading JAX...")
+  print2("Loading fastrerandomize environment...")
   {
   library(reticulate)
   if(!is.null(conda_env)){

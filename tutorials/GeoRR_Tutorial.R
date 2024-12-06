@@ -1,9 +1,8 @@
 # Geo-rerandomization tutorial
 {
-  # Install devtools if needed
-  # install.packages("devtools")
-
-  # Install fastrerandomize if you haven't already
+  options(error=NULL)
+  
+  # Install fastrerandomize and causalimages if you haven't already
   # devtools::install_github(repo = "cjerzak/fastrerandomize-software/fastrerandomize")
   # devtools::install_github(repo = "cjerzak/causalimages-software/causalimages")
 
@@ -150,7 +149,8 @@
     n_units = nrow(MyImageEmbeddings),
     n_treated = nrow(MyImageEmbeddings) / 2,
     X = MyImageEmbeddings,
-    randomization_accept_prob = 0.0001)
+    randomization_accept_prob = 0.0001, 
+    conda_env_required = F)
   dim( np$array( candidate_randomizations_array ) )
 
   print("Done with Geo-rerandomization tutorial!")

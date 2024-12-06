@@ -53,8 +53,7 @@ randomization_test <- function(
                                conda_env = "fastrerandomize", conda_env_required = T
                                ){
   tau_obs <- FI <- covers_truth <- NULL
-  
-  if(!"jax" %in% ls(envir = .GlobalEnv)){
+  if(!"VectorizedFastHotel2T2" %in% ls(envir = .GlobalEnv)){
     initialize_jax_code <- paste(deparse(initialize_jax),collapse="\n")
     initialize_jax_code <- gsub(initialize_jax_code,pattern="function \\(\\)",replace="")
     eval( parse( text = initialize_jax_code ), envir = environment() )
