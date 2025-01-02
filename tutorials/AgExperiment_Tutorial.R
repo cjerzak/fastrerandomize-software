@@ -6,7 +6,7 @@
   # NOTE: If you haven't installed or set up the package:
   #  devtools::install_github("cjerzak/fastrerandomize-software/fastrerandomize")
   #  If needed (done once), install the JAX backend:
-  #       fastrerandomize::build_backend()
+  #  fastrerandomize::build_backend()
   
   options(error = NULL)
   
