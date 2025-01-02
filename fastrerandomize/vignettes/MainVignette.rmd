@@ -3,7 +3,7 @@ title: "FastRerandomize Package Tutorial"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{An Introduction to MyPackage}
+  %\VignetteIndexEntry{An Introduction to fastrerandomize}
   %\VignetteEngine{knitr::rmarkdown}
   %\usepackage[UTF-8]{inputenc}
 ---
