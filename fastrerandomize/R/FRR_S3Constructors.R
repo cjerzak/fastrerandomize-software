@@ -243,8 +243,9 @@ plot.fastrerandomize_test <- function(x, ...) {
   
   # Points/labels
   points(x = c(left, right), y = c(0, 0), pch = 16, col = "blue")
-  text(x = mid, y = 0.3, labels = expression(hat(tau)~sprintf(" = %s", round(mid, 3))), 
-                                        col = "red")
+  text(x = mid, y = 0.3, 
+       labels = eval(parse(text = sprintf("expression(hat(tau)~%s)",sprintf(" '= %s'", round(mid, 3))) )),
+       col = "red")
   box()
   
   # Return invisibly
