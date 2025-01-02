@@ -164,7 +164,7 @@ generate_randomizations_mc <- function(n_units, n_treated,
   # After processing all batches, the candidate_randomizations are the top_perms
   #assert_that(all(top_perms$shape == c(num_to_accept, n_units)), msg = paste0("candidate_randomizations must have dimensions ",  num_to_accept, " x ", n_units, ".") )
   return(list(
-              "candidate_randomizations"=top_perms,
+              "candidate_randomizations" = top_perms,
               "keys_candidate_randomizations" = top_keys,
               "M_candidate_randomizations"= top_M_results
               ))

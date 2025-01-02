@@ -128,3 +128,8 @@ print2 <- function(text, quiet = F){
 JaxKey <- function(int_){ jax$random$PRNGKey(int_)}
 
 SoftPlus_r <- function(x){ log(exp(x)+1) }
+
+output2output <- function(x, return_type = "R"){ 
+  if(return_type == "R"){ return( np$array(x) ) }
+  if(return_type == "jax"){ return( x ) }
+}

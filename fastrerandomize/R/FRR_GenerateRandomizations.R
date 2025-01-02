@@ -60,6 +60,7 @@ generate_randomizations <- function(n_units,
                                    seed = NULL, 
                                    verbose = TRUE,
                                    file = NULL, 
+                                   return_type = "R", 
                                    conda_env = "fastrerandomize", conda_env_required = T
                                    ){
   if(!"VectorizedFastHotel2T2" %in% ls(envir = .GlobalEnv)){
@@ -104,14 +105,13 @@ generate_randomizations <- function(n_units,
     }
     # gc();py_gc$collect()
     
-  browser() 
     print2("Returning generate_randomizations...")
     if (is.null(file)) {
       # Wrap in S3 constructor
       return(
         fastrerandomize_class(
-          randomizations = candidate_randomizations$candidate_randomizations, 
-          balance = candidate_randomizations$M_candidate_randomizations,
+          randomizations = output2output(candidate_randomizations$candidate_randomizations, return_type),
+          balance = output2output(candidate_randomizations$M_candidate_randomizations, return_type),
           call = match.call()
         )
       )
