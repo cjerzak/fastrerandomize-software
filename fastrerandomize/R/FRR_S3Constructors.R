@@ -225,7 +225,7 @@ plot.fastrerandomize_test <- function(x, ...) {
   plot(NULL, NULL,
        xlim = c(min(left, mid) - 1, max(right, mid) + 1),
        ylim = c(-1, 1),
-       xlab = "Outcome Scale",
+       xlab = "Effect Scale",
        ylab = "",
        main = "Fiducial Interval and Observed Effect",
        axes = FALSE, ...)
