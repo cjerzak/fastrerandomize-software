@@ -1,58 +1,99 @@
 {
-options(error = NULL)
-#######################################
-# AgExperiment_Tutorial.R - an agriculture experiment tutorial
-#######################################  
+  options(error = NULL)
   
-# Install fastrerandomize if you haven't already (install devtools if needed via install.packages("devtools"))
-# devtools::install_github(repo = "cjerzak/fastrerandomize-software/fastrerandomize")
-
-# local install for development team
-# install.packages("~/Documents/fastrerandomize-software/fastrerandomize",repos = NULL, type = "source",force = F)
+  #######################################
+  # AgExperiment_Tutorial.R - an agriculture experiment tutorial
+  #######################################
   
-# build backend if needed
-# fastrerandomize::build_backend()
+  # NOTE: If you haven't installed or set up the package:
+  #  - devtools::install_github("cjerzak/fastrerandomize-software/fastrerandomize")
+  #  - Then the Python backend (if needed, done once)
+  #       fastrerandomize::build_backend()
+  
+  # 1. Analysis parameters
+  n_units   <- 22L
+  n_treated <- 12L
+  
+  # 2. Generate covariate data
+  X <- matrix(rnorm(n_units * 5), nrow = n_units)
+  
+  fastrerandomize::print2("Generating a set of acceptable randomizations based on randomization_accept_prob...")
+  
+  # 3. Generate randomizations
+  #    - 'generate_randomizations' now returns an S3 object of class 'fastrerandomize_randomization'
+  #    - randomization_type can be "exact" or "monte_carlo"
+  #    - Adjust 'max_draws' or 'batch_size' as needed
+  CandRandomizations <- fastrerandomize::generate_randomizations(
+    n_units = n_units,
+    n_treated = n_treated,
+    X = X,
+    randomization_type = "exact", 
+    max_draws = 10000L,
+    # randomization_type = "monte_carlo", max_draws = 50000L, batch_size = 1000L,
+    randomization_accept_prob = 0.0001
+  )
+  
+  # --- (NEW) Demonstrate basic S3 usage ---
+  cat("\n--- S3 method usage demo ---\n\n")
+  
+  # 4a. Print the object (will call print.fastrerandomize_randomization)
+  print(CandRandomizations)
+  
+  # 4b. Show a summary (will call summary.fastrerandomize_randomization)
+  summary(CandRandomizations)
+  
+  # 4c. Plot the balance distribution if available (plot.fastrerandomize_randomization)
+  plot(CandRandomizations)
+  
+  # 5. Because it's an S3 object, the randomizations themselves are stored in:
+  #      CandRandomizations$randomizations
+  #    If you want the underlying jax/numpy shape (instead of R's dim()):
+  if (!is.null(CandRandomizations$randomizations$shape)) {
+    cat("\nShape of randomizations in Python/jax sense:\n")
+    print(CandRandomizations$randomizations$shape)
+  }
+  
+  # 6. If a balance vector was stored, its shape (or length) can be shown similarly:
+  if (!is.null(CandRandomizations$balance)) {
+    cat("\nLength of balance vector:\n")
+    print(length(CandRandomizations$balance))
+  }
+  
+  # 7. Convert to base R (matrix) if you need to manipulate randomizations in pure R
+  candidate_randomizations <- NULL
+  if (!is.null(CandRandomizations$randomizations)) {
+    candidate_randomizations <- as.matrix(fastrerandomize::np$array(CandRandomizations$randomizations))
+    cat("\nDimensions of randomizations in R:\n")
+    print(dim(candidate_randomizations))
+  }
+  
+  # -------------------------------------------------------------------
+  # 8. Randomization Test (optionally using these randomizations)
+  fastrerandomize::print2("Starting randomization test...")
+  
+  #    Setup simulated outcome data
+  CoefY <- rnorm(ncol(X))
+  if (is.null(candidate_randomizations)) {
+    # fallback if something didn't generate
+    # otherwise just use candidate_randomizations from above
+    cat("Warning: candidate_randomizations is NULL, generating a simple Wobs\n")
+    Wobs <- c(rep(1, n_treated), rep(0, n_units - n_treated))
+  } else {
+    Wobs <- candidate_randomizations[1, ]  # pick the first acceptable randomization
+  }
+  tau_true <- 1
+  Yobs <- c(X %*% as.matrix(CoefY) + Wobs * tau_true + rnorm(n_units, sd = 0.1))
+  
+  ExactRandomizationTestResults <- fastrerandomize::randomization_test(
+    obsW = Wobs,
+    obsY = Yobs,
+    candidate_randomizations = candidate_randomizations,  # pure R matrix is fine
+    findFI = FALSE
+  )
+  cat("\n--- Randomization test results ---\n")
+  cat("P-value:     ", ExactRandomizationTestResults$p_value, "\n")
+  cat("Tau (D-in-M):", ExactRandomizationTestResults$tau_obs, "\n")
+  
+  cat("\nAgricultural experiment tutorial complete!\n")
 
-# First, specify some analysis parameters
-n_units <- 22L; n_treated <- 12L
-
-# Generate covariate data
-X <- matrix(rnorm(n_units*5),nrow = n_units)
-
-fastrerandomize::print2("Generating a set of acceptable randomizations based randomization_accept_prob...") 
-# When randomization_accept_prob = 1, all randomizations are accepted.
-# When randomization_accept_prob < 1, only well-balanced randomizations are accepted.
-# When randomization_accept_prob = 1/|Size of cand. randomization set|, 1 randomization is accepted.
-CandRandomizationsPackage <- fastrerandomize::generate_randomizations(
-  n_units = n_units,
-  n_treated = n_treated,
-  X = X,
-  randomization_type = "exact", max_draws = 10000L,  # exact sampling 
-  #randomization_type = "monte_carlo", max_draws = 50000L, batch_size = 1000L, # monte carlo sampling 
-  randomization_accept_prob = 0.0001)
-CandRandomizationsPackage$candidate_randomizations$shape
-CandRandomizationsPackage$M_candidate_randomizations$shape
-
-# You can coerce candidate_randomizations_array into R like this:
-candidate_randomizations <- np$array( CandRandomizationsPackage$candidate_randomizations )
-dim( candidate_randomizations )
-
-# We can also use `fastrerandomize` to perform a randomization test using those acceptable randomizations.
-# Setup simulated outcome data
-CoefY <- rnorm(ncol(X))
-Wobs <- candidate_randomizations[1,]
-tau_true <- 1
-Yobs <- c(X %*% as.matrix(CoefY) + Wobs*tau_true + rnorm(n_units, sd = 0.1))
-
-fastrerandomize::print2("Starting randomization test...") 
-ExactRandomizationTestResults <- fastrerandomize::randomization_test(
-  obsW = Wobs,
-  obsY = Yobs,
-  candidate_randomizations = candidate_randomizations,
-  findFI = F # set to T if an exact fiducial interval needed
-)
-ExactRandomizationTestResults$p_value # p-value
-ExactRandomizationTestResults$tau_obs # difference-in-means ATE estimate
-
-print(  "Agricultural experiment tutorial complete!"  )
 }

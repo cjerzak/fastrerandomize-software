@@ -134,7 +134,8 @@
   if( reSaveTfRecords <- F ){
       causalimages::WriteTfRecord(  file = tfrecord_loc,
                                     uniqueImageKeys = unique(UgandaDataProcessed$geo_long_lat_key),
-                                    acquireImageFxn = acquireImageRep )
+                                    acquireImageFxn = acquireImageRep, 
+                                    conda_env = "jax_cpu", conda_env_required = T )
   }
 
   # get representations
@@ -148,8 +149,6 @@
     conda_env = "jax_cpu", conda_env_required = T
   )
   MyImageEmbeddings <- MyImageEmbeddings$ImageRepresentations
-
-  stop("XXX")
 
   UgandaDataProcessed$geo_lat_center
   # restart analysis here 

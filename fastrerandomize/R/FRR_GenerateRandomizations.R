@@ -105,9 +105,19 @@ generate_randomizations <- function(n_units,
     # gc();py_gc$collect()
     
     print2("Returning generate_randomizations...")
-    if(is.null(file)){ return( candidate_randomizations ) } 
-    if(!is.null(file)){ 
-      write.csv(np$array(candidate_randomizations), file = file); 
-      return( sprintf("File saved at %s", file) ) 
-    } 
+    if (is.null(file)) {
+      # Wrap in S3 constructor
+      return(
+        fastrerandomize_randomization(
+          randomizations = candidate_randomizations, 
+          balance = M_results,
+          call = match.call()
+        )
+      )
+    } else {
+      # existing file-writing logic
+      write.csv(np$array(candidate_randomizations), file = file)
+      return(sprintf("File saved at %s", file))
+    }
+      
 }
