@@ -175,8 +175,16 @@ randomization_test <- function(
       }
     }
   }
-
-  return( list(p_value = p_value,
-                 FI = FI,
-                 tau_obs = tau_obs) )
+  
+  # -------------------------------------------------------------------
+  # Wrap in an S3 constructor
+  return(
+    fastrerandomize_test(
+      p_value = p_value,
+      FI      = FI,
+      tau_obs = tau_obs,
+      candidate_randomizations = candidate_randomizations, 
+      call    = match.call()  
+    )
+  )
 }
