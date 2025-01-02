@@ -1,5 +1,5 @@
 {
-  rm(list=ls())
+  rm(list=ls()); options(error = NULL)
   # set path and specify package name
   setwd(sprintf("~/Documents/%s-software",
                 package_name <- "fastrerandomize"))

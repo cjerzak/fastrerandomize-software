@@ -1,7 +1,11 @@
 ---
 title: "FastRerandomize Package Tutorial"
-output: html_document
-date: "2025-01-02"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{An Introduction to MyPackage}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[UTF-8]{inputenc}
 ---
 
 ## Introduction
