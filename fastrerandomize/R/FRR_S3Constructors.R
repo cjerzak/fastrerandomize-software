@@ -225,7 +225,7 @@ plot.fastrerandomize_test <- function(x, ...) {
   plot(NULL, NULL,
        xlim = c(min(left, mid) - 1, max(right, mid) + 1),
        ylim = c(-1, 1),
-       xlab = "Treatment Effect Scale",
+       xlab = "Outcome Scale",
        ylab = "",
        main = "Fiducial Interval and Observed Effect",
        axes = FALSE, ...)
@@ -243,7 +243,7 @@ plot.fastrerandomize_test <- function(x, ...) {
   
   # Points/labels
   points(x = c(left, right), y = c(0, 0), pch = 16, col = "blue")
-  text(x = mid, y = 0.3, labels = paste("tau_obs =", round(mid, 3)), col = "red")
+  text(x = mid, y = 0.3, labels = paste(expression(hat(tau)~sprintf(" = %s" round(mid, 3))), col = "red")
   box()
   
   # Return invisibly

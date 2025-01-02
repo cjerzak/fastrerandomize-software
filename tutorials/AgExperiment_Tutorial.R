@@ -60,7 +60,7 @@
     obsW = Wobs,
     obsY = Yobs,
     candidate_randomizations = CandRandomizations$randomizations,  # pure R matrix is fine
-    findFI = FALSE
+    findFI = TRUE
   )
   
   cat("\n--- Randomization test results ---\n")
