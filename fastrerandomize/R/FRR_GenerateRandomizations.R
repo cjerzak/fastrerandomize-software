@@ -104,6 +104,7 @@ generate_randomizations <- function(n_units,
     }
     # gc();py_gc$collect()
     
+  browser() 
     print2("Returning generate_randomizations...")
     if (is.null(file)) {
       # Wrap in S3 constructor
