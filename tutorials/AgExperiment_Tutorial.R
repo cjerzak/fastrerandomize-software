@@ -6,8 +6,8 @@
   #######################################
   
   # NOTE: If you haven't installed or set up the package:
-  #  - devtools::install_github("cjerzak/fastrerandomize-software/fastrerandomize")
-  #  - Then the Python backend (if needed, done once)
+  #  devtools::install_github("cjerzak/fastrerandomize-software/fastrerandomize")
+  #  Then the Python backend (if needed, done once):
   #       fastrerandomize::build_backend()
   
   # 1. Analysis parameters
