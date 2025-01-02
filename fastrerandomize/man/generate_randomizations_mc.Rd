@@ -11,10 +11,11 @@ generate_randomizations_mc(
   randomization_accept_prob = 1,
   threshold_func = VectorizedFastHotel2T2,
   max_draws = 1e+05,
+  batch_size = 1000,
   seed = NULL,
-  batch_size = 10000,
   approximate_inv = TRUE,
   verbose = FALSE,
+  file = NULL,
   conda_env = "fastrerandomize",
   conda_env_required = T
 )
@@ -32,9 +33,9 @@ generate_randomizations_mc(
 
 \item{max_draws}{An integer specifying the maximum number of randomizations to draw. Default is 100000}
 
-\item{seed}{An integer seed for random number generation. Default is 42}
-
 \item{batch_size}{An integer specifying how many randomizations to process at once. Default is 10000. Lower values use less memory but may be slower}
+
+\item{seed}{An integer seed for random number generation. Default is 42}
 
 \item{verbose}{A logical value indicating whether to print detailed information about batch processing progress, and GPU memory usage. Default is FALSE}
 }

@@ -7,7 +7,7 @@
 generate_randomizations(
   n_units,
   n_treated,
-  X,
+  X = NULL,
   randomization_accept_prob,
   threshold_func = NULL,
   max_draws = 10^6,
@@ -16,6 +16,7 @@ generate_randomizations(
   approximate_inv = TRUE,
   seed = NULL,
   verbose = TRUE,
+  file = NULL,
   conda_env = "fastrerandomize",
   conda_env_required = T
 )

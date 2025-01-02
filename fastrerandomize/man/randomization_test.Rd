@@ -13,16 +13,14 @@ randomization_test(
   candidate_randomizations_array = NULL,
   n0_array = NULL,
   n1_array = NULL,
-  prior_treatment_effect_mean = NULL,
-  prior_treatment_effect_SD = NULL,
-  true_treatment_effect = NULL,
-  simulate = F,
-  coef_prior = NULL,
-  nSimulate_obsW = 50L,
-  nSimulate_obsY = 50L,
   randomization_accept_prob = 1,
   findFI = F,
   c_initial = 2,
+  max_draws = 10^6,
+  batch_size = 10^5,
+  randomization_type = "monte_carlo",
+  approximate_inv = TRUE,
+  file = NULL,
   conda_env = "fastrerandomize",
   conda_env_required = T
 )
@@ -44,25 +42,13 @@ randomization_test(
 
 \item{n1_array}{An optional array specifying the number of treated units.}
 
-\item{prior_treatment_effect_mean}{An optional numeric value for the prior mean of the treatment effect. Default is NULL.}
-
-\item{prior_treatment_effect_SD}{An optional numeric value for the prior standard deviation of the treatment effect. Default is NULL.}
-
-\item{true_treatment_effect}{An optional numeric value specifying the true treatment effect. Default is NULL.}
-
-\item{simulate}{A logical value indicating whether to run \code{randomization_test} in simulation mode. Default is FALSE.}
-
-\item{coef_prior}{An optional function generating coefficients on values of \code{X} for predicting \code{Y(0)}.}
-
-\item{nSimulate_obsW}{A numeric value specifying the number of simulated values for obsW. Default is \code{50L}.}
-
-\item{nSimulate_obsY}{A numeric value specifying the number of simulated values for obsY. Default is \code{50L}.}
-
 \item{randomization_accept_prob}{An numeric scalar or vector of probabilities for accepting each randomization.}
 
 \item{findFI}{A logical value indicating whether to find the fiducial interval. Default is FALSE.}
 
 \item{c_initial}{A numeric value representing the initial criterion for the randomization. Default is \code{2}.}
+
+\item{true_treatment_effect}{An optional numeric value specifying the true treatment effect. Default is NULL.}
 }
 \value{
 A list consisting of \itemize{
