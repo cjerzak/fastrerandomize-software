@@ -56,7 +56,7 @@
   Yobs <- c(X %*% as.matrix(CoefY) + Wobs * tau_true + rnorm(n_units, sd = 0.1))
   
   # 5b. Perform randomization test 
-  ExactRandomizationTestResults <- fastrerandomize::randomization_test(
+  randomization_test_results <- fastrerandomize::randomization_test(
     obsW = Wobs,
     obsY = Yobs,
     candidate_randomizations = CandRandomizations$randomizations,  # pure R matrix is fine
@@ -64,9 +64,9 @@
   )
   
   cat("\n--- Randomization test results ---\n")
-  print(test_result)       
-  summary(test_result)     
-  plot(test_result)     
+  print( randomization_test_results )       
+  summary( randomization_test_results )     
+  plot( randomization_test_results )     
   
   cat("\nAgricultural experiment tutorial complete!\n")
 }
