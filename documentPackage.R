@@ -6,6 +6,7 @@
   
   package_path <- sprintf("~/Documents/%s-software/%s",package_name,package_name)
   tools::add_datalist(package_path, force = TRUE, small.size = 1L)
+  devtools::build_vignettes(package_path)
   devtools::document(package_path)
   
   # remove old PDF

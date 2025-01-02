@@ -21,6 +21,9 @@ Note: This tutorial assumes you have installed the fastrerandomize package, eith
 
 # (Done once) Optionally build the JAX backend if needed
 # fastrerandomize::build_backend()
+
+# note that this vignette can be found like so: 
+vignette(package = "fastrerandomize")
 ```
 
 ## 1. Analysis Parameters
