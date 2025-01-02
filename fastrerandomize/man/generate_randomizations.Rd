@@ -17,6 +17,7 @@ generate_randomizations(
   seed = NULL,
   verbose = TRUE,
   file = NULL,
+  return_type = "R",
   conda_env = "fastrerandomize",
   conda_env_required = T
 )

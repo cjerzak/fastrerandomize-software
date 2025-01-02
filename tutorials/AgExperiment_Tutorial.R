@@ -45,55 +45,28 @@
   # 4c. Plot the balance distribution if available (plot.fastrerandomize_instance)
   plot(CandRandomizations)
   
-  # 5. Because it's an S3 object, the randomizations themselves are stored in:
-  #      CandRandomizations$randomizations
-  #    If you want the underlying jax/numpy shape (instead of R's dim()):
-  if (!is.null(CandRandomizations$randomizations$shape)) {
-    cat("\nShape of randomizations in Python/jax sense:\n")
-    print(CandRandomizations$randomizations$shape)
-  }
-  
-  # 6. If a balance vector was stored, its shape (or length) can be shown similarly:
-  if (!is.null(CandRandomizations$balance)) {
-    cat("\nLength of balance vector:\n")
-    print(length(CandRandomizations$balance))
-  }
-  
-  # 7. Convert to base R (matrix) if you need to manipulate randomizations in pure R
-  candidate_randomizations <- NULL
-  if (!is.null(CandRandomizations$randomizations)) {
-    candidate_randomizations <- as.matrix(fastrerandomize::np$array(CandRandomizations$randomizations))
-    cat("\nDimensions of randomizations in R:\n")
-    print(dim(candidate_randomizations))
-  }
-  
   # -------------------------------------------------------------------
-  # 8. Randomization Test (optionally using these randomizations)
+  # 5. Randomization Test
   fastrerandomize::print2("Starting randomization test...")
   
-  #    Setup simulated outcome data
+  # 5a. Setup simulated outcome data
   CoefY <- rnorm(ncol(X))
-  if (is.null(candidate_randomizations)) {
-    # fallback if something didn't generate
-    # otherwise just use candidate_randomizations from above
-    cat("Warning: candidate_randomizations is NULL, generating a simple Wobs\n")
-    Wobs <- c(rep(1, n_treated), rep(0, n_units - n_treated))
-  } else {
-    Wobs <- candidate_randomizations[1, ]  # pick the first acceptable randomization
-  }
+  Wobs <- CandRandomizations$randomizations[1, ]  # pick the first acceptable randomization
   tau_true <- 1
   Yobs <- c(X %*% as.matrix(CoefY) + Wobs * tau_true + rnorm(n_units, sd = 0.1))
   
+  # 5b. Perform randomization test 
   ExactRandomizationTestResults <- fastrerandomize::randomization_test(
     obsW = Wobs,
     obsY = Yobs,
-    candidate_randomizations = candidate_randomizations,  # pure R matrix is fine
+    candidate_randomizations = CandRandomizations$randomizations,  # pure R matrix is fine
     findFI = FALSE
   )
+  
   cat("\n--- Randomization test results ---\n")
-  cat("P-value:     ", ExactRandomizationTestResults$p_value, "\n")
-  cat("Tau (D-in-M):", ExactRandomizationTestResults$tau_obs, "\n")
+  print(test_result)       
+  summary(test_result)     
+  plot(test_result)     
   
   cat("\nAgricultural experiment tutorial complete!\n")
-
 }
