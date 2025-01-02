@@ -36,13 +36,13 @@
   # --- Demonstrate S3 usage ---
   cat("\n--- S3 method usage demo ---\n\n")
   
-  # 4a. Print the object (will call print.fastrerandomize_randomization)
+  # 4a. Print the object (will call print.fastrerandomize_instance)
   print(CandRandomizations)
   
-  # 4b. Show a summary (will call summary.fastrerandomize_randomization)
+  # 4b. Show a summary (will call summary.fastrerandomize_instance)
   summary(CandRandomizations)
   
-  # 4c. Plot the balance distribution if available (plot.fastrerandomize_randomization)
+  # 4c. Plot the balance distribution if available (plot.fastrerandomize_instance)
   plot(CandRandomizations)
   
   # 5. Because it's an S3 object, the randomizations themselves are stored in:

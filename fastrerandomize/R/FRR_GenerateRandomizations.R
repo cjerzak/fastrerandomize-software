@@ -108,7 +108,7 @@ generate_randomizations <- function(n_units,
     if (is.null(file)) {
       # Wrap in S3 constructor
       return(
-        fastrerandomize_randomization(
+        fastrerandomize_instance(
           candidate_randomizations = candidate_randomizations$candidate_randomizations, 
           randomizations_balance = candidate_randomizations$M_candidate_randomizations,
           call = match.call()
