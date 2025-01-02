@@ -96,7 +96,7 @@ plot.fastrerandomize_randomizations <- function(x, ...) {
   }
   hist(
     x$balance, 
-    main = "Distribution of Balance Measures",
+    main = "Distribution of balance measures \n(among accepted randomizations)",
     xlab = "Balance Measure",
     col = "steelblue", 
     ...
@@ -151,9 +151,9 @@ print.fastrerandomize_test <- function(x, ...) {
   cat("Observed effect (tau_obs): ", x$tau_obs, "\n")
   
   if (!is.null(x$FI)) {
-    cat("Fiducial Interval: [", x$FI[1], ", ", x$FI[2], "]\n", sep = "")
+    cat("Fiducial interval: [", x$FI[1], ", ", x$FI[2], "]\n", sep = "")
   } else {
-    cat("No Fiducial Interval.\n")
+    cat("No fiducial interval computed (findFI = FALSE)\n")
   }
   
   invisible(x)
