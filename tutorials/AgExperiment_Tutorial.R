@@ -1,6 +1,4 @@
 {
-  options(error = NULL)
-  
   #######################################
   # AgExperiment_Tutorial.R - an agriculture experiment tutorial
   #######################################
@@ -9,6 +7,8 @@
   #  devtools::install_github("cjerzak/fastrerandomize-software/fastrerandomize")
   #  Then the Python backend (if needed, done once):
   #       fastrerandomize::build_backend()
+  
+  options(error = NULL)
   
   # 1. Analysis parameters
   n_units   <- 22L
@@ -33,7 +33,7 @@
     randomization_accept_prob = 0.0001
   )
   
-  # --- (NEW) Demonstrate basic S3 usage ---
+  # --- Demonstrate S3 usage ---
   cat("\n--- S3 method usage demo ---\n\n")
   
   # 4a. Print the object (will call print.fastrerandomize_randomization)
