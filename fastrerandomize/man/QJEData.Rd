@@ -14,7 +14,7 @@ A data frame with 968 rows and 2161 column.
 \source{
 Burchardi, K.B., Ghatak, M., & Johanssen, A. (2019). 
 Moral hazard: Experimental evidence from tenancy contracts.
-_The Quarterly Journal of Economics_, 134(1), 281-347.
+*The Quarterly Journal of Economics*, 134(1), 281-347.
 }
 \usage{
 data(QJEData)
