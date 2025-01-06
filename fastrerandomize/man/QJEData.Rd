@@ -17,9 +17,8 @@ Moral hazard: Experimental evidence from tenancy contracts.
 The Quarterly Journal of Economics, 134(1), 281-347.
 }
 \usage{
-QJEData
+data(QJEData)
 }
 \description{
 Data from a field experiment studying moral hazard in tenancy contracts in agriculture.
 }
-\keyword{datasets}

@@ -14,5 +14,8 @@
 #' Moral hazard: Experimental evidence from tenancy contracts.
 #' The Quarterly Journal of Economics, 134(1), 281-347.
 #' 
+#' @name QJEData
+#' @docType data
+#' @usage data(QJEData)
 
-"QJEData"
+NULL
