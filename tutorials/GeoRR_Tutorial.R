@@ -154,8 +154,21 @@ if (resave_files <- FALSE) {
   MyImageEmbeddings <- MyImageEmbeddings$ImageRepresentations
   write.csv(MyImageEmbeddings, 
             file = "~/Downloads/GeoRerandomizeTutorial.csv")
+  
+  UgandaDataProcessed$outcome <- UgandaDataProcessed$human_capital_index_e
+  UgandaDataProcessed_subset <- UgandaDataProcessed[,c("treated",
+                               "outcome",
+                               "geo_long_lat_key")]
+  which_take <- which(!is.na(UgandaDataProcessed_subset$treated))
+  
+  ImageEmbeddings <- MyImageEmbeddings[which_take,]
+  RCTData <- UgandaDataProcessed_subset[which_take,]
+  dim(ImageEmbeddings)
+  save(list = c("ImageEmbeddings","RCTData"),
+       file = "~/Downloads/YOPData.RData") 
 }
-MyImageEmbeddings <- read.csv(file = "~/Downloads/GeoRerandomizeTutorial.csv")[,-1]
+
+data(YOPData, package = "fastrerandomize")
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # 6. Perform Geo-rerandomization using fastrerandomize
@@ -181,3 +194,4 @@ plot(CandidateRandomizations)
 
 fastrerandomize::print2("Done with Geo-rerandomization tutorial!")
 }
+

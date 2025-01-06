@@ -15,6 +15,7 @@
   n_treated <- 12L
   
   # 2. Generate covariate data
+  data(QJEData, package = "fastrerandomize")
   X <- matrix(rnorm(n_units * 5), nrow = n_units)
   
   fastrerandomize::print2("Generating a set of acceptable randomizations based on randomization_accept_prob...")
