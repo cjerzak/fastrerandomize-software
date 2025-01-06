@@ -15,10 +15,10 @@ A list containing two data frames:
 \itemize{
   \item Blattman, C., Fiala, N. and Martinez, S. (2020). The Long-term Impacts 
   of Grants on Poverty: Nine-year Evidence from Uganda's Youth Opportunities Program. 
-  *American Economic Review: Insights*, 2(3), 287-304.
+  American Economic Review: Insights, 2(3), 287-304.
   
   \item Jerzak, C.T., Johansson, F.D. and Daoud, A. (2023). Image-based Treatment 
-  Effect Heterogeneity. *Conference on Causal Learning and Reasoning*, 531-552. *PMLR*.
+  Effect Heterogeneity. Conference on Causal Learning and Reasoning, 531-552. PMLR.
 }
 }
 \usage{
