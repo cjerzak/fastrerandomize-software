@@ -9,7 +9,11 @@ vignette: >
 
 ## Introduction
 
-This vignette demonstrates how to use the fastrerandomize package for generating and testing experimental designs in an agricultural study setting. We will walk through:
+This vignette demonstrates how to use the fastrerandomize package for generating and testing experimental designs in an agricultural study setting based on: 
+
+* Burchardi, Konrad B et al. (2019). "Moral Hazard: Experimental Evidence from Tenancy Contracts." In: _The Quarterly Journal of Economics_ 134.1, pp. 281–347. 
+
+We will walk through:
 
 * Generating synthetic covariate data
 * Creating candidate randomizations
