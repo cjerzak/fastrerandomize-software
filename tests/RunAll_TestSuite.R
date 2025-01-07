@@ -33,9 +33,9 @@
       
       t_RRTest <- try({
         RRTest_ <- fastrerandomize::randomization_test(
-          obsW = (W_<-as.integer(np$array(RandomizationSet_$candidate_randomizations[1,]))),
-          obsY = rnorm(RandomizationSet_$candidate_randomizations$shape[[2]])+2*W_,
-          candidate_randomizations_array = RandomizationSet_$candidate_randomizations,
+          obsW = (W_<-as.integer(RandomizationSet_$randomizations[1,])),
+          obsY = rnorm(ncol(RandomizationSet_$randomizations))+2*W_,
+          candidate_randomizations = RandomizationSet_$randomizations,
           findFI = findFI, 
           X = X)
         if(!is.null(RRTest_$FI)){ 
@@ -47,6 +47,6 @@
     }
   }, T)
     
-  if('try-error' %in% class(tryTests)){ fastrerandomize::print2("At least one test failed..."); print( tryTests ) }
+  if('try-error' %in% class(tryTests)){  print( tryTests ); fastrerandomize::print2("At least one test failed... See above.") }
   if(!'try-error' %in% class(tryTests)){ fastrerandomize::print2("All tests succeeded!") }
 }
