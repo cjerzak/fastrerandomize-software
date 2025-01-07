@@ -24,4 +24,3 @@
 #' @usage data(YOPData)
 
 NULL
-#"YOPData"

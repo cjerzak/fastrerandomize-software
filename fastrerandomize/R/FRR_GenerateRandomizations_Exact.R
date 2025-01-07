@@ -71,7 +71,7 @@ generate_randomizations_exact <- function(n_units, n_treated,
                                    conda_env = "fastrerandomize", conda_env_required = T){
   if(!"VectorizedFastHotel2T2" %in% ls(envir = .GlobalEnv)){
     initialize_jax_code <- paste(deparse(initialize_jax),collapse="\n")
-    initialize_jax_code <- gsub(initialize_jax_code,pattern="function \\(\\)",replace="")
+    initialize_jax_code <- gsub(initialize_jax_code,pattern="function \\(\\)",relacement="")
     eval( parse( text = initialize_jax_code ), envir = environment() )
   }
   

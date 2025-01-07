@@ -71,7 +71,7 @@ generate_randomizations <- function(n_units,
                                    ){
   if(!"VectorizedFastHotel2T2" %in% ls(envir = .GlobalEnv)){
       initialize_jax_code <- paste(deparse(initialize_jax),collapse="\n")
-      initialize_jax_code <- gsub(initialize_jax_code,pattern="function \\(\\)",replace="")
+      initialize_jax_code <- gsub(initialize_jax_code,pattern="function \\(\\)",relacement="")
       eval( parse( text = initialize_jax_code ), envir = environment() )
     }
     if(is.null(threshold_func)){ threshold_func <- VectorizedFastHotel2T2 }

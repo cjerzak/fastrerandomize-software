@@ -68,11 +68,11 @@ generate_randomizations_mc <- function(n_units, n_treated,
                                       ){
   if(!"VectorizedFastHotel2T2" %in% ls(envir = .GlobalEnv)){
     initialize_jax_code <- paste(deparse(initialize_jax),collapse="\n")
-    initialize_jax_code <- gsub(initialize_jax_code, pattern="function \\(\\)",replace="")
+    initialize_jax_code <- gsub(initialize_jax_code, pattern="function \\(\\)",relacement="")
     eval( parse( text = initialize_jax_code ), envir = environment() )
   }
 
-  if(is.null(seed)){ seed <- as.integer(runif(1, 0, 100000)) }
+  if(is.null(seed)){ seed <- as.integer(stats::runif(1, 0, 100000)) }
   
   # Calculate the maximum number of possible randomizations
   max_rand_num <- choose(n_units, n_treated)
@@ -144,7 +144,8 @@ generate_randomizations_mc <- function(n_units, n_treated,
   
   top_M_results <- sapply(1L:num_batches, function(b_){ # note: vmapping this causes unacceptable memory overhead 
     top_M_results_ <- top_M_fxn(key, jnp$array(as.integer(b_)))
-  return(list("top_keys"=top_M_results_$top_keys, "top_M_results"=top_M_results_$top_M_results) ) })
+  return(list("top_keys"=top_M_results_$top_keys, 
+              "top_M_results"=top_M_results_$top_M_results) ) })
   
   # concatenate results 
   top_keys <- jnp$concatenate(top_M_results["top_keys",],0L)
