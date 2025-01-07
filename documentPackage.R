@@ -22,4 +22,3 @@
   # Check package to ensure it meets CRAN standards.
   # devtools::check( package_path )
 }
-

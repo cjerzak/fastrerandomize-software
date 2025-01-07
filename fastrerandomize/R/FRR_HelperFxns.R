@@ -52,3 +52,5 @@ approx_log_n_choose_m <- function(n, m){
   result <- n * log(n) - m * log(m) - (n - m)*log(n-m) + 0.5 * (log(n) - log(m) - log(n-m) - log(2*pi))
   return(result)
 }
+
+fastrr_env <- new.env(parent = emptyenv())
