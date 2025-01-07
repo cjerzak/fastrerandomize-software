@@ -5,11 +5,14 @@
 \alias{QJEData}
 \title{QJEData: Agricultural Treatment Experiment Data}
 \format{
-A data frame with 968 rows and 2161 column. 
-  \describe{
-    \item{rows}{Indicate units}
-    \item{columns}{Contain RCT data features}
-  }
+A data frame on 968 experimental units.
+\describe{
+  \item{educ_low}{Numeric/binary. Whether the farmer has low formal education (1) or not (0). Education levels may shape farmers’ understanding of contracts, willingness to invest, or risk preferences.}
+  \item{hh_size}{Numeric (integer). Household size. Differences in family labor availability or consumption needs can influence effort levels and thus relate to moral hazard in production decisions.}
+  \item{treat1}{Numeric/binary. Primary treatment indicator (e.g., whether a farmer is offered a specific tenancy contract or cost-sharing arrangement).}
+  \item{R_yield_ELA_sqm}{Numeric. Yield (e.g., kilograms of crop output) per square meter. One of the principal outcome measures for evaluating productivity and the impact of the treatment on farm performance.}
+  \item{ELA_Fertil_D}{Numeric/binary. Indicator for whether fertilizer was used (1) or not (0). Used to measure investment in farm inputs—a key mechanism for moral hazard (if farmers reduce effort or inputs under certain contracts).}
+}
 }
 \source{
 Burchardi, K.B., Ghatak, M., & Johanssen, A. (2019). 
