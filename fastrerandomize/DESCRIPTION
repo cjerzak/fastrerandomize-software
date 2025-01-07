@@ -12,7 +12,7 @@ Authors@R:
              family = "Kamat",
              role = "aut",
              email = "aniketkamat@berkeley.edu",
-             comment = c(ORCID = "XXX")),
+             comment = c(ORCID = "0009-0003-6411-1084")),
       person(given = "Connor",
              family = "Jerzak",
              role = "aut",

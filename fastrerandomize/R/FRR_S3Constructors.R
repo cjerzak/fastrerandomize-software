@@ -94,7 +94,7 @@ plot.fastrerandomize_randomizations <- function(x, ...) {
     message("No balance data in this randomization object. Nothing to plot.")
     return(invisible(NULL))
   }
-  hist(
+  graphics::hist(
     x$balance, 
     main = "Distribution of balance measures \n(among accepted randomizations)",
     xlab = "Balance Measure",
@@ -178,7 +178,8 @@ summary.fastrerandomize_test <- function(object, ...) {
   cat("Observed effect (tau_obs):\n  ", object$tau_obs, "\n\n")
   
   if (!is.null(object$FI)) {
-    cat("Fiducial Interval:\n  [", object$FI[1], ", ", object$FI[2], "]\n\n", sep = "")
+    cat("Fiducial Interval:\n  [", object$FI[1],
+        ", ", object$FI[2], "]\n\n", sep = "")
   } else {
     cat("No Fiducial Interval.\n\n")
   }
@@ -208,7 +209,7 @@ plot.fastrerandomize_test <- function(x, ...) {
   if (is.null(x$FI)) {
     message("No fiducial interval to plot, only a single observed effect.")
     # Optionally just plot a single point on an axis:
-    plot(x = x$tau_obs, y = 0,
+    graphics::plot(x = x$tau_obs, y = 0,
          xlab = "Effect Size", ylab = "", 
          main = "Observed Effect (No FI available)",
          xlim = c(x$tau_obs - abs(x$tau_obs)*0.5, x$tau_obs + abs(x$tau_obs)*0.5),
@@ -222,31 +223,33 @@ plot.fastrerandomize_test <- function(x, ...) {
   mid   <- x$tau_obs
   
   # Set up plot space
-  plot(NULL, NULL,
+  graphics::plot(NULL, NULL,
        xlim = c(min(left, mid) - 1, max(right, mid) + 1),
        ylim = c(-1, 1),
        xlab = "Effect Scale",
        ylab = "",
        main = "Fiducial Interval and Observed Effect",
        axes = FALSE, ...)
-  axis(1)
+  graphics::axis(1)
   
   # Plot the FI
-  segments(x0 = left,  y0 = 0,
-           x1 = right, y1 = 0,
-           lwd = 2, col = "blue")
+  graphics::segments(x0 = left,  y0 = 0,
+                     x1 = right, y1 = 0,
+                     lwd = 2, col = "blue")
   
   # Mark the midpoint
-  segments(x0 = mid, y0 = -0.2,
-           x1 = mid, y1 =  0.2,
-           col = "red", lwd = 2)
+  graphics::segments(x0 = mid, y0 = -0.2,
+                     x1 = mid, y1 =  0.2,
+                     col = "red", lwd = 2)
   
   # Points/labels
-  points(x = c(left, right), y = c(0, 0), pch = 16, col = "blue")
-  text(x = mid, y = 0.3, 
-       labels = eval(parse(text = sprintf("expression(hat(tau)~%s)",sprintf(" '= %s'", round(mid, 3))) )),
+  graphics::points(x = c(left, right),
+                   y = c(0, 0), pch = 16, col = "blue")
+  graphics::text(x = mid, y = 0.3, 
+       labels = eval(parse(text = sprintf("expression(hat(tau)~%s)",
+                                          sprintf(" '= %s'", round(mid, 3))) )),
        col = "red")
-  box()
+  graphics::box()
   
   # Return invisibly
   invisible(x)

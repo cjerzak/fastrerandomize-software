@@ -135,3 +135,6 @@ print(result_fi)
 }
 
 }
+\seealso{
+\code{\link{generate_randomizations}} for randomization generation function.
+}

@@ -101,6 +101,6 @@ Hotelling, H. (1931). The generalization of Student's ratio.
 The Annals of Mathematical Statistics, 2(3), 360-378.
 }
 \seealso{
-\code{\link{VectorizedFastHotel2T2}} for details on the balance statistic calculation
-\code{\link{InsertOnesVectorized}} for the treatment assignment generation
+\code{\link{generate_randomizations}} for full randomization generation function. 
+\code{\link{generate_randomizations_mc}} for the Monte Carlo version.
 }

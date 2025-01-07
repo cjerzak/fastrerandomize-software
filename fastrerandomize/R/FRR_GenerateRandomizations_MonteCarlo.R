@@ -62,8 +62,8 @@
 #' }
 #'
 #' @seealso
-#' \code{\link{generate_randomizations}} for the non-Monte Carlo version
-#' \code{\link{VectorizedFastHotel2T2}} for the default threshold function
+#' \code{\link{generate_randomizations}} for full randomization generation function. 
+#' \code{\link{generate_randomizations_exact}} for the exact version. 
 #' 
 #' @import reticulate
 #' @importFrom assertthat assert_that
