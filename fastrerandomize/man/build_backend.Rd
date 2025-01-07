@@ -2,7 +2,7 @@
 % Please edit documentation in R/FRR_BuildBackend.R
 \name{build_backend}
 \alias{build_backend}
-\title{Build the environment for fastrerandomize. Builds a conda environment in which jax and np are installed.}
+\title{An optional function to build the environment for fastrerandomize. Builds a conda environment in which jax and np are installed. Users can also create a conda environment where jax and np are installed themselves.}
 \usage{
 build_backend(conda_env = "fastrerandomize", conda = "auto")
 }
@@ -16,7 +16,7 @@ Builds the computational environment for \code{fastrerandomize}. This function r
 You may find out a list of conda Python paths via: \code{system("which python")}
 }
 \description{
-Build the environment for fastrerandomize. Builds a conda environment in which jax and np are installed.
+An optional function to build the environment for fastrerandomize. Builds a conda environment in which jax and np are installed. Users can also create a conda environment where jax and np are installed themselves.
 }
 \examples{
 # For a tutorial, see

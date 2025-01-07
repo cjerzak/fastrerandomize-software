@@ -1,4 +1,4 @@
-#' Build the environment for fastrerandomize. Builds a conda environment in which jax and np are installed.
+#' An optional function to build the environment for fastrerandomize. Builds a conda environment in which jax and np are installed. Users can also create a conda environment where jax and np are installed themselves. 
 #'
 #' @param conda_env (default = `"fastrerandomize"`) Name of the conda environment in which to place the backends.
 #' @param conda (default = `auto`) The path to a conda executable. Using `"auto"` allows reticulate to attempt to automatically find an appropriate conda binary.
