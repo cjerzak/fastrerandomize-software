@@ -36,12 +36,12 @@ print2 <- function(text,
   }
 }
 
-JaxKey <- function(int_){ jax$random$PRNGKey(int_)}
+JaxKey <- function(int_){ fastrr_env$jax$random$PRNGKey(int_)}
 
 SoftPlus_r <- function(x){ log(exp(x)+1) }
 
 output2output <- function(x, return_type = "R"){ 
-  if(return_type == "R"){ return( np$array(x) ) }
+  if(return_type == "R"){ return( fastrr_env$np$array(x) )  }
   if(return_type == "jax"){ return( x ) }
 }
 
@@ -53,4 +53,4 @@ approx_log_n_choose_m <- function(n, m){
   return(result)
 }
 
-fastrr_env <- new.env(parent = emptyenv())
+fastrr_env <- new.env( parent = emptyenv() )

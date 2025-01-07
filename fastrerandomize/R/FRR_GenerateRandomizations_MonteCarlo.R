@@ -101,17 +101,17 @@ generate_randomizations_mc <- function(n_units, n_treated,
   base_vector <- c(rep(1L, n_treated), rep(0L, n_units - n_treated))
   
   # Convert base_vector to a JAX array with a smaller data type to save memory
-  base_vector_jax <- jnp$array(as.integer(base_vector), dtype = jnp$int8)
+  base_vector_jax <- fastrr_env$jnp$array(as.integer(base_vector), dtype = fastrr_env$jnp$int8)
   
   # Initialize JAX random key with the provided seed
-  key <- jax$random$PRNGKey(as.integer(seed))
+  key <- fastrr_env$jax$random$PRNGKey(as.integer(seed))
   
   # Convert X to JAX array (float16 can cause issues with matrix inverse)
-  X_jax <- jnp$array(as.matrix(X), dtype = jnp$float32)
+  X_jax <- fastrr_env$jnp$array(as.matrix(X), dtype = fastrr_env$jnp$float32)
   
   # Set up sample sizes for treatment/control
-  n0_array <- jnp$array(as.integer(n_units - n_treated))
-  n1_array <- jnp$array(as.integer(n_treated))
+  n0_array <- fastrr_env$jnp$array(as.integer(n_units - n_treated))
+  n1_array <- fastrr_env$jnp$array(as.integer(n_treated))
     
   # Calculate the number of batches
   num_batches <- ceiling(max_draws / batch_size)
@@ -134,49 +134,49 @@ generate_randomizations_mc <- function(n_units, n_treated,
   }
   t0 <- Sys.time()
 
-  batch_permutation <- jax$jit( jax$vmap( function(key_, base_vector_){
-      perm_ = jax$random$permutation(key_, base_vector_)
+  batch_permutation <- fastrr_env$jax$jit( fastrr_env$jax$vmap( function(key_, base_vector_){
+      perm_ = fastrr_env$jax$random$permutation(key_, base_vector_)
       return(perm_)
   }, list(0L, NULL)) )
   
-  top_M_fxn <- jax$jit(function(key, b_){ 
-    key <- jax$random$fold_in(key, b_)
-    vkey <- jax$random$split(key, as.integer(batch_size))
+  top_M_fxn <- fastrr_env$jax$jit(function(key, b_){ 
+    key <- fastrr_env$jax$random$fold_in(key, b_)
+    vkey <- fastrr_env$jax$random$split(key, as.integer(batch_size))
     
     # Generate permutations for the current batch - run on CPU? 
     perms_batch <- batch_permutation(vkey, base_vector_jax)
     
     # Calculate balance measures (e.g., Hotelling T-squared) for each permutation in the batch
-    M_results_batch_ <- jnp$squeeze( threshold_func(
+    M_results_batch_ <- fastrr_env$jnp$squeeze( threshold_func(
       X_jax,
       perms_batch,
       n0_array, 
       n1_array, 
       approximate_inv
-    ) )$astype(jnp$float16)
+    ) )$astype(fastrr_env$jnp$float16)
     return(list("top_keys"=vkey,
                 "top_M_results"=M_results_batch_))
   })
   
   top_M_results <- sapply(1L:num_batches, function(b_){ # note: vmapping this causes unacceptable memory overhead 
-    top_M_results_ <- top_M_fxn(key, jnp$array(as.integer(b_)))
+    top_M_results_ <- top_M_fxn(key, fastrr_env$jnp$array(as.integer(b_)))
   return(list("top_keys"=top_M_results_$top_keys, 
               "top_M_results"=top_M_results_$top_M_results) ) })
   
   # concatenate results 
-  top_keys <- jnp$concatenate(top_M_results["top_keys",],0L)
-  top_M_results <- jnp$concatenate(top_M_results["top_M_results",],0L)
+  top_keys <- fastrr_env$jnp$concatenate(top_M_results["top_keys",],0L)
+  top_M_results <- fastrr_env$jnp$concatenate(top_M_results["top_M_results",],0L)
   
   # Limit the size of combined arrays
   combined_length <- top_M_results$shape[[1]]
   {
     # Get indices of combined_M_results sorted in ascending order
-    sorted_indices <- jnp$argsort(top_M_results)
+    sorted_indices <- fastrr_env$jnp$argsort(top_M_results)
     
     # Keep only top num_to_accept permutations
     indices_to_keep <- sorted_indices[0:num_to_accept]
-    top_M_results <- jnp$take(top_M_results, indices_to_keep)
-    top_keys <- jnp$take(top_keys, indices_to_keep, axis=0L)
+    top_M_results <- fastrr_env$jnp$take(top_M_results, indices_to_keep)
+    top_keys <- fastrr_env$jnp$take(top_keys, indices_to_keep, axis=0L)
     top_perms <- batch_permutation(top_keys, base_vector_jax)
   }
 

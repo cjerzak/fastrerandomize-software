@@ -88,7 +88,7 @@ generate_randomizations_exact <- function(n_units, n_treated,
                                    file = NULL,
                                    conda_env = "fastrerandomize", 
                                    conda_env_required = TRUE){
-  if(!"VectorizedFastHotel2T2" %in% ls(envir = .GlobalEnv)){
+  if(!"VectorizedFastHotel2T2" %in% ls(envir = fastrr_env)){
     initialize_jax_code <- paste(deparse(initialize_jax),collapse="\n")
     initialize_jax_code <- gsub(initialize_jax_code,pattern="function \\(\\)",replacement="")
     eval( parse( text = initialize_jax_code ), envir = environment() )
@@ -99,37 +99,37 @@ generate_randomizations_exact <- function(n_units, n_treated,
               msg = "Value of min(randomization_accept_prob) indices less than 10 accepted randomizations. Increase min(randomization_accept_prob)!")
   
   # Get all combinations of positions to set to 1
-  combinations <- jnp$array(  utils::combn(n_units, n_treated) - 1L )
-  ZerosHolder <- jnp$zeros(as.integer(n_units), dtype=jnp$uint16)
-  candidate_randomizations <- InsertOnesVectorized(combinations, ZerosHolder)
+  combinations <- fastrr_env$jnp$array(  utils::combn(n_units, n_treated) - 1L )
+  ZerosHolder <- fastrr_env$jnp$zeros(as.integer(n_units), dtype=fastrr_env$jnp$uint16)
+  candidate_randomizations <- fastrr_env$InsertOnesVectorized(combinations, ZerosHolder)
 
   M_results <- NULL; if(!is.null(X)){
     # Set up sample sizes for treatment/control
-    n0_array <- jnp$array(  (n_units - n_treated) )
-    n1_array <- jnp$array(  n_treated )
+    n0_array <- fastrr_env$jnp$array(  (n_units - n_treated) )
+    n1_array <- fastrr_env$jnp$array(  n_treated )
     
     # Calculate balance measure (Hotelling T-squared) for each candidate randomization
     M_results <-  threshold_func(
-      jnp$array( X ),                    # Covariates
-      jnp$array(candidate_randomizations, dtype = jnp$float32),  # Possible assignments
+      fastrr_env$jnp$array( X ),                    # Covariates
+      fastrr_env$jnp$array(candidate_randomizations, dtype = fastrr_env$jnp$float32),  # Possible assignments
       n0_array, 
       n1_array,                # Sample sizes
       approximate_inv
     )
     
     # Find acceptance threshold based on specified quantile
-    a_threshold <- jnp$quantile( 
+    a_threshold <- fastrr_env$jnp$quantile( 
       M_results,  
-      jnp$array(randomization_accept_prob)
+      fastrr_env$jnp$array(randomization_accept_prob)
     )
 
     # Keep only randomizations with balance measure below threshold
-    candidate_randomizations <- jnp$take(
+    candidate_randomizations <- fastrr_env$jnp$take(
       candidate_randomizations,
-      indices = (takeM_ <- jnp$where(jnp$less(M_results,a_threshold))[[1]] ),
+      indices = (takeM_ <- fastrr_env$jnp$where(fastrr_env$jnp$less(M_results,a_threshold))[[1]] ),
       axis = 0L
     )
-    M_results <- jnp$take( M_results, indices = takeM_, axis = 0L )
+    M_results <- fastrr_env$jnp$take( M_results, indices = takeM_, axis = 0L )
   }
   
   return(list("candidate_randomizations"=candidate_randomizations,

@@ -85,15 +85,15 @@ generate_randomizations <- function(n_units,
                                    conda_env = "fastrerandomize", 
                                    conda_env_required = TRUE
                                    ){
-  browser()
   if(!"VectorizedFastHotel2T2" %in% ls(envir = fastrr_env)){
       initialize_jax_code <- paste(deparse(initialize_jax),collapse="\n")
-      initialize_jax_code <- gsub(initialize_jax_code,pattern="function \\(\\)",replacement="")
+      initialize_jax_code <- sub(initialize_jax_code,pattern = "function\\s*\\([^)]*\\)",replacement="") # sub ensure only 1st pattern matched
       eval( parse( text = initialize_jax_code ), envir = environment() )
-    }
-    if(is.null(threshold_func)){ threshold_func <- fastrr_env$VectorizedFastHotel2T2 }
+  }
   
-    if (randomization_type == "exact"){
+  if(is.null(threshold_func)){ threshold_func <- fastrr_env$VectorizedFastHotel2T2 }
+  
+  if (randomization_type == "exact"){
         if (verbose){
             print("Using exact randomization")
         }
@@ -139,7 +139,7 @@ generate_randomizations <- function(n_units,
       )
     } else {
       # existing file-writing logic
-      utils::write.csv(np$array(candidate_randomizations$candidate_randomizations), file = file)
+      utils::write.csv( fastrr_env$np$array(candidate_randomizations$candidate_randomizations), file = file)
       return(sprintf("File saved at %s", file))
     }
       

@@ -120,8 +120,8 @@ randomization_test <- function(
   }
 
 
-  if(is.null(n0_array)){ n0_array <- jnp$array(sum(obsW == 0)) }
-  if(is.null(n1_array)){ n1_array <- jnp$array(sum(obsW == 1)) }
+  if(is.null(n0_array)){ n0_array <- fastrr_env$jnp$array(sum(obsW == 0)) }
+  if(is.null(n1_array)){ n1_array <- fastrr_env$jnp$array(sum(obsW == 1)) }
 
   if(!is.null(obsW)){obsW <- c(unlist(obsW))}
   if(!is.null(X)){X <- as.matrix(X)}
@@ -129,22 +129,24 @@ randomization_test <- function(
 
   #if(is.null(candidate_randomizations_array) & is.null(candidate_randomizations)){
   if(is.null(candidate_randomizations)){
-      candidate_randomizations <- np$array( candidate_randomizations_array )
+      candidate_randomizations <- fastrr_env$np$array( candidate_randomizations_array )
   }
   if(is.null(candidate_randomizations_array)){
-      candidate_randomizations_array <- jnp$array(candidate_randomizations, dtype = jnp$float32)
+      candidate_randomizations_array <- fastrr_env$jnp$array(candidate_randomizations, 
+                                                             dtype = fastrr_env$jnp$float32)
   }
 
   # perform randomization inference using input data
   {
-    tau_obs <- c(np$array( FastDiffInMeans(jnp$array(obsY), # 
-                                           jnp$array(obsW), # 
+    tau_obs <- c(fastrr_env$np$array( fastrr_env$FastDiffInMeans(
+                                          fastrr_env$jnp$array(obsY), # 
+                                          fastrr_env$jnp$array(obsW), # 
                                            n0_array, #
                                            n1_array # 
                                            ) ))
-    tau_perm_null_0 <- np$array(
-      W_VectorizedFastDiffInMeans(
-          jnp$array(obsY),  # y_ =
+    tau_perm_null_0 <- fastrr_env$np$array(
+      fastrr_env$W_VectorizedFastDiffInMeans(
+          fastrr_env$jnp$array(obsY),  # y_ =
           candidate_randomizations_array, # t_ =
           n0_array, # n0 =
           n1_array # n1 =
@@ -152,8 +154,8 @@ randomization_test <- function(
     p_value <- mean( abs(tau_perm_null_0) >= abs(tau_obs) )
 
     if( findFI ){
-      obsY_array <- jnp$array( obsY )
-      obsW_array <- jnp$array( obsW )
+      obsY_array <- fastrr_env$jnp$array( obsY )
+      obsW_array <- fastrr_env$jnp$array( obsW )
 
       n_search_attempts <- 500
       exhaustive_search  <-  length(obsW) <= n_search_attempts
@@ -181,7 +183,9 @@ randomization_test <- function(
             lower_Y_0_under_null[obsW == 1] <- obsY[obsW == 1] - lowerBound_estimate_step_t
             lower_Y_obs_perm[permutation_treatment_vec==0] <- lower_Y_0_under_null[permutation_treatment_vec==0]
             lower_Y_obs_perm[permutation_treatment_vec==1] <- lower_Y_0_under_null[permutation_treatment_vec==1] + lowerBound_estimate_step_t
-            lower_tau_at_step_t <- np$array( FastDiffInMeans(jnp$array(lower_Y_obs_perm), jnp$array(permutation_treatment_vec),
+            lower_tau_at_step_t <- fastrr_env$np$array( fastrr_env$FastDiffInMeans(
+                                                             fastrr_env$jnp$array(lower_Y_obs_perm), 
+                                                             fastrr_env$jnp$array(permutation_treatment_vec),
                                                              n0_array, n1_array) )
 
             c_step_t <-  k * (tau_obs  - lowerBound_estimate_step_t)
@@ -196,7 +200,9 @@ randomization_test <- function(
             upper_Y_obs_perm[permutation_treatment_vec==0] <- upper_Y_0_under_null[permutation_treatment_vec==0]
             upper_Y_obs_perm[permutation_treatment_vec==1] <- upper_Y_0_under_null[permutation_treatment_vec==1] + upperBound_estimate_step_t
             #upper_tau_at_step_t <- mean(upper_Y_obs_perm[permutation_treatment_vec == 1]) - mean(upper_Y_obs_perm[permutation_treatment_vec == 0])
-            upper_tau_at_step_t <- np$array( FastDiffInMeans(jnp$array(upper_Y_obs_perm), jnp$array(permutation_treatment_vec), n0_array, n1_array) )
+            upper_tau_at_step_t <- fastrr_env$np$array( fastrr_env$FastDiffInMeans(fastrr_env$jnp$array(upper_Y_obs_perm), 
+                                                                                   fastrr_env$jnp$array(permutation_treatment_vec), 
+                                                                                   n0_array, n1_array) )
 
             c_step_t <- k * (upperBound_estimate_step_t  -  tau_obs)
             #if(is.na(c_step_t)){
@@ -216,7 +222,8 @@ randomization_test <- function(
       {
         tau_pseudo_seq <- seq(FI[1]-1, FI[2]*2,length.out=100)
         pvals_vec <- sapply(tau_pseudo_seq, function(tau_pseudo){
-          stat_vec_at_tau_pseudo <- np$array(     vec1_get_stat_vec_at_tau_pseudo(candidate_randomizations_array,# treatment_pseudo
+          stat_vec_at_tau_pseudo <- fastrr_env$np$array(     fastrr_env$vec1_get_stat_vec_at_tau_pseudo(
+                                                                                  candidate_randomizations_array,# treatment_pseudo
                                                                                   obsY_array,# obsY_array
                                                                                   obsW_array, # obsW_array
                                                                                   tau_pseudo, # tau_pseudo

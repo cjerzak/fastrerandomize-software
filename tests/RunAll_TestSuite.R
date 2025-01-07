@@ -10,14 +10,15 @@
     # local install for development team
     # install.packages("~/Documents/fastrerandomize-software/fastrerandomize",repos = NULL, type = "source",force = F)
     
+    options(error = NULL)
     t_GenData <- try({
       set.seed(999L, kind = "Wichmann-Hill")
       X <- matrix(rnorm(20*5), 20, 5)
     },T)
     if("try-error" %in% class(t_GenData)){ stop("Failed at t_GenData...") }
     
-    for(findFI in c(FALSE, TRUE)){ 
     for(type_ in c("exact","monte_carlo")){ 
+    for(findFI in c(FALSE, TRUE)){ 
       fastrerandomize::print2(sprintf("On type: %s", type_))
       
       t_GetSet <- try({
@@ -27,7 +28,8 @@
           X = X,
           randomization_accept_prob = 0.1,
           randomization_type = type_,
-          max_draws = 10000L, batch_size = 100L)
+          max_draws = 10000L, 
+          batch_size = 100L)
       },T)
       if("try-error" %in% class(t_GetSet)){ stop(sprintf("Failed at t_GetSet: %s...",type_)) }
       
