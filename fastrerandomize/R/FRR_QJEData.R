@@ -6,7 +6,7 @@
 #' @format A data frame with 968 rows and 2161 column. 
 #'   \describe{
 #'     \item{rows}{Indicate units}
-#'     \item{columns}{Indicate RCT data}
+#'     \item{columns}{Contain RCT data features}
 #'   }
 #'
 #' @source

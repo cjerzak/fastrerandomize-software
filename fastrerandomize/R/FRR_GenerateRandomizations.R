@@ -1,4 +1,4 @@
-#' Generate randomizations for experimental design
+#' Generate randomizations for a rerandomization-based experimental design
 #'
 #' This function generates randomizations for experimental design using either exact enumeration
 #' or Monte Carlo sampling methods. It provides a unified interface to both approaches while
@@ -27,24 +27,30 @@
 #' one possible treatment assignment vector
 #'
 #' @examples
+#' # Generate synthetic data 
+#' X <- matrix(rnorm(20*5), 20, 5)
+#' 
 #' # Generate randomizations using exact enumeration
-#' X <- matrix(rnorm(100*5), 100, 5)
-#' RandomizationSet_Exact <- GenerateRandomizations(100, 50, X, 
+#' RandomizationSet_Exact <- generate_randomizations(
+#'                n_units = nrow(X), 
+#'                n_treated = round(nrow(X)/2), 
+#'                X = X, 
 #'                randomization_accept_prob=0.1,
 #'                randomization_type="exact")
 #'
 #' # Generate randomizations using Monte Carlo sampling
-#' RandomizationSet_MC <- GenerateRandomizations(
-#'                n_units = 100, 
-#'                n_treated = 50, 
+#' RandomizationSet_MC <- generate_randomizations(
+#'                n_units = nrow(X), 
+#'                n_treated = round(nrow(X)/2), 
 #'                X = X,
-#'                randomization_accept_prob=0.1,
-#'                randomization_type="monte_carlo",
-#'                max_draws=1000)
+#'                randomization_accept_prob = 0.1,
+#'                randomization_type = "monte_carlo",
+#'                max_draws = 100000,
+#'                batch_size = 1000)
 #'
 #' @seealso
-#' \code{\link{GenerateRandomizations_Exact}} for the exact enumeration method
-#' \code{\link{GenerateRandomizations_MonteCarlo}} for the Monte Carlo sampling method
+#' \code{\link{generate_randomizations_exact}} for the exact enumeration method
+#' \code{\link{generate_randomizations_mc}} for the Monte Carlo sampling method
 #'
 #' @export
 #' @md

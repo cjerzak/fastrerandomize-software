@@ -26,13 +26,13 @@ Authors@R:
 Description: Provides hardware-accelerated tools for performing rerandomization
     and randomization testing in experimental research. Using a JAX backend, the
     package enables exact rerandomization inference even for large experiments
-    with hundreds of millions of possible randomizations. Key functionalities
+    with hundreds of billions of possible randomizations. Key functionalities
     include generating pools of acceptable rerandomizations based on covariate
     balance, conducting exact randomization tests, and performing pre-analysis
     evaluations to determine optimal rerandomization acceptance thresholds. The
     package supports various hardware acceleration frameworks including CPU,
-    CUDA, and METAL, making it versatile across computing environments. This
-    allows researchers to efficiently implement rerandomization designs and
+    CUDA, and METAL, making it versatile across accelerated computing environments. This
+    allows researchers to efficiently implement stringent rerandomization designs and
     conduct valid inference even with large sample sizes.
 URL: https://github.com/cjerzak/fastrerandomize-software
 BugReports: https://github.com/cjerzak/fastrerandomize-software/issues

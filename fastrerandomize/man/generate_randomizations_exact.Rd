@@ -58,16 +58,14 @@ accepted if their balance measure is below the specified quantile threshold.
 }
 \note{
 This function requires JAX and NumPy to be installed and accessible through
-the reticulate package. The function assumes the existence of helper functions
-InsertOnesVectorized and VectorizedFastHotel2T2.
+the reticulate package.
 }
 \examples{
-# Generate all possible randomizations for 6 units with 3 treated
-rand <- GenerateRandomizations(n_units = 6, n_treated = 3)
+# Generate synthetic data 
+X <- matrix(rnorm(60), nrow = 10)  # 10 units, 6 covariates
 
 # Generate balanced randomizations with covariates
-X <- matrix(rnorm(60), nrow = 10)  # 10 units, 6 covariates
-BalancedRandomizations <- GenerateRandomizations(
+BalancedRandomizations <- generate_randomizations_exact(
   n_units = 10,
   n_treated = 5,
   X = X,

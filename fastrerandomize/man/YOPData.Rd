@@ -26,5 +26,5 @@ data(YOPData)
 }
 \description{
 Data from a re-analysis of the Youth Opportunities Program anti-poverty RCT 
-in Uganda, with satellite imagery neural representations linked to treatment units.
+in Uganda, with satellite imagery neural representations linked to RCT units.
 }
