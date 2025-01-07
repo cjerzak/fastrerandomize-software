@@ -94,41 +94,43 @@ Fast randomization test
 \examples{
 \dontrun{
 # A small synthetic demonstration with 6 units, 3 treated and 3 controls:
+
+# Seed for reproducability 
 set.seed(12345)
 
-# Treatment assignment and one covariate
-W <- c(1, 1, 1, 0, 0, 0)  
-X <- matrix(rnorm(6), ncol = 1)  
+# Generate pre-treatment covariates
+X <- matrix(rnorm(24*2), ncol = 2)
 
-# Observed outcomes (with a true effect of +2 in the treated group)
-obsY <- rnorm(6, mean = 2 * W)
-
-# 1. Randomization test via Monte Carlo sampling
-result_mc <- randomization_test(
-  obsW = W,
-  obsY = obsY,
+# Generate candidate randomizations
+RandomizationSet_MC <- generate_randomizations(
+  n_units = nrow(X),
+  n_treated = round(nrow(X)/2),
   X = X,
+  randomization_accept_prob = 0.1,
   randomization_type = "monte_carlo",
-  randomization_accept_prob = 0.1,  # keep top 10\% most balanced
-  max_draws = 1000
+  max_draws = 100000,
+  batch_size = 1000
 )
-print(result_mc)
 
-# 2. For smaller problems, exact enumeration is feasible
-result_exact <- randomization_test(
+# Generate outcome
+W <- RandomizationSet_MC$randomizations[1,]
+obsY <- rnorm(nrow(X), mean = 2 * W)
+
+# Perform randomization test
+results_base <- randomization_test(
   obsW = W,
   obsY = obsY,
   X = X,
-  randomization_type = "exact"
+  candidate_randomizations = RandomizationSet_MC$randomizations,
 )
-print(result_exact)
+print(results_base)
 
-# 3. Optionally, compute a fiducial interval (with exact enumeration)
+# Perform randomization test
 result_fi <- randomization_test(
   obsW = W,
   obsY = obsY,
   X = X,
-  randomization_type = "exact",
+  candidate_randomizations = RandomizationSet_MC$randomizations,
   findFI = TRUE
 )
 print(result_fi)
