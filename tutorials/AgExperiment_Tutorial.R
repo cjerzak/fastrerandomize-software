@@ -10,17 +10,17 @@
   
   options(error = NULL)
   
-  # 1. Analysis parameters
-  n_units   <- 22L
-  n_treated <- 12L
-  
-  # 2. Generate covariate data
+  # Obtain pre-treatment covariates 
   data(QJEData, package = "fastrerandomize")
-  X <- matrix(rnorm(n_units * 5), nrow = n_units)
+  myCovariates <- c("children","married","hh_size","hh_sexrat")
+  QJEData <- QJEData[!is.na(rowSums(QJEData[,myCovariates])),]
+  X <- QJEData[,myCovariates]
   
-  fastrerandomize::print2("Generating a set of acceptable randomizations based on randomization_accept_prob...")
+  # Analysis parameters
+  n_units   <- nrow(X)
+  n_treated <- nrow(X)/2
   
-  # 3. Generate randomizations
+  # Generate randomizations
   #    - 'generate_randomizations' now returns an S3 object of class 'fastrerandomize_randomization'
   #    - randomization_type can be "exact" or "monte_carlo"
   #    - Adjust 'max_draws' or 'batch_size' as needed
@@ -28,9 +28,8 @@
     n_units = n_units,
     n_treated = n_treated,
     X = X,
-    randomization_type = "exact", 
-    max_draws = 10000L,
-    # randomization_type = "monte_carlo", max_draws = 50000L, batch_size = 1000L,
+    randomization_type = "monte_carlo", 
+    max_draws = 1000000L, batch_size = 1000L,
     randomization_accept_prob = 0.0001
   )
   

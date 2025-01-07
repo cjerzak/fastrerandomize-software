@@ -6,7 +6,7 @@
 options(error = NULL)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# 1. Install and Set Up
+# Install and Set Up
 #    (You only need to do this once)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # devtools::install_github(repo = "cjerzak/fastrerandomize-software/fastrerandomize")
@@ -25,9 +25,9 @@ data(YOPData, package = "fastrerandomize")
 # Here we generate a set of acceptable randomizations based on image embeddings
 # randomization_accept_prob determines what fraction pass a balance test.
 CandidateRandomizations <- fastrerandomize::generate_randomizations(
-  n_units       = nrow(MyImageEmbeddings),
-  n_treated     = round(nrow(MyImageEmbeddings) / 2),
-  X             = MyImageEmbeddings,
+  n_units       = nrow(YOPData$ImageEmbeddings),
+  n_treated     = round(nrow(YOPData$ImageEmbeddings) / 2),
+  X             = YOPData$ImageEmbeddings,
   max_draws     = 10^5, 
   batch_size   = 10^3,
   randomization_accept_prob = 0.001,

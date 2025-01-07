@@ -38,25 +38,29 @@ initialize_jax <- function(conda_env = "fastrerandomize",
       fastrr_env$jnp$expand_dims(fastrr_env$jnp$take(A_, I_, axis = 0L), 0L)
     })
     
-    fastrr_env$Potential2Obs <- fastrr_env$jax$jit(Potential2Obs_R <- function(Y0__, Y1__, obsW__){
+    fastrr_env$Potential2Obs <- fastrr_env$jax$jit(fastrr_env$Potential2Obs_R <- function(Y0__, Y1__, obsW__){
       fastrr_env$jnp$add( fastrr_env$jnp$multiply(Y0__, fastrr_env$jnp$subtract(1, obsW__)),
                fastrr_env$jnp$multiply(Y1__, obsW__))
     })
     
-    fastrr_env$W_VectorizedFastDiffInMeans <- fastrr_env$jax$jit( W_VectorizedFastDiffInMeans_R <- fastrr_env$jax$vmap(function(y_, w_, n0, n1){
-      FastDiffInMeans_R(y_, w_, n0, n1)},
+    fastrr_env$W_VectorizedFastDiffInMeans <- fastrr_env$jax$jit( 
+      W_VectorizedFastDiffInMeans_R <- fastrr_env$jax$vmap(function(y_, w_, n0, n1){
+          FastDiffInMeans_R(y_, w_, n0, n1)},
       in_axes = list(NULL, 0L, NULL, NULL)) )
     
-    fastrr_env$Y_VectorizedFastDiffInMeans <- fastrr_env$jax$jit( Y_VectorizedFastDiffInMeans_R <- fastrr_env$jax$vmap(function(y_, w_, n0, n1){
-      FastDiffInMeans_R(y_, w_, n0, n1)},
+    fastrr_env$Y_VectorizedFastDiffInMeans <- fastrr_env$jax$jit( 
+      Y_VectorizedFastDiffInMeans_R <- fastrr_env$jax$vmap(function(y_, w_, n0, n1){
+         FastDiffInMeans_R(y_, w_, n0, n1)},
       in_axes = list(0L, NULL, NULL, NULL)) )
     
-    fastrr_env$YW_VectorizedFastDiffInMeans <- fastrr_env$jax$jit( YW_VectorizedFastDiffInMeans_R <- fastrr_env$jax$vmap(function(y_, w_, n0, n1){
-      W_VectorizedFastDiffInMeans(y_, w_, n0, n1)},
+    fastrr_env$YW_VectorizedFastDiffInMeans <- fastrr_env$jax$jit( 
+      YW_VectorizedFastDiffInMeans_R <- fastrr_env$jax$vmap(function(y_, w_, n0, n1){
+          W_VectorizedFastDiffInMeans(y_, w_, n0, n1)},
       in_axes = list(0L, NULL, NULL, NULL)) )
     
-    fastrr_env$WVectorizedFastDiffInMeans <- fastrr_env$jax$jit( fastrr_env$jax$vmap(function(y_, w_, n0, n1){
-      fastrr_env$FastDiffInMeans(y_, w_, n0, n1)},
+    fastrr_env$WVectorizedFastDiffInMeans <- fastrr_env$jax$jit( 
+      fastrr_env$jax$vmap(function(y_, w_, n0, n1){
+        fastrr_env$FastDiffInMeans(y_, w_, n0, n1)},
       in_axes = list(NULL, 0L, NULL, NULL)) )
     
     fastrr_env$GreaterEqualMagCompare <- fastrr_env$jax$jit(GreaterEqualMagCompare_R <- function(NULL_, OBS_){
