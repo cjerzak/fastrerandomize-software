@@ -36,21 +36,15 @@ print2 <- function(text,
   }
 }
 
-JaxKey <- function(int_){ fastrr_env$jax$random$PRNGKey(int_)}
-
-SoftPlus_r <- function(x){ log(exp(x)+1) }
-
 output2output <- function(x, return_type = "R"){ 
   if(return_type == "R"){ return( fastrr_env$np$array(x) )  }
   if(return_type == "jax"){ return( x ) }
 }
 
-scale_fxn <- function(old_seq, newmin, newmax){(newmax - newmin) * (old_seq - min(old_seq)) / (max(old_seq) - min(old_seq)) + newmin}
-
-approx_log_n_choose_m <- function(n, m){
-  #http://math.stackexchange.com/questions/64716/approximating-the-logarithm-of-the-binomial-coefficient
-  result <- n * log(n) - m * log(m) - (n - m)*log(n-m) + 0.5 * (log(n) - log(m) - log(n-m) - log(2*pi))
-  return(result)
+.onUnload <- function(libpath) {
+  # Clean up temp files
+  temp_files <- list.files(tempdir(), pattern = "^tmp", full.names = TRUE)
+  unlink(temp_files, recursive = TRUE)
 }
 
 fastrr_env <- new.env( parent = emptyenv() )

@@ -9,7 +9,7 @@ generate_randomizations_mc(
   n_treated,
   X,
   randomization_accept_prob = 1,
-  threshold_func = VectorizedFastHotel2T2,
+  threshold_func = NULL,
   max_draws = 1e+05,
   batch_size = 1000,
   seed = NULL,

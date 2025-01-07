@@ -72,7 +72,7 @@
 generate_randomizations_mc <- function(n_units, n_treated,
                                        X,
                                        randomization_accept_prob = 1,
-                                       threshold_func = VectorizedFastHotel2T2, 
+                                       threshold_func = NULL, 
                                        max_draws = 100000, 
                                        batch_size = 1000, 
                                        seed = NULL,
@@ -82,13 +82,13 @@ generate_randomizations_mc <- function(n_units, n_treated,
                                        conda_env = "fastrerandomize", 
                                        conda_env_required = TRUE
                                       ){
-  if(!"VectorizedFastHotel2T2" %in% ls(envir = .GlobalEnv)){
+  if (!"VectorizedFastHotel2T2" %in% ls(envir = fastrr_env)) {
     initialize_jax_code <- paste(deparse(initialize_jax),collapse="\n")
-    initialize_jax_code <- gsub(initialize_jax_code, pattern="function \\(\\)",replacement="")
+    initialize_jax_code <- sub(initialize_jax_code,pattern = "function\\s*\\([^)]*\\)",replacement="") # sub ensure only 1st pattern matched
     eval( parse( text = initialize_jax_code ), envir = environment() )
   }
-
   if(is.null(seed)){ seed <- as.integer(stats::runif(1, 0, 100000)) }
+  if(is.null(threshold_func)){ threshold_func <- fastrr_env$VectorizedFastHotel2T2 }
   
   # Calculate the maximum number of possible randomizations
   max_rand_num <- choose(n_units, n_treated)
@@ -101,7 +101,8 @@ generate_randomizations_mc <- function(n_units, n_treated,
   base_vector <- c(rep(1L, n_treated), rep(0L, n_units - n_treated))
   
   # Convert base_vector to a JAX array with a smaller data type to save memory
-  base_vector_jax <- fastrr_env$jnp$array(as.integer(base_vector), dtype = fastrr_env$jnp$int8)
+  base_vector_jax <- fastrr_env$jnp$array(as.integer(base_vector), 
+                                          dtype = fastrr_env$jnp$int8)
   
   # Initialize JAX random key with the provided seed
   key <- fastrr_env$jax$random$PRNGKey(as.integer(seed))

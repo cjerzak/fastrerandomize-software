@@ -83,16 +83,17 @@ generate_randomizations_exact <- function(n_units, n_treated,
                                    X = NULL,
                                    randomization_accept_prob = 1,
                                    approximate_inv = TRUE, 
-                                   threshold_func = VectorizedFastHotel2T2,
+                                   threshold_func = NULL,
                                    seed = NULL, 
                                    file = NULL,
                                    conda_env = "fastrerandomize", 
                                    conda_env_required = TRUE){
-  if(!"VectorizedFastHotel2T2" %in% ls(envir = fastrr_env)){
+  if (!"VectorizedFastHotel2T2" %in% ls(envir = fastrr_env)) {
     initialize_jax_code <- paste(deparse(initialize_jax),collapse="\n")
-    initialize_jax_code <- gsub(initialize_jax_code,pattern="function \\(\\)",replacement="")
+    initialize_jax_code <- sub(initialize_jax_code,pattern = "function\\s*\\([^)]*\\)",replacement="") # sub ensure only 1st pattern matched
     eval( parse( text = initialize_jax_code ), envir = environment() )
   }
+  if(is.null(threshold_func)){ threshold_func <- fastrr_env$VectorizedFastHotel2T2 }
   
   max_rand_num <- choose(n_units, n_treated)
   assert_that( max_rand_num*min(randomization_accept_prob) > 10, 

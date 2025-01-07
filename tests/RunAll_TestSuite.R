@@ -17,8 +17,8 @@
     },T)
     if("try-error" %in% class(t_GenData)){ stop("Failed at t_GenData...") }
     
-    for(type_ in c("exact","monte_carlo")){ 
-    for(findFI in c(FALSE, TRUE)){ 
+    #for(type_ in sample(c("exact","monte_carlo"),2)){ for(type_ in sample(c("exact","monte_carlo"),2)){ 
+    for(findFI in c(FALSE, TRUE)){ for(type_ in c("exact","monte_carlo")){ 
       fastrerandomize::print2(sprintf("On type: %s", type_))
       
       t_GetSet <- try({
