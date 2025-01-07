@@ -3,6 +3,7 @@ title: "FastRerandomize Package Tutorial"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
+  %\VignetteIndexEntry{FastRerandomize Package Tutorial}
   %\VignetteEngine{knitr::rmarkdown}
   %\usepackage[UTF-8]{inputenc}
 ---
@@ -11,7 +12,7 @@ vignette: >
 
 This vignette demonstrates how to use the fastrerandomize package for generating and testing experimental designs in an agricultural study setting based on: 
 
-* Burchardi, Konrad B et al. (2019). "Moral Hazard: Experimental Evidence from Tenancy Contracts." In: _The Quarterly Journal of Economics_ 134.1, pp. 281–347. 
+* Burchardi, K.B., Gulesci, S., Lerva, B. and Sulaiman, M., 2019. Moral hazard: Experimental Evidence from Tenancy Contracts. The Quarterly Journal of Economics, 134(1), pp.281-347.
 
 We will walk through:
 
@@ -94,7 +95,6 @@ Next, we showcase a randomization-based inference procedure using fastrerandomiz
 We simulate an outcome Y that depends on our covariates X, the chosen randomization, and some true treatment effect τ. Here, we pick the first acceptable randomization from our set as our "observed" assignment, Wobs.
 
 ```{r setup_outcomes}
-set.seed(123)
 CoefY <- rnorm(ncol(X))          # Coefficients for outcome model
 Wobs  <- CandRandomizations$randomizations[1, ]  # use the 1st acceptable randomization
 tau_true <- 1                     # true treatment effect

@@ -1,4 +1,3 @@
-#!/usr/bin/env Rscript
 #' Build the environment for fastrerandomize. Builds a conda environment in which jax and np are installed.
 #'
 #' @param conda_env (default = `"fastrerandomize"`) Name of the conda environment in which to place the backends.
@@ -14,7 +13,7 @@
 #' @export
 #' @md
 
-build_backend <- function(conda_env = "fastrerandomize", conda = "auto", tryMetal = T){
+build_backend <- function(conda_env = "fastrerandomize", conda = "auto"){
   # Create a new conda environment
   reticulate::conda_create(envname = conda_env,
                            conda = conda,
@@ -24,13 +23,13 @@ build_backend <- function(conda_env = "fastrerandomize", conda = "auto", tryMeta
   Packages2Install <- c("numpy==1.26.4",
                         "jax==0.4.26",
                         "jaxlib==0.4.26")
-  if(tryMetal){ 
-    if(Sys.info()["machine"] == "arm64"){
-      Packages2Install <- c(Packages2Install,"jax-metal==0.1.0")
-    }
+  
+  # Install METAL where available 
+  if( Sys.info()["machine"] == "arm64" & Sys.info()["sysname"] == "Darwin" ){
+    Packages2Install <- c(Packages2Install,"jax-metal==0.1.0")
   }
   for(pack_ in Packages2Install){
-      try_ <- try(reticulate::py_install(pack_, conda = conda, pip = TRUE, envname = conda_env),T)
+      try_ <- try(reticulate::py_install(pack_, conda = conda, pip = TRUE, envname = conda_env), TRUE)
   }
   print("Done building fastrerandomize backend!")
 }

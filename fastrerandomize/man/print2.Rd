@@ -4,7 +4,7 @@
 \alias{print2}
 \title{Print timestamped messages with optional quieting}
 \usage{
-print2(text, quiet = F)
+print2(text, quiet = FALSE)
 }
 \arguments{
 \item{text}{A character string containing the message to be printed}

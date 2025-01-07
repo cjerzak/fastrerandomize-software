@@ -14,6 +14,21 @@
 #' @param randomization_accept_prob A numeric value between 0 and 1 specifying the
 #'   quantile threshold for accepting randomizations based on balance statistics.
 #'   Default is 1 (accept all randomizations).
+#' @param approximate_inv A logical value indicating whether to use an approximate inverse 
+#'   (diagonal of the covariance matrix) instead of the full matrix inverse when computing 
+#'   balance metrics. This can speed up computations for high-dimensional covariates.
+#'   Default is TRUE.
+#' @param seed An integer seed for random number generation, used when enumerating 
+#'   or filtering exact randomizations with potentially randomized steps (e.g., 
+#'   random draws in thresholding). Default is NULL (no fixed seed).
+#' @param file A character string specifying the path (including filename) where candidate 
+#'   randomizations will be saved. If \code{NULL}, the function returns the randomizations 
+#'   in memory. Default is NULL.
+#' @param conda_env A character string specifying the name of the conda environment to use 
+#'   via \code{reticulate}. Default is "fastrerandomize".
+#' @param conda_env_required A logical indicating whether the specified conda environment 
+#'   must be strictly used. If \code{TRUE}, an error is thrown if the environment is not found. 
+#'   Default is TRUE.
 #' @param threshold_func A function that calculates balance statistics for candidate
 #'   randomizations. Default is VectorizedFastHotel2T2 which computes Hotelling's T²
 #'   statistic.
@@ -34,6 +49,8 @@
 #' accepted if their balance measure is below the specified quantile threshold.
 #'
 #' @examples
+#' 
+#' \dontrun{
 #' # Generate synthetic data 
 #' X <- matrix(rnorm(60), nrow = 10)  # 10 units, 6 covariates
 #' 
@@ -44,6 +61,7 @@
 #'   X = X,
 #'   randomization_accept_prob = 0.25  # Keep top 25% most balanced
 #' )
+#' }
 #'
 #' @importFrom utils combn
 #' @import reticulate
@@ -68,10 +86,11 @@ generate_randomizations_exact <- function(n_units, n_treated,
                                    threshold_func = VectorizedFastHotel2T2,
                                    seed = NULL, 
                                    file = NULL,
-                                   conda_env = "fastrerandomize", conda_env_required = T){
+                                   conda_env = "fastrerandomize", 
+                                   conda_env_required = TRUE){
   if(!"VectorizedFastHotel2T2" %in% ls(envir = .GlobalEnv)){
     initialize_jax_code <- paste(deparse(initialize_jax),collapse="\n")
-    initialize_jax_code <- gsub(initialize_jax_code,pattern="function \\(\\)",relacement="")
+    initialize_jax_code <- gsub(initialize_jax_code,pattern="function \\(\\)",replacement="")
     eval( parse( text = initialize_jax_code ), envir = environment() )
   }
   
@@ -84,8 +103,6 @@ generate_randomizations_exact <- function(n_units, n_treated,
   ZerosHolder <- jnp$zeros(as.integer(n_units), dtype=jnp$uint16)
   candidate_randomizations <- InsertOnesVectorized(combinations, ZerosHolder)
 
-  
-  if(length(randomization_accept_prob) > 1){browser(); browser(); browser()}
   M_results <- NULL; if(!is.null(X)){
     # Set up sample sizes for treatment/control
     n0_array <- jnp$array(  (n_units - n_treated) )

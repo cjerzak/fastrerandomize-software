@@ -14,7 +14,7 @@ randomization_test(
   n0_array = NULL,
   n1_array = NULL,
   randomization_accept_prob = 1,
-  findFI = F,
+  findFI = FALSE,
   c_initial = 2,
   max_draws = 10^6,
   batch_size = 10^5,
@@ -22,7 +22,7 @@ randomization_test(
   approximate_inv = TRUE,
   file = NULL,
   conda_env = "fastrerandomize",
-  conda_env_required = T
+  conda_env_required = TRUE
 )
 }
 \arguments{
@@ -48,12 +48,36 @@ randomization_test(
 
 \item{c_initial}{A numeric value representing the initial criterion for the randomization. Default is \code{2}.}
 
-\item{true_treatment_effect}{An optional numeric value specifying the true treatment effect. Default is NULL.}
+\item{max_draws}{An integer specifying the maximum number of candidate randomizations
+to generate (or to consider) for the test when \code{randomization_type = "monte_carlo"}.
+Default is \code{1e6}.}
+
+\item{batch_size}{An integer specifying the batch size for Monte Carlo sampling.
+Batches are processed one at a time for memory efficiency. Default is \code{1e5}.}
+
+\item{randomization_type}{A string specifying the type of randomization for the test.
+Allowed values are "exact" or "monte_carlo". Default is "monte_carlo".}
+
+\item{approximate_inv}{A logical value indicating whether to use an approximate inverse
+(diagonal of the covariance matrix) instead of the full matrix inverse when computing
+balance metrics. This can speed up computations for high-dimensional covariates.
+Default is \code{TRUE}.}
+
+\item{file}{A character string specifying the path (including filename) where candidate
+randomizations will be saved or loaded from. If \code{NULL}, randomizations
+remain in memory. Default is NULL.}
+
+\item{conda_env}{A character string specifying the name of the conda environment to use
+via \code{reticulate}. Default is "fastrerandomize".}
+
+\item{conda_env_required}{A logical indicating whether the specified conda environment
+must be strictly used. If \code{TRUE}, an error is thrown if the environment is not found.
+Default is \code{TRUE}.}
 }
 \value{
 A list consisting of \itemize{
 \item \code{p_value} A numeric value or vector representing the p-value of the test (or the expected p-value under the prior structure specified in the function inputs).
-\item \code{FI} A numeric vector representing the fiducial interval if \code{findFI=T}.
+\item \code{FI} A numeric vector representing the fiducial interval if \code{findFI=TRUE}.
 \item \code{tau_obs} A numeric value or vector representing the estimated treatment effect(s)
 }
 }
@@ -63,12 +87,51 @@ Fast randomization test
 \section{References}{
 
 \itemize{
-\item
+\item Zhang, Y. and Zhao, Q., 2023. What is a randomization test?. Journal of the American Statistical Association, 118(544), pp.2928-2942.
 }
 }
 
 \examples{
-# For a tutorial, see
-# github.com/cjerzak/fastrerandomization-software
+\dontrun{
+# A small synthetic demonstration with 6 units, 3 treated and 3 controls:
+set.seed(12345)
+
+# Treatment assignment and one covariate
+W <- c(1, 1, 1, 0, 0, 0)  
+X <- matrix(rnorm(6), ncol = 1)  
+
+# Observed outcomes (with a true effect of +2 in the treated group)
+obsY <- rnorm(6, mean = 2 * W)
+
+# 1. Randomization test via Monte Carlo sampling
+result_mc <- randomization_test(
+  obsW = W,
+  obsY = obsY,
+  X = X,
+  randomization_type = "monte_carlo",
+  randomization_accept_prob = 0.1,  # keep top 10\% most balanced
+  max_draws = 1000
+)
+print(result_mc)
+
+# 2. For smaller problems, exact enumeration is feasible
+result_exact <- randomization_test(
+  obsW = W,
+  obsY = obsY,
+  X = X,
+  randomization_type = "exact"
+)
+print(result_exact)
+
+# 3. Optionally, compute a fiducial interval (with exact enumeration)
+result_fi <- randomization_test(
+  obsW = W,
+  obsY = obsY,
+  X = X,
+  randomization_type = "exact",
+  findFI = TRUE
+)
+print(result_fi)
+}
 
 }

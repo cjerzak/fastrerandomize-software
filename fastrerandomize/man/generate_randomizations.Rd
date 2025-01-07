@@ -19,7 +19,7 @@ generate_randomizations(
   file = NULL,
   return_type = "R",
   conda_env = "fastrerandomize",
-  conda_env_required = T
+  conda_env_required = TRUE
 )
 }
 \arguments{
@@ -39,11 +39,27 @@ generate_randomizations(
 
 \item{randomization_type}{A string specifying the type of randomization: either "exact" or "monte_carlo"}
 
+\item{approximate_inv}{A logical value indicating whether to use an approximate inverse
+(diagonal of the covariance matrix) instead of the full matrix inverse when computing
+balance metrics. This can speed up computations for high-dimensional covariates.
+Default is \code{TRUE}.}
+
 \item{seed}{An integer seed for random number generation in Monte Carlo sampling}
 
 \item{verbose}{A logical value indicating whether to print progress information. Default is TRUE}
 
 \item{file}{A string specifying where to save candidate randomizations (if saving, not returning)}
+
+\item{return_type}{A string specifying the format of the returned randomizations and balance
+measures. Allowed values are "R" for base R objects (e.g., \code{matrix}, \code{numeric})
+or "jax" for JAX/NumPy arrays. Default is "R".}
+
+\item{conda_env}{A character string specifying the name of the conda environment to use
+via \code{reticulate}. Default is "fastrerandomize".}
+
+\item{conda_env_required}{A logical indicating whether the specified conda environment
+must be strictly used. If \code{TRUE}, an error is thrown if the environment is not found.
+Default is TRUE.}
 }
 \value{
 A JAX array containing the accepted randomizations, where each row represents
@@ -64,6 +80,8 @@ The function supports two methods of generating randomizations:
 For large problems (e.g., X with >20 columns), Monte Carlo sampling is recommended.
 }
 \examples{
+
+\dontrun{
 # Generate synthetic data 
 X <- matrix(rnorm(20*5), 20, 5)
 
@@ -84,6 +102,7 @@ RandomizationSet_MC <- generate_randomizations(
                randomization_type = "monte_carlo",
                max_draws = 100000,
                batch_size = 1000)
+ }
 
 }
 \seealso{

@@ -11,7 +11,6 @@ initialize_jax <- function(){ #initialize_jax <- function(conda_env = "fastreran
   if(!"jax" %in% ls()){  jax <<- reticulate::import("jax") }
   if(!"jnp" %in% ls()){  jnp <<- reticulate::import("jax.numpy") }
   if(!"np" %in% ls()){  np <<- reticulate::import("numpy") }
-  if(!"py_gc" %in% ls()){  py_gc <<- reticulate::import("gc") }
 
   # disable 64 bit computations  
   jax$config$update("jax_enable_x64", FALSE); jaxFloatType <<- jnp$float32 
@@ -35,14 +34,7 @@ initialize_jax <- function(){ #initialize_jax <- function(conda_env = "fastreran
     InsertOnesVectorized <<- jax$jit( jax$vmap(function(treat_indices_, zeros_){
       InsertOnes(treat_indices_, zeros_)
     }, list(1L,NULL)))
-
-    if(T == F){ # sanity checks
-      expand_grid_text <- paste(rep("0L:1L",times = n_units <- 20), collapse = ", ")
-      expand_grid_jax_text <- paste(rep("jnp$array(0L:1L)",times = n_units), collapse = ", ")
-      system.time( tmp1 <- eval(parse(text = sprintf("expand_grid_JAX(n_units,n_units/2)",expand_grid_jax_text))) )
-      system.time( tmp2 <- eval(parse(text = sprintf("expand.grid(%s)",expand_grid_text))) )
-    }
-
+    
     FastDiffInMeans <<- jax$jit( FastDiffInMeans_R <<- function(y_,w_, n0, n1){
       my1 <- jnp$divide(jnp$sum(jnp$multiply(y_, w_)), n1)
       my0 <- jnp$divide(jnp$sum(jnp$multiply(y_, jnp$subtract(1.,w_))), n0)
@@ -78,14 +70,15 @@ initialize_jax <- function(){ #initialize_jax <- function(conda_env = "fastreran
       jnp$mean(jnp$greater_equal(jnp$abs(NULL_),  jnp$expand_dims(OBS_,1L)), 1L)
     })
 
-    if(T == F){ # sanity checks
-      y_ <- jnp$array(rnorm(10))
-      w_ <-  jnp$array(rbinom(10,size=1, prob = 0.5))
-      n0 <- jnp$array(10.); n1 <- jnp$array(3.)
-      w_mat <- jnp$array( matrix(rbinom(100*10, size = 1, prob = 0.5),nrow = 100) )
-      FastDiffInMeans(y_, w_, n0, n1)
-      np$array( VectorizedFastDiffInMeans(y_, w_mat, n0, n1) )
-    }
+    # sanity checks
+    #if(T == F){ 
+      #y_ <- jnp$array(rnorm(10))
+      #w_ <-  jnp$array(rbinom(10,size=1, prob = 0.5))
+      #n0 <- jnp$array(10.); n1 <- jnp$array(3.)
+      #w_mat <- jnp$array( matrix(rbinom(100*10, size = 1, prob = 0.5),nrow = 100) )
+      #FastDiffInMeans(y_, w_, n0, n1)
+      #np$array( VectorizedFastDiffInMeans(y_, w_mat, n0, n1) )
+    #}
 
     get_stat_vec_at_tau_pseudo <<- jax$jit( function(treatment_pseudo,
                                                      obsY_array,
@@ -148,11 +141,18 @@ initialize_jax <- function(){ #initialize_jax <- function(conda_env = "fastreran
     Tstat <- jnp$matmul(jnp$matmul(jnp$transpose(xbar_diff), CovInv) , xbar_diff)
   })
   
-  VectorizedFastHotel2T2 <<- jax$jit(VectorizedFastHotel2T2_R <<- jax$vmap(function(samp_, w_, n0, n1, approximate_inv = FALSE){
+  VectorizedFastHotel2T2 <<- jax$jit(VectorizedFastHotel2T2_R <<- jax$vmap(function(
+        samp_, w_, 
+        n0, n1, 
+        approximate_inv = FALSE){
     FastHotel2T2(samp_, w_, n0, n1, approximate_inv)},
-    in_axes = list(NULL, 0L, NULL, NULL, NULL)) )
+    in_axes = list(NULL, 0L, NULL, NULL, NULL)) 
+  )
   
-  BatchedVectorizedFastHotel2T2 <<- function(samp_, w_, n0, n1, NWBatch, approximate_inv = FALSE){
+  BatchedVectorizedFastHotel2T2 <<- function(samp_, w_, 
+                                             n0, n1, 
+                                             NWBatch, 
+                                             approximate_inv = FALSE){
     N_w <- w_$shape[0]  # Total number of w_ vectors
     num_batches <- as.integer( (N_w + NWBatch - 1) / NWBatch )  # Calculate number of batches
     

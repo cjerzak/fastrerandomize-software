@@ -12,6 +12,18 @@
 #' @param max_draws An integer specifying the maximum number of randomizations to draw. Default is 100000
 #' @param seed An integer seed for random number generation. Default is 42
 #' @param batch_size An integer specifying how many randomizations to process at once. Default is 10000. Lower values use less memory but may be slower
+#' @param approximate_inv A logical value indicating whether to use an approximate inverse 
+#'   (diagonal of the covariance matrix) instead of the full matrix inverse when computing 
+#'   balance metrics. This can speed up computations for high-dimensional covariates.
+#'   Default is \code{TRUE}.
+#' @param file A character string specifying the path (including filename) where candidate 
+#'   randomizations will be saved. If \code{NULL}, the function returns the randomizations 
+#'   in memory. Default is \code{NULL}.
+#' @param conda_env A character string specifying the name of the conda environment to use 
+#'   via \code{reticulate}. Default is "fastrerandomize".
+#' @param conda_env_required A logical indicating whether the specified conda environment 
+#'   must be strictly used. If \code{TRUE}, an error is thrown if the environment is not found. 
+#'   Default is \code{TRUE}.
 #' @param verbose A logical value indicating whether to print detailed information about batch processing progress, and GPU memory usage. Default is FALSE
 #' @details
 #' The function works by:
@@ -25,6 +37,8 @@
 #'
 #' @return A JAX array containing the accepted randomizations, where each row represents one possible treatment assignment vector
 #' @examples
+#' 
+#' \dontrun{
 #' # Generate synthetic data 
 #' X <- matrix(rnorm(100*5), 100, 5) # 5 covariates
 #' 
@@ -45,6 +59,7 @@
 #'                randomization_accept_prob=0.01, 
 #'                max_draws = 1000000,
 #'                batch_size = 1000)
+#' }
 #'
 #' @seealso
 #' \code{\link{generate_randomizations}} for the non-Monte Carlo version
@@ -64,11 +79,12 @@ generate_randomizations_mc <- function(n_units, n_treated,
                                        approximate_inv = TRUE,
                                        verbose = FALSE,
                                        file = NULL, 
-                                       conda_env = "fastrerandomize", conda_env_required = T
+                                       conda_env = "fastrerandomize", 
+                                       conda_env_required = TRUE
                                       ){
   if(!"VectorizedFastHotel2T2" %in% ls(envir = .GlobalEnv)){
     initialize_jax_code <- paste(deparse(initialize_jax),collapse="\n")
-    initialize_jax_code <- gsub(initialize_jax_code, pattern="function \\(\\)",relacement="")
+    initialize_jax_code <- gsub(initialize_jax_code, pattern="function \\(\\)",replacement="")
     eval( parse( text = initialize_jax_code ), envir = environment() )
   }
 
@@ -166,9 +182,7 @@ generate_randomizations_mc <- function(n_units, n_treated,
 
   #assert_that(top_M_results$shape[[1]] <= num_to_accept, msg = paste0("top_M_results must have dimensions ", num_to_accept, " x 1."))
   # assert_that(top_perms$shape[[1]] <= num_to_accept, msg = paste0("top_perms must have dimensions ", num_to_accept, " x ", n_units, "."))
-  # rm( top_keys )
-  # gc(); py_gc$collect()
-  
+
   print(sprintf("MC Loop Time (s): %.4f", as.numeric(difftime(Sys.time(), t0, units = "secs"))))
     
   # After processing all batches, the candidate_randomizations are the top_perms

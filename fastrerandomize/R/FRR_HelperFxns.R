@@ -29,7 +29,8 @@
 #'
 #' @export
 #' @md
-print2 <- function(text, quiet = F){
+print2 <- function(text, 
+                   quiet = FALSE){
   if(!quiet){
     print( sprintf("[%s] %s" ,format(Sys.time(), "%Y-%m-%d %H:%M:%S"),text) )
   }

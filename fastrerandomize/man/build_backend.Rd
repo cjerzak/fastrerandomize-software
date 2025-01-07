@@ -4,7 +4,7 @@
 \alias{build_backend}
 \title{Build the environment for fastrerandomize. Builds a conda environment in which jax and np are installed.}
 \usage{
-build_backend(conda_env = "fastrerandomize", conda = "auto", tryMetal = T)
+build_backend(conda_env = "fastrerandomize", conda = "auto")
 }
 \arguments{
 \item{conda_env}{(default = \code{"fastrerandomize"}) Name of the conda environment in which to place the backends.}

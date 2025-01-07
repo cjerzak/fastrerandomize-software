@@ -14,7 +14,7 @@ generate_randomizations_exact(
   seed = NULL,
   file = NULL,
   conda_env = "fastrerandomize",
-  conda_env_required = T
+  conda_env_required = TRUE
 )
 }
 \arguments{
@@ -30,9 +30,29 @@ randomizations are returned without balance filtering.}
 quantile threshold for accepting randomizations based on balance statistics.
 Default is 1 (accept all randomizations).}
 
+\item{approximate_inv}{A logical value indicating whether to use an approximate inverse 
+(diagonal of the covariance matrix) instead of the full matrix inverse when computing 
+balance metrics. This can speed up computations for high-dimensional covariates.
+Default is TRUE.}
+
 \item{threshold_func}{A function that calculates balance statistics for candidate
 randomizations. Default is VectorizedFastHotel2T2 which computes Hotelling's T²
 statistic.}
+
+\item{seed}{An integer seed for random number generation, used when enumerating 
+or filtering exact randomizations with potentially randomized steps (e.g., 
+random draws in thresholding). Default is NULL (no fixed seed).}
+
+\item{file}{A character string specifying the path (including filename) where candidate 
+randomizations will be saved. If \code{NULL}, the function returns the randomizations 
+in memory. Default is NULL.}
+
+\item{conda_env}{A character string specifying the name of the conda environment to use 
+via \code{reticulate}. Default is "fastrerandomize".}
+
+\item{conda_env_required}{A logical indicating whether the specified conda environment 
+must be strictly used. If \code{TRUE}, an error is thrown if the environment is not found. 
+Default is TRUE.}
 }
 \value{
 A JAX NumPy array where each row represents a valid treatment assignment
@@ -61,6 +81,8 @@ This function requires JAX and NumPy to be installed and accessible through
 the reticulate package.
 }
 \examples{
+
+\dontrun{
 # Generate synthetic data 
 X <- matrix(rnorm(60), nrow = 10)  # 10 units, 6 covariates
 
@@ -71,6 +93,7 @@ BalancedRandomizations <- generate_randomizations_exact(
   X = X,
   randomization_accept_prob = 0.25  # Keep top 25\% most balanced
 )
+}
 
 }
 \references{

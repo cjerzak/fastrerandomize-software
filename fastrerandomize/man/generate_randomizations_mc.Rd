@@ -17,7 +17,7 @@ generate_randomizations_mc(
   verbose = FALSE,
   file = NULL,
   conda_env = "fastrerandomize",
-  conda_env_required = T
+  conda_env_required = TRUE
 )
 }
 \arguments{
@@ -37,7 +37,23 @@ generate_randomizations_mc(
 
 \item{seed}{An integer seed for random number generation. Default is 42}
 
+\item{approximate_inv}{A logical value indicating whether to use an approximate inverse
+(diagonal of the covariance matrix) instead of the full matrix inverse when computing
+balance metrics. This can speed up computations for high-dimensional covariates.
+Default is \code{TRUE}.}
+
 \item{verbose}{A logical value indicating whether to print detailed information about batch processing progress, and GPU memory usage. Default is FALSE}
+
+\item{file}{A character string specifying the path (including filename) where candidate
+randomizations will be saved. If \code{NULL}, the function returns the randomizations
+in memory. Default is \code{NULL}.}
+
+\item{conda_env}{A character string specifying the name of the conda environment to use
+via \code{reticulate}. Default is "fastrerandomize".}
+
+\item{conda_env_required}{A logical indicating whether the specified conda environment
+must be strictly used. If \code{TRUE}, an error is thrown if the environment is not found.
+Default is \code{TRUE}.}
 }
 \value{
 A JAX array containing the accepted randomizations, where each row represents one possible treatment assignment vector
@@ -60,6 +76,8 @@ The function uses smaller data types (int8, float16) where possible to reduce me
 It also includes assertions to verify array shapes and dimensions throughout.
 }
 \examples{
+
+\dontrun{
 # Generate synthetic data 
 X <- matrix(rnorm(100*5), 100, 5) # 5 covariates
 
@@ -80,6 +98,7 @@ rand_more_strict <- generate_randomizations_mc(
                randomization_accept_prob=0.01, 
                max_draws = 1000000,
                batch_size = 1000)
+}
 
 }
 \seealso{

@@ -164,7 +164,9 @@ if (resave_files <- FALSE) {
   ImageEmbeddings <- MyImageEmbeddings[which_take,]
   RCTData <- UgandaDataProcessed_subset[which_take,]
   dim(ImageEmbeddings)
-  save(list = c("ImageEmbeddings","RCTData"),
+  YOPData <- list("ImageEmbeddings"=ImageEmbeddings,
+                  "RCTData"=ImageEmbeddings)
+  save(list = "YOPData",
        file = "~/Downloads/YOPData.RData") 
 }
 
