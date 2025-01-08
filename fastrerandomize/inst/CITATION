@@ -1,7 +1,7 @@
 citHeader("To cite the fastrerandomize package in publications, please use the following:")
   
-citEntry(
-  entry  = "Manual",
+bibentry(
+  bibtype  = "Manual",
   title    = "FastRerandomize: An R Package for Hardware-accelerated Rerandomization for Improved Balance",
   author   = c(
     person("Fucheng Warren", "Zhu",   role = c("aut", "cre"), comment = c(ORCID = "0009-0001-5692-7572")),
