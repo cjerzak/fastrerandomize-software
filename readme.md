@@ -102,6 +102,6 @@ _
 
 _
 
-*Package performance: GPU vs. CPU* 
+
 [<img src="https://github.com/cjerzak/fastrerandomize-software/blob/main/misc/figures/CPU_v_GPU_FALSE_1000.png?raw=true">](https://arxiv.org/abs/2310.00861.pdf)
 
