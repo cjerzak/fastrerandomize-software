@@ -114,9 +114,7 @@ randomization_test <- function(
                                ){
   tau_obs <- FI <- covers_truth <- NULL
   if (!"VectorizedFastHotel2T2" %in% ls(envir = fastrr_env)) {
-    initialize_jax_code <- paste(deparse(initialize_jax),collapse="\n")
-    initialize_jax_code <- sub(initialize_jax_code,pattern = "function\\s*\\([^)]*\\)",replacement="") # sub ensure only 1st pattern matched
-    eval( parse( text = initialize_jax_code ), envir = environment() )
+    initialize_jax(conda_env = conda_env, conda_env_required = conda_env_required)
   }
 
   if(is.null(n0_array)){ n0_array <- fastrr_env$jnp$array(sum(obsW == 0)) }

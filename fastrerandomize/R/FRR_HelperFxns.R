@@ -43,7 +43,7 @@ output2output <- function(x, return_type = "R"){
 
 .onUnload <- function(libpath) {
   # Clean up temp files
-  temp_files <- list.files(tempdir(), pattern = "^tmp", full.names = TRUE)
+  temp_files <- list.files(tempdir(), pattern = "^fastrerandomize_tmp", full.names = TRUE)
   unlink(temp_files, recursive = TRUE)
 }
 

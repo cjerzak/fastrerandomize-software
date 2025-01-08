@@ -4,7 +4,7 @@
 #' @param conda (default = `auto`) The path to a conda executable. Using `"auto"` allows reticulate to attempt to automatically find an appropriate conda binary.
 
 #' @return Builds the computational environment for `fastrerandomize`. This function requires an Internet connection.
-#' You may find out a list of conda Python paths via: `system("which python")`
+#' You may find out a list of conda Python paths via: `Sys.which("python")`
 #'
 #' @examples
 #' # For a tutorial, see

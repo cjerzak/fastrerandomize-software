@@ -83,9 +83,7 @@ generate_randomizations_mc <- function(n_units, n_treated,
                                        conda_env_required = TRUE
                                       ){
   if (!"VectorizedFastHotel2T2" %in% ls(envir = fastrr_env)) {
-    initialize_jax_code <- paste(deparse(initialize_jax),collapse="\n")
-    initialize_jax_code <- sub(initialize_jax_code,pattern = "function\\s*\\([^)]*\\)",replacement="") # sub ensure only 1st pattern matched
-    eval( parse( text = initialize_jax_code ), envir = environment() )
+    initialize_jax(conda_env = conda_env, conda_env_required = conda_env_required) 
   }
   if(is.null(seed)){ seed <- as.integer(stats::runif(1, 0, 100000)) }
   if(is.null(threshold_func)){ threshold_func <- fastrr_env$VectorizedFastHotel2T2 }
@@ -159,7 +157,7 @@ generate_randomizations_mc <- function(n_units, n_treated,
   })
   
   AllKeys <- fastrr_env$jax$random$split(key, as.integer(max_draws))
-  AllKeySelectionIndices <- split( as.integer(1L:max_draws - 1L), 
+  AllKeySelectionIndices <- split( as.integer( (1L:max_draws) - 1L), 
                                    sapply(1:num_batches, function(x){rep(x,times = batch_size)}))
   top_M_results <- sapply(1L:num_batches, function(b_){ # note: vmapping this causes unacceptable memory overhead 
     top_M_results_ <- top_M_fxn( fastrr_env$jnp$take(AllKeys,

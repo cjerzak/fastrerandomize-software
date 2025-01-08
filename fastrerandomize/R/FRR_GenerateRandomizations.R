@@ -86,9 +86,7 @@ generate_randomizations <- function(n_units,
                                    conda_env_required = TRUE
                                    ){
   if (!"VectorizedFastHotel2T2" %in% ls(envir = fastrr_env)) {
-      initialize_jax_code <- paste(deparse(initialize_jax),collapse="\n")
-      initialize_jax_code <- sub(initialize_jax_code,pattern = "function\\s*\\([^)]*\\)",replacement="") # sub ensure only 1st pattern matched
-      eval( parse( text = initialize_jax_code ), envir = environment() )
+      initialize_jax(conda_env = conda_env, conda_env_required = conda_env_required) 
   }
   if(is.null(threshold_func)){ threshold_func <- fastrr_env$VectorizedFastHotel2T2 }
   
