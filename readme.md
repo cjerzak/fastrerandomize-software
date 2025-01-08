@@ -42,15 +42,13 @@ X <- matrix(rnorm(n_units*5),nrow = n_units)
 # When randomization_accept_prob = 1, all randomizations are accepted. 
 # When randomization_accept_prob < 1, only well-balanced randomizations are accepted. 
 # When randomization_accept_prob = 1/|Size of cand. randomization set|, 1 randomization is accepted.
-candidate_randomizations_array <- fastrerandomize::generate_randomizations(
+candidate_randomizations <- fastrerandomize::generate_randomizations(
                                             n_units = n_units,
                                             n_treated = n_treated,
                                             X = X,
                                             randomization_accept_prob = 0.001)
-candidate_randomizations_array$shape
 
-# You can coerce candidate_randomizations_array into R like this: 
-candidate_randomizations <- np$array( candidate_randomizations_array )
+# Check out the candidate randomization dimensions 
 dim( candidate_randomizations )
 ```
 We can also use `fastrerandomize` to perform a randomization test using those acceptable randomizations. 
@@ -75,7 +73,8 @@ ExactRandomizationTestResults$tau_obs # difference-in-means ATE estimate
 # Replication Data<a id="data"></a>
 Replication data for the package is available using the `data` command. 
 ```
-data( fastrerandomize )
+data( QJEData )
+data( YOPData )
 ```
 
 # Development 
