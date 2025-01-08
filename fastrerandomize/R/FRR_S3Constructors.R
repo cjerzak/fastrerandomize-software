@@ -30,6 +30,7 @@ fastrerandomize_class <- function(randomizations, balance = NULL, call = NULL) {
 #' @param x An object of class \code{fastrerandomize_instance}.
 #' @param ... Further arguments passed to or from other methods.
 #'
+#' @method print fastrerandomize_randomizations
 #' @export
 print.fastrerandomize_randomizations <- function(x, ...) {
   cat("Object of class 'fastrerandomize_randomizations'\n\n")
@@ -62,6 +63,7 @@ print.fastrerandomize_randomizations <- function(x, ...) {
 #'
 #' @return A list with summary statistics, printed by default.
 #'
+#' @method summary fastrerandomize_randomizations
 #' @export
 summary.fastrerandomize_randomizations <- function(object, ...) {
   cat("Summary of 'fastrerandomize_randomizations' object:\n\n")
@@ -88,6 +90,7 @@ summary.fastrerandomize_randomizations <- function(object, ...) {
 #' @param x An object of class \code{fastrerandomize_randomizations}.
 #' @param ... Further arguments passed to base \code{\link{plot}} functions.
 #'
+#' @method plot fastrerandomize_randomizations
 #' @export
 plot.fastrerandomize_randomizations <- function(x, ...) {
   if (is.null(x$balance)) {
@@ -138,6 +141,7 @@ fastrerandomize_test <- function(
 #' @param x An object of class \code{fastrerandomize_test}.
 #' @param ... Further arguments passed to or from other methods.
 #'
+#' @method print fastrerandomize_test
 #' @export
 print.fastrerandomize_test <- function(x, ...) {
   cat("Object of class 'fastrerandomize_test'\n\n")
@@ -166,6 +170,7 @@ print.fastrerandomize_test <- function(x, ...) {
 #'
 #' @return Returns an (invisible) list with detailed test results.
 #'
+#' @method summary fastrerandomize_test
 #' @export
 summary.fastrerandomize_test <- function(object, ...) {
   cat("Summary of 'fastrerandomize_test' object:\n\n")
@@ -204,6 +209,7 @@ summary.fastrerandomize_test <- function(object, ...) {
 #' @param x An object of class \code{fastrerandomize_test}.
 #' @param ... Further graphical parameters passed to \code{\link{plot}}.
 #'
+#' @method plot fastrerandomize_test
 #' @export
 plot.fastrerandomize_test <- function(x, ...) {
   if (is.null(x$FI)) {
