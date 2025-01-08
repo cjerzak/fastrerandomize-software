@@ -36,6 +36,48 @@ print2 <- function(text,
   }
 }
 
+#' Check if Python and JAX are available
+#'
+#' This function checks if Python and JAX can be accessed via `reticulate`. If not,
+#' it returns `NULL` and prints a message suggesting to run `build_backend()`.
+#'
+#' @param conda_env A character string specifying the name of the conda environment. 
+#'   Default is `"fastrerandomize"`.
+#' @param conda The path to a conda executable, or `"auto"`. Default is `"auto"`.
+#'
+#' @return Returns `TRUE` (invisibly) if both Python and JAX are available; otherwise returns `NULL`.
+#'
+#' @examples
+#' \dontrun{
+#'   check_jax_availability()
+#' }
+#'
+#' @export
+check_jax_availability <- function(conda_env = "fastrerandomize", 
+                                   conda = "auto") {
+  
+  # Try to use the specified conda environment
+  reticulate::use_condaenv(conda_env, required = FALSE, conda = conda)
+  
+  # Check if Python is available
+  if(!reticulate::py_available(initialize = TRUE)){
+    message("Python is not available. Please install Python/conda and build the backend using ",
+            "fastrerandomize::build_backend(conda_env = '", conda_env, "', conda = '", conda, "').")
+    return(NULL)
+  }
+  
+  # Check if JAX is installed
+  if(!reticulate::py_module_available("jax")){
+    message("JAX is not installed. Please build the backend using ",
+            "fastrerandomize::build_backend(conda_env = '", conda_env, "', conda = '", conda, "').")
+    return(NULL)
+  }
+  
+  # If we reach this point, both Python and JAX are accessible
+  # message("Python and JAX are available.")
+  invisible(TRUE)
+}
+
 output2output <- function(x, return_type = "R"){ 
   if(return_type == "R"){ return( fastrr_env$np$array(x) )  }
   if(return_type == "jax"){ return( x ) }

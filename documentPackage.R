@@ -21,4 +21,8 @@
   
   # Check package to ensure it meets CRAN standards.
   # devtools::check( package_path )
+  
+  # Rebuild data from terminal 
+  # cd ~/Documents/fastrerandomize-software
+  # R CMD build --resave-data fastrerandomize
 }

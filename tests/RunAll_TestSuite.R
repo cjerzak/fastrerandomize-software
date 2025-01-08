@@ -4,12 +4,12 @@
   # code for testing functionalities of fastrerandomize on your hardware
   ##########################################
   tryTests <- try({
-    # remote install latest version of the package
-    # devtools::install_github(repo = "cjerzak/fastrerandomize-software/fastrerandomize")
-
     # local install for development team
     # install.packages("~/Documents/fastrerandomize-software/fastrerandomize",repos = NULL, type = "source",force = F)
     
+    # remote install latest version of the package
+    # devtools::install_github(repo = "cjerzak/fastrerandomize-software/fastrerandomize")
+
     options(error = NULL)
     t_GenData <- try({
       set.seed(999L, kind = "Wichmann-Hill")
