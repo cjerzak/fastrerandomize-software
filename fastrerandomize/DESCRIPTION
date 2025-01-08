@@ -1,5 +1,5 @@
 Package: fastrerandomize
-Title: FastRerandomize: An R Package for Hardware-accelerated Rerandomization
+Title: FastRerandomize: An R Package for Hardware-Accelerated Rerandomization
     for Improved Balance
 Version: 0.1
 Authors@R: 

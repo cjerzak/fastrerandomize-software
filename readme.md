@@ -1,4 +1,4 @@
-# `fastrerandomize`: An R Package for Ultra-fast Rerandomization Using Accelerated Computing 
+# `fastrerandomize`: An R Package for Ultra-Fast Rerandomization Using Accelerated Computing 
 
 [**What is `fastrerandomize`?**](#description)
 | [**Installation**](#installation)
