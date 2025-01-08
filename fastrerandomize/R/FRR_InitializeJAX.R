@@ -29,7 +29,7 @@ initialize_jax <- function(conda_env = "fastrerandomize",
     }, list(1L,NULL)))
     
     fastrr_env$FastDiffInMeans <- fastrr_env$jax$jit( FastDiffInMeans_R <- function(y_,w_, n0, n1){
-      my1 <- fastrr_env$jnp$divide(fastrr_env$jnp$sum(fastrr_env$jnp$multiply(y_, w_)), n1)
+      my1 <- fastrr_env$jnp$divide(fastrr_env$jnp$sum(fastrr_env$jnp$multiply(y_,w_)), n1)
       my0 <- fastrr_env$jnp$divide(fastrr_env$jnp$sum(fastrr_env$jnp$multiply(y_, fastrr_env$jnp$subtract(1.,w_))), n0)
       return( diff10 <- fastrr_env$jnp$subtract(my1, my0) )
     })
@@ -109,7 +109,7 @@ initialize_jax <- function(conda_env = "fastrerandomize",
     
       # set up calc
       xbar1 <- fastrr_env$jnp$divide(fastrr_env$jnp$sum(
-                            fastrr_env$RowBroadcast(samp_,w_),1L,keepdims = T), n1)
+                            fastrr_env$RowBroadcast(samp_, w_),1L,keepdims = T), n1)
       xbar2 <- fastrr_env$jnp$divide(fastrr_env$jnp$sum(
                             fastrr_env$RowBroadcast(samp_,fastrr_env$jnp$subtract(1.,w_)),1L,keepdims = T), n0)
       CovWts <- fastrr_env$jnp$add(fastrr_env$jnp$reciprocal(n0), fastrr_env$jnp$reciprocal(n1))
@@ -121,14 +121,17 @@ initialize_jax <- function(conda_env = "fastrerandomize",
                              CovInv <- fastrr_env$jnp$reciprocal( fastrr_env$jnp$multiply(CovPooled, CovWts) ) ;
                              return( CovInv )})
       xbar_diff <- fastrr_env$jnp$subtract(xbar1, xbar2)
-      Tstat <- fastrr_env$jnp$matmul(fastrr_env$jnp$matmul(fastrr_env$jnp$transpose(xbar_diff), CovInv) , xbar_diff)
+      Tstat <- fastrr_env$jnp$matmul(
+                                     fastrr_env$jnp$matmul(fastrr_env$jnp$transpose(xbar_diff), CovInv) ,
+                                     xbar_diff)
     })
     
     fastrr_env$VectorizedFastHotel2T2 <- fastrr_env$jax$jit(VectorizedFastHotel2T2_R <- fastrr_env$jax$vmap(function(
     samp_, w_, 
     n0, n1, 
     approximate_inv = FALSE){
-      fastrr_env$FastHotel2T2(samp_, w_, n0, n1, approximate_inv)},
+      fastrr_env$FastHotel2T2(samp_, w_, 
+                              n0, n1, approximate_inv)},
     in_axes = list(NULL, 0L, NULL, NULL, NULL)) 
     )
     
@@ -150,7 +153,7 @@ initialize_jax <- function(conda_env = "fastrerandomize",
         
         # Accumulate results
         carry <- fastrr_env$jnp$concatenate(list(carry, Tstat_batch), axis=0)
-        carry
+        return( carry ) 
       }
       
       # Initialize carry with an empty array

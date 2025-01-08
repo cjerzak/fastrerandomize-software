@@ -86,7 +86,7 @@ rand_less_strict <- generate_randomizations_mc(
                n_units = 100, 
                n_treated = 50, 
                X = X, 
-               randomization_accept_prob=0.0001, 
+               randomization_accept_prob=0.01, 
                max_draws = 100000,
                batch_size = 1000)
 
@@ -95,7 +95,7 @@ rand_more_strict <- generate_randomizations_mc(
                n_units = 100, 
                n_treated = 50, 
                X = X, 
-               randomization_accept_prob=0.01, 
+               randomization_accept_prob=0.001, 
                max_draws = 1000000,
                batch_size = 1000)
 }
