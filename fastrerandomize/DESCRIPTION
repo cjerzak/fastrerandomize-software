@@ -5,7 +5,7 @@ Version: 0.1
 Authors@R: 
     c(person(given = "Fucheng Warren",
              family = "Zhu",
-             role = c("aut", "cre"),
+             role = c("aut"),
              email = "wzhu@college.harvard.edu",
              comment = c(ORCID = "0009-0001-5692-7572")),
       person(given = "Aniket Sachin",
@@ -15,7 +15,7 @@ Authors@R:
              comment = c(ORCID = "0009-0003-6411-1084")),
       person(given = "Connor",
              family = "Jerzak",
-             role = "aut",
+             role = c("aut", "cre"),
              email = "connor.jerzak@gmail.com",
              comment = c(ORCID = "0000-0003-1914-8905")),
       person(given = "Rebecca",
