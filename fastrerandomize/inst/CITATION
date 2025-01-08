@@ -1,0 +1,18 @@
+citHeader("To cite the fastrerandomize package in publications, please use the following:")
+  
+citEntry(
+  entry  = "Manual",
+  title    = "FastRerandomize: An R Package for Hardware-accelerated Rerandomization for Improved Balance",
+  author   = c(
+    person("Fucheng Warren", "Zhu",   role = c("aut", "cre"), comment = c(ORCID = "0009-0001-5692-7572")),
+    person("Aniket Sachin",   "Kamat", role = "aut",         comment = c(ORCID = "0009-0003-6411-1084")),
+    person("Connor",           "Jerzak", role = "aut",        comment = c(ORCID = "0000-0003-1914-8905")),
+    person("Rebecca",          "Goldstein", role = "aut",     comment = c(ORCID = "0000-0002-9944-8440"))
+  ),
+  year     = "2025",
+  version  = "0.1",
+  note     = "R package version 0.1",
+  url      = "https://github.com/cjerzak/fastrerandomize-software"
+)
+
+citFooter("For more information, see the GitHub repository above.")
