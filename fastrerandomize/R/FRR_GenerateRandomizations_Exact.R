@@ -96,7 +96,7 @@ generate_randomizations_exact <- function(n_units, n_treated,
   if(is.null(threshold_func)){ threshold_func <- fastrr_env$VectorizedFastHotel2T2 }
   
   max_rand_num <- choose(n_units, n_treated)
-  assert_that( max_rand_num*min(randomization_accept_prob) > 10, 
+  assertthat::assert_that( max_rand_num*min(randomization_accept_prob) > 10, 
               msg = "Value of min(randomization_accept_prob) indices less than 10 accepted randomizations. Increase min(randomization_accept_prob)!")
   
   # Get all combinations of positions to set to 1

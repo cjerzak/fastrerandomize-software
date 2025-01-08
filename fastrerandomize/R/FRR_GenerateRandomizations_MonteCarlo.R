@@ -92,9 +92,9 @@ generate_randomizations_mc <- function(n_units, n_treated,
   
   # Calculate the maximum number of possible randomizations
   max_rand_num <- choose(n_units, n_treated)
-  assert_that(max_draws <= max_rand_num, 
+  assertthat::assert_that(max_draws <= max_rand_num, 
               msg = paste0("max_draws must be less than or equal to the total number of possible randomizations (", max_rand_num, ")."))
-  assert_that(max_draws >= 2*batch_size, 
+  assertthat::assert_that(max_draws >= 2*batch_size, 
               msg = "max_draws must be at least 2*batch_size")
   
   # Define the base vector: 1s for treated, 0s for control
