@@ -114,7 +114,7 @@ randomization_test <- function(
                                ){
   if( is.null(check_jax_availability()) ) { return(NULL) }
 
-  tau_obs <- FI <- covers_truth <- NULL
+  tau_obs <- FI <- NULL
   if (!"VectorizedFastHotel2T2" %in% ls(envir = fastrr_env)) {
     initialize_jax(conda_env = conda_env, conda_env_required = conda_env_required)
   }
