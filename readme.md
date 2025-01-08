@@ -91,9 +91,9 @@ Connor T. Jerzak and Rebecca Goldstein. "Degrees of Randomness in Rerandomizatio
          year={2023}}
 ```
 
-[<img src="https://github.com/cjerzak/fastrerandomize-software/blob/main/misc/figures/Viz_MainFxns.pdf">](https://arxiv.org/abs/2310.00861.pdf)
+[<img src="https://github.com/cjerzak/fastrerandomize-software/blob/main/misc/figures/Viz_MainFxns.pdf?raw=true">](https://arxiv.org/abs/2310.00861.pdf)
 
-[<img src="https://github.com/cjerzak/fastrerandomize-software/blob/main/misc/figures/Viz_GPU.pdf">](https://arxiv.org/abs/2310.00861.pdf)
+[<img src="https://github.com/cjerzak/fastrerandomize-software/blob/main/misc/figures/Viz_GPU.pdf?raw=true">](https://arxiv.org/abs/2310.00861.pdf)
 
-[<img src="https://github.com/cjerzak/fastrerandomize-software/blob/main/misc/figures/CPU_v_GPU_FALSE_1000.pdf">](https://arxiv.org/abs/2310.00861.pdf)
+[<img src="https://github.com/cjerzak/fastrerandomize-software/blob/main/misc/figures/CPU_v_GPU_FALSE_1000.pdf?raw=true">](https://arxiv.org/abs/2310.00861.pdf)
 
