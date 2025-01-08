@@ -92,7 +92,7 @@ Connor T. Jerzak and Rebecca Goldstein. "Degrees of Randomness in Rerandomizatio
 
 _
 
-*Package function visualizations* 
+*Package function visualization* 
 [<img src="https://github.com/cjerzak/fastrerandomize-software/blob/main/misc/figures/Viz_MainFxns.png?raw=true">](https://arxiv.org/abs/2310.00861.pdf)
 
 _
