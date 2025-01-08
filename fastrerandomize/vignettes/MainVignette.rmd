@@ -50,7 +50,7 @@ n_units   <- nrow(X)
 n_treated <- nrow(X)/2
 ```
 
-## 3. Generate Randomizations
+## 2. Generate Randomizations
 
 We now create our candidate randomizations using the function `generate_randomizations()` from fastrerandomize. Depending on the scale and complexity of your experiment, you may choose either exact enumeration ("exact") or Monte Carlo ("monte_carlo") randomization.
 
@@ -59,6 +59,10 @@ In this example, we'll use the exact approach, but note that `randomization_acce
 ```{r generate_randomizations}
 library(fastrerandomize)
 
+RunMainAnalysis <- (!is.null(check_jax_availability()) )
+# if FALSE, consider calling build_backend()
+
+if(RunMainAnalysis){
 CandRandomizations <- generate_randomizations(
   n_units = n_units,
   n_treated = n_treated,
@@ -68,6 +72,7 @@ CandRandomizations <- generate_randomizations(
   batch_size = 1000L,
   randomization_accept_prob = 0.0001
 )
+}
 ```
 
 ## 4. S3 Methods: Print, Summary, and Plot
@@ -75,6 +80,7 @@ CandRandomizations <- generate_randomizations(
 `generate_randomizations()` returns an S3 object of class `fastrerandomize_randomizations`. We can use its associated print, summary, and plot methods to inspect the candidate randomizations.
 
 ```{r s3_methods}
+if(RunMainAnalysis){
 # 4a. Print the object
 print(CandRandomizations)
 
@@ -83,25 +89,28 @@ summary(CandRandomizations)
 
 # 4c. Plot the balance distribution
 plot(CandRandomizations)
+}
 ```
 
-## 5. Randomization Test
+## 3. Randomization Test
 
 Next, we showcase a randomization-based inference procedure using fastrerandomize.
 
-### 5a. Setup Simulated Outcomes
+### 3a. Setup Simulated Outcomes
 
 We simulate an outcome Y that depends on our covariates X, the chosen randomization, and some true treatment effect τ. Here, we pick the first acceptable randomization from our set as our "observed" assignment, Wobs.
 
 ```{r setup_outcomes}
+if(RunMainAnalysis){
 CoefY <- rnorm(ncol(X))          # Coefficients for outcome model
 Wobs  <- CandRandomizations$randomizations[1, ]  # use the 1st acceptable randomization
 tau_true <- 1                     # true treatment effect
 # Generate Y = X * Coef + W*tau + noise
 Yobs <- as.numeric( as.matrix(X) %*% as.matrix(CoefY) + Wobs * tau_true + rnorm(n_units, sd = 0.1))
+}
 ```
 
-### 5b. Run the Randomization Test
+### 3b. Run the Randomization Test
 
 We pass our observed treatment assignment (`obsW`), observed outcomes (`obsY`), and the full matrix of candidate randomizations (`candidate_randomizations`) to `randomization_test()`. This test:
 
@@ -110,6 +119,7 @@ We pass our observed treatment assignment (`obsW`), observed outcomes (`obsY`), 
 * Estimates the p-value by comparing the observed statistic to its permutation distribution
 
 ```{r randomization_test}
+if(RunMainAnalysis){
 randomization_test_results <- randomization_test(
   obsW = Wobs,
   obsY = Yobs,
@@ -121,6 +131,7 @@ randomization_test_results <- randomization_test(
 print(randomization_test_results)
 summary(randomization_test_results)
 plot(randomization_test_results)
+}
 ```
 
 The `findFI = TRUE` flag further attempts to locate a fiducial interval (FI) for the treatment effect.
@@ -134,4 +145,4 @@ This tutorial demonstrated a basic workflow with fastrerandomize:
 * Visualizing and summarizing these assignments
 * Testing for treatment effects with a randomization-based approach
 
-We encourage you to consult the package documentation for more advanced functionalities, including GPU-accelerated computations via JAX and flexible definitions of "balance" criteria beyond what was shown here.
+We encourage you to consult the package documentation for more advanced functionalities, including GPU-accelerated computations via JAX and flexible definitions of balance criteria in addition to what was shown here.
