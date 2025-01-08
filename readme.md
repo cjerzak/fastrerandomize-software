@@ -93,7 +93,9 @@ Connor T. Jerzak and Rebecca Goldstein. "Degrees of Randomness in Rerandomizatio
 
 [<img src="https://github.com/cjerzak/fastrerandomize-software/blob/main/misc/figures/Viz_MainFxns.png?raw=true">](https://arxiv.org/abs/2310.00861.pdf)
 
+
 [<img src="https://github.com/cjerzak/fastrerandomize-software/blob/main/misc/figures/Viz_GPU.png?raw=true">](https://arxiv.org/abs/2310.00861.pdf)
+
 
 [<img src="https://github.com/cjerzak/fastrerandomize-software/blob/main/misc/figures/CPU_v_GPU_FALSE_1000.png?raw=true">](https://arxiv.org/abs/2310.00861.pdf)
 
