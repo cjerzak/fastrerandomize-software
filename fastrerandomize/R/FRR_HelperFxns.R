@@ -54,10 +54,12 @@ print2 <- function(text,
 #'
 #' @export
 check_jax_availability <- function(conda_env = "fastrerandomize", 
-                                   conda = "auto") {
+                                   conda = "auto"){
   
   # Try to use the specified conda environment
-  try_condaenv <- try(reticulate::use_condaenv(conda_env, required = TRUE, conda = conda), T)
+  try_condaenv <- try(reticulate::use_condaenv(conda_env, 
+                                               required = TRUE, 
+                                               conda = conda), T)
   if("try-error" %in% class(try_condaenv)){
     message("conda environment is not available. Please install Python/conda and build the backend using ",
             "fastrerandomize::build_backend(conda_env = '", conda_env, "', conda = '", conda, "').")
