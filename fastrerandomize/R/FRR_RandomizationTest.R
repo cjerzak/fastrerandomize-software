@@ -247,6 +247,7 @@ randomization_test <- function(
       FI      = FI,
       tau_obs = tau_obs,
       candidate_randomizations = candidate_randomizations, 
+      fastrr_env = fastrr_env, 
       call    = match.call()  
     )
   )

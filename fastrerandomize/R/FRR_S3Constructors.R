@@ -9,16 +9,18 @@
 #'   randomization.
 #' @param balance A numeric vector or similar object holding balance statistics 
 #'   for each randomization, or \code{NULL} if not applicable.
+#' @param fastrr_env Associated \code{fastrr_env} environment.  
 #' @param call The function call, if you wish to store it for reference (optional).
 #'
 #' @return An object of class \code{fastrerandomize_randomizations}.
 #'
 #' @export
-fastrerandomize_class <- function(randomizations, balance = NULL, call = NULL) {
+fastrerandomize_class <- function(randomizations, balance = NULL, fastrr_env=NULL, call = NULL) {
   structure(
     list(
       randomizations = randomizations,
       balance = balance,
+      fastrr_env = fastrr_env, 
       call = call
     ),
     class = "fastrerandomize_randomizations"
@@ -111,6 +113,7 @@ plot.fastrerandomize_randomizations <- function(x, ...) {
 #' @param p_value A numeric value representing the p-value of the test.
 #' @param FI A numeric vector (length 2) representing the fiducial interval, or NULL if not requested.
 #' @param tau_obs A numeric value (or vector) representing the estimated treatment effect.
+#' @param fastrr_env Associated `fastrr_env` environment.  
 #' @param call An optional function call, stored for reference.
 #' @param ... Other slots you may want to store (e.g. additional diagnostics).
 #'
@@ -121,6 +124,7 @@ fastrerandomize_test <- function(
     p_value,
     FI,
     tau_obs,
+    fastrr_env = NULL,
     call = NULL,
     ...
 ){
@@ -129,6 +133,7 @@ fastrerandomize_test <- function(
       p_value = p_value,
       FI = FI,
       tau_obs = tau_obs,
+      fastrr_env = fastrr_env, 
       call = call,
       ...
     ),

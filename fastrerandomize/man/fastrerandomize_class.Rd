@@ -4,7 +4,12 @@
 \alias{fastrerandomize_class}
 \title{Constructor for fastrerandomize randomizations}
 \usage{
-fastrerandomize_class(randomizations, balance = NULL, call = NULL)
+fastrerandomize_class(
+  randomizations,
+  balance = NULL,
+  fastrr_env = NULL,
+  call = NULL
+)
 }
 \arguments{
 \item{randomizations}{A matrix or array where each row (or slice) represents one 
@@ -12,6 +17,8 @@ randomization.}
 
 \item{balance}{A numeric vector or similar object holding balance statistics 
 for each randomization, or \code{NULL} if not applicable.}
+
+\item{fastrr_env}{Associated \code{fastrr_env} environment.}
 
 \item{call}{The function call, if you wish to store it for reference (optional).}
 }

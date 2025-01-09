@@ -137,6 +137,7 @@ generate_randomizations <- function(n_units,
         fastrerandomize_class(
           randomizations = output2output(candidate_randomizations$candidate_randomizations, return_type),
           balance = output2output(candidate_randomizations$M_candidate_randomizations, return_type),
+          fastrr_env = fastrr_env, 
           call = match.call()
         )
       )
