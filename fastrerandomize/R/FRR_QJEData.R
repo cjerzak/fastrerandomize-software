@@ -21,7 +21,7 @@
 #' @source
 #' Burchardi, K.B., Ghatak, M., & Johanssen, A. (2019). 
 #' Moral hazard: Experimental evidence from tenancy contracts.
-#' \emph{The Quarterly Journal of Economics}, 134(1), 281–347.
+#' \emph{The Quarterly Journal of Economics}, 134(1), 281-347.
 #' 
 #' @name QJEData
 #' @docType data

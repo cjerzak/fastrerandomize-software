@@ -55,7 +55,7 @@ initialize_jax <- function(conda_env = "fastrerandomize",
     
     fastrr_env$YW_VectorizedFastDiffInMeans <- fastrr_env$jax$jit( 
       YW_VectorizedFastDiffInMeans_R <- fastrr_env$jax$vmap(function(y_, w_, n0, n1){
-          W_VectorizedFastDiffInMeans(y_, w_, n0, n1)},
+        fastrr_env$W_VectorizedFastDiffInMeans(y_, w_, n0, n1)},
       in_axes = list(0L, NULL, NULL, NULL)) )
     
     fastrr_env$WVectorizedFastDiffInMeans <- fastrr_env$jax$jit( 

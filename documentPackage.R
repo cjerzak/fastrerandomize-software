@@ -24,11 +24,11 @@
   
   # Rebuild data from terminal 
   # cd ~/Documents/fastrerandomize-software
-  # R CMD build --resave-data fastrerandomize
+  # R CMD build  --resave-data fastrerandomize
   
   # build
-  #  R CMD build ~/Documents/fastrerandomize-software/fastrerandomize
+  #  R CMD build --resave-data ~/Documents/fastrerandomize-software/fastrerandomize
   
   # check (update version as needed)
-  #  R CMD check --as-cran fastrerandomize_0.1.tar.gz
+  #  R CMD check --as-cran ~/Documents/fastrerandomize_0.1.tar.gz
 }
