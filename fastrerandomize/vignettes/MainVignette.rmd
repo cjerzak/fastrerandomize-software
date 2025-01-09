@@ -39,6 +39,8 @@ Note: This tutorial assumes you have installed the fastrerandomize package, eith
 For illustration, we use several pre-treatment covariates from the original experiment. 
 
 ```{r generate_covariates}
+library(fastrerandomize)
+
 # Obtain pre-treatment covariates 
 data(QJEData, package = "fastrerandomize")
 myCovariates <- c("children","married","hh_size","hh_sexrat")
@@ -47,7 +49,7 @@ X <- QJEData[,myCovariates]
   
 # Analysis parameters
 n_units   <- nrow(X)
-n_treated <- nrow(X)/2
+n_treated <- round(nrow(X)/2)
 ```
 
 ## 2. Generate Randomizations
@@ -57,8 +59,6 @@ We now create our candidate randomizations using the function `generate_randomiz
 In this example, we'll use the exact approach, but note that `randomization_accept_prob` is set very low (0.0001) for demonstration, so that we can see some filtering in action.
 
 ```{r generate_randomizations}
-library(fastrerandomize)
-
 RunMainAnalysis <- (!is.null(check_jax_availability()) )
 # if FALSE, consider calling build_backend()
 

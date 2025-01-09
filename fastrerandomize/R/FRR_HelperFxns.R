@@ -57,7 +57,12 @@ check_jax_availability <- function(conda_env = "fastrerandomize",
                                    conda = "auto") {
   
   # Try to use the specified conda environment
-  reticulate::use_condaenv(conda_env, required = FALSE, conda = conda)
+  try_condaenv <- try(reticulate::use_condaenv(conda_env, required = TRUE, conda = conda), T)
+  if("try-error" %in% class(try_condaenv)){
+    message("conda environment is not available. Please install Python/conda and build the backend using ",
+            "fastrerandomize::build_backend(conda_env = '", conda_env, "', conda = '", conda, "').")
+    return(NULL)
+  }
   
   # Check if Python is available
   if(!reticulate::py_available(initialize = TRUE)){
