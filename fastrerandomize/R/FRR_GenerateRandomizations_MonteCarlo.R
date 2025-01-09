@@ -175,7 +175,6 @@ generate_randomizations_mc <- function(n_units, n_treated,
   # Main analysis 
   {
     # Keep only top num_to_accept permutations
-    # plot(fastrr_env$np$array(fastrr_env$jnp$argsort( top_M_results )))
     indices_to_keep <- fastrr_env$jnp$take(fastrr_env$jnp$argsort( top_M_results ), 
                                            indices = fastrr_env$jnp$arange(as.integer(num_to_accept)) )
     
@@ -194,7 +193,6 @@ generate_randomizations_mc <- function(n_units, n_treated,
       n0_array, 
       n1_array, 
       approximate_inv ) )
-    # fastrr_env$jnp$mean(M_results_batch_) - fastrr_env$jnp$mean(top_M_results) # -> 0 
   }
 
   print(sprintf("MC Loop Time (s): %.4f", as.numeric(difftime(Sys.time(), t0, units = "secs"))))

@@ -198,13 +198,11 @@ randomization_test <- function(
             upper_Y_0_under_null[obsW == 1] <- obsY[obsW == 1] - upperBound_estimate_step_t
             upper_Y_obs_perm[permutation_treatment_vec==0] <- upper_Y_0_under_null[permutation_treatment_vec==0]
             upper_Y_obs_perm[permutation_treatment_vec==1] <- upper_Y_0_under_null[permutation_treatment_vec==1] + upperBound_estimate_step_t
-            #upper_tau_at_step_t <- mean(upper_Y_obs_perm[permutation_treatment_vec == 1]) - mean(upper_Y_obs_perm[permutation_treatment_vec == 0])
             upper_tau_at_step_t <- fastrr_env$np$array( fastrr_env$FastDiffInMeans(fastrr_env$jnp$array(upper_Y_obs_perm), 
                                                                                    fastrr_env$jnp$array(permutation_treatment_vec), 
                                                                                    n0_array, n1_array) )
 
             c_step_t <- k * (upperBound_estimate_step_t  -  tau_obs)
-            #if(is.na(c_step_t)){
             if(upper_tau_at_step_t > tau_obs) {  upperBound_estimate_step_t <- upperBound_estimate_step_t - c_step_t * (alpha/2) / step_t  }
             if(upper_tau_at_step_t <= tau_obs) { upperBound_estimate_step_t <- upperBound_estimate_step_t + c_step_t * (1-alpha/2) / step_t }
           }
@@ -232,7 +230,6 @@ randomization_test <- function(
 
           ret_ <- min(mean( tau_obs >= stat_vec_at_tau_pseudo),
                       mean( tau_obs <= stat_vec_at_tau_pseudo))
-          #ret_ <- reject_ <- tau_obs >= quantiles_[1] & tau_obs <= quantiles_[2]
           return( ret_ )
         } )
         tau_pseudo_seq_AcceptNull <- tau_pseudo_seq[pvals_vec>0.05]

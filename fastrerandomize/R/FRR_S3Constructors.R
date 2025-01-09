@@ -214,7 +214,6 @@ summary.fastrerandomize_test <- function(object, ...) {
 plot.fastrerandomize_test <- function(x, ...) {
   if (is.null(x$FI)) {
     message("No fiducial interval to plot, only a single observed effect.")
-    # Optionally just plot a single point on an axis:
     graphics::plot(x = x$tau_obs, y = 0,
          xlab = "Effect Size", ylab = "", 
          main = "Observed Effect (No FI available)",

@@ -79,7 +79,6 @@ check_jax_availability <- function(conda_env = "fastrerandomize",
   }
   
   # If we reach this point, both Python and JAX are accessible
-  # message("Python and JAX are available.")
   invisible(TRUE)
 }
 

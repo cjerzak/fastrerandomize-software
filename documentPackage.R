@@ -19,16 +19,12 @@
   # library( causalimages ); data(  CausalImagesTutorialData )
   log(sort( sapply(ls(),function(l_){object.size(eval(parse(text=l_)))})))
   
-  # Check package to ensure it meets CRAN standards.
+  # check package to ensure it meets CRAN standards.
   # devtools::check( package_path )
   
-  # Rebuild data from terminal 
-  # cd ~/Documents/fastrerandomize-software
-  # R CMD build  --resave-data fastrerandomize
-  
-  # build
-  #  R CMD build --resave-data ~/Documents/fastrerandomize-software/fastrerandomize
+  # build package tar
+  # R CMD build --resave-data ~/Documents/fastrerandomize-software/fastrerandomize
   
   # check (update version as needed)
-  #  R CMD check --as-cran ~/Documents/fastrerandomize_0.1.tar.gz
+  # R CMD check --as-cran ~/Documents/fastrerandomize_0.1.tar.gz
 }

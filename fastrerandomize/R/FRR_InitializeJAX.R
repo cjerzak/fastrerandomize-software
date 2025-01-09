@@ -73,17 +73,11 @@ initialize_jax <- function(conda_env = "fastrerandomize",
                                                      tau_pseudo,
                                                      n0_array,
                                                      n1_array){
-      #Y0_under_null <- obsY - obsW*tau_pseudo
       Y0_under_null <- fastrr_env$jnp$subtract(obsY_array,  fastrr_env$jnp$multiply(obsW_array, tau_pseudo))
-      
-      #Y1_under_null_pseudo <- Y0_under_null + treatment_pseudo*tau_pseudo
       Y1_under_null_pseudo <- fastrr_env$jnp$add(Y0_under_null,  fastrr_env$jnp$multiply(treatment_pseudo, tau_pseudo))
-      
-      #Yobs_pseudo <- Y1_under_null_pseudo*treatment_pseudo + Y0_under_null * (1-treatment_pseudo)
+
       Yobs_pseudo <- fastrr_env$jnp$add(fastrr_env$jnp$multiply(Y1_under_null_pseudo, treatment_pseudo),
                              fastrr_env$jnp$multiply(Y0_under_null, fastrr_env$jnp$subtract(1., treatment_pseudo)))
-      
-      #stat_ <- mean(Yobs_pseudo[treatment_pseudo == 1]) - mean(Yobs_pseudo[treatment_pseudo == 0])
       stat_ <- fastrr_env$FastDiffInMeans(Yobs_pseudo, treatment_pseudo, n0_array, n1_array)
     } )
     
