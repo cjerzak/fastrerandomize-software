@@ -82,7 +82,7 @@ generate_randomizations_mc <- function(n_units, n_treated,
                                        conda_env = "fastrerandomize", 
                                        conda_env_required = TRUE
                                       ){
-  if (is.null(check_jax_availability())) { return(NULL) }
+  if (is.null(check_jax_availability(conda_env=conda_env))) { return(NULL) }
   
   if (!"VectorizedFastHotel2T2" %in% ls(envir = fastrr_env)) {
     initialize_jax(conda_env = conda_env, conda_env_required = conda_env_required) 
