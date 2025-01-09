@@ -92,13 +92,18 @@ Connor T. Jerzak and Rebecca Goldstein. "Degrees of Randomness in Rerandomizatio
 
 _
 
-*Package function visualization* 
+*Package functions* 
 [<img src="https://github.com/cjerzak/fastrerandomize-software/blob/main/misc/figures/Viz_MainFxns.png?raw=true">](https://arxiv.org/abs/2310.00861.pdf)
 
 _
 
-*Hardware acceleration visualization* 
+*Hardware acceleration* 
 [<img src="https://github.com/cjerzak/fastrerandomize-software/blob/main/misc/figures/Viz_GPU.png?raw=true">](https://arxiv.org/abs/2310.00861.pdf)
+
+_
+
+*Key to minimize memory overhead* 
+[<img src="https://github.com/cjerzak/fastrerandomize-software/blob/main/misc/figures/Viz_Keys.png?raw=true">](https://arxiv.org/abs/2310.00861.pdf)
 
 _
 
