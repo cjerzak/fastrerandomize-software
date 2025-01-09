@@ -106,8 +106,8 @@ generate_randomizations <- function(n_units,
                                                 randomization_accept_prob = randomization_accept_prob, 
                                                 threshold_func = threshold_func, 
                                                 file = file,
-                                                conda_env = "fastrerandomize", 
-                                                conda_env_required = TRUE,
+                                                conda_env = conda_env, 
+                                                conda_env_required = conda_env_required,
                                                 seed = seed)
     } else if (randomization_type == "monte_carlo"){
         if (verbose){
@@ -123,8 +123,8 @@ generate_randomizations <- function(n_units,
                                                                     batch_size = batch_size, 
                                                                     seed = seed, 
                                                                     file = file, 
-                                                                    conda_env = "fastrerandomize", 
-                                                                    conda_env_required = TRUE,
+                                                                    conda_env = conda_env, 
+                                                                    conda_env_required = conda_env_required,
                                                                     verbose = verbose)
     } else {
         stop("Invalid randomization type")
