@@ -112,7 +112,7 @@ randomization_test <- function(
                                file = NULL, 
                                conda_env = "fastrerandomize", conda_env_required = TRUE
                                ){
-  if( is.null(check_jax_availability()) ) { return(NULL) }
+  if( is.null(check_jax_availability(conda_env=conda_env)) ) { return(NULL) }
 
   tau_obs <- FI <- NULL
   if (!"VectorizedFastHotel2T2" %in% ls(envir = fastrr_env)) {
