@@ -75,7 +75,7 @@ multivariate balance between treatment and control groups. Randomizations are
 accepted if their balance measure is below the specified quantile threshold.
 }
 \note{
-This function requires JAX and NumPy to be installed and accessible through
+This function requires 'JAX' and 'NumPy' to be installed and accessible through
 the reticulate package.
 }
 \examples{

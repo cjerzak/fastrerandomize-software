@@ -65,7 +65,7 @@
 #' @import reticulate
 #'
 #' @note
-#' This function requires JAX and NumPy to be installed and accessible through
+#' This function requires 'JAX' and 'NumPy' to be installed and accessible through
 #' the reticulate package. 
 #'
 #' @references
