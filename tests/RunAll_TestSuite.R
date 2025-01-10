@@ -11,7 +11,6 @@
     # devtools::install_github(repo = "cjerzak/fastrerandomize-software/fastrerandomize")
 
     options(error = NULL)
-    verbose <- FALSE
     t_GenData <- try({
       set.seed(999L, kind = "Wichmann-Hill")
       X <- matrix(rnorm(20*5), 20, 5)
@@ -19,6 +18,7 @@
     if("try-error" %in% class(t_GenData)){ stop("Failed at t_GenData...") }
     
     #for(findFI in c(FALSE, TRUE)){ for(type_ in c("exact","monte_carlo")){  # deterministic order
+    for(verbose in c(TRUE, FALSE)){ 
     for(type_ in sample(c("exact","monte_carlo"),2)){ for(findFI in sample(c(FALSE, TRUE), 2)){  # random order
       fastrerandomize::print2(sprintf("On type: %s", type_))
       
@@ -50,7 +50,9 @@
       if("try-error" %in% class(t_RRTest)){ stop(sprintf("Failed at t_RRTest: [%s, %s]...",type_, findFI)) }
     }
     }
-  }, T)
+    }
+  }
+  , T)
     
   if('try-error' %in% class(tryTests)){  print( tryTests ); fastrerandomize::print2("At least one test failed... See above.") }
   if(!'try-error' %in% class(tryTests)){ fastrerandomize::print2("All tests succeeded!") }
