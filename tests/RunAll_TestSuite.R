@@ -17,8 +17,7 @@
     },T)
     if("try-error" %in% class(t_GenData)){ stop("Failed at t_GenData...") }
     
-    #for(findFI in c(FALSE, TRUE)){ for(type_ in c("exact","monte_carlo")){  # deterministic order
-    for(verbose in c(TRUE, FALSE)){ 
+    for(verbose in c(TRUE, FALSE)){ for(approx_inv in c(TRUE, FALSE)){ 
     for(type_ in sample(c("exact","monte_carlo"),2)){ for(findFI in sample(c(FALSE, TRUE), 2)){  # random order
       fastrerandomize::print2(sprintf("On type: %s", type_))
       
@@ -29,6 +28,7 @@
           X = X,
           randomization_accept_prob = 0.1,
           randomization_type = type_,
+          approximate_inv = approx_inv, 
           verbose = verbose, 
           max_draws = 10000L, 
           batch_size = 100L)
@@ -48,6 +48,7 @@
         }
       },T)
       if("try-error" %in% class(t_RRTest)){ stop(sprintf("Failed at t_RRTest: [%s, %s]...",type_, findFI)) }
+    }
     }
     }
     }
