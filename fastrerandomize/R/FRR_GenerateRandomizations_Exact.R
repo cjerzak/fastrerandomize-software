@@ -18,9 +18,6 @@
 #'   (diagonal of the covariance matrix) instead of the full matrix inverse when computing 
 #'   balance metrics. This can speed up computations for high-dimensional covariates.
 #'   Default is \code{TRUE}.
-#' @param seed An integer seed for random number generation, used when enumerating 
-#'   or filtering exact randomizations with potentially randomized steps (e.g., 
-#'   random draws in thresholding). Default is \code{NULL} (no fixed seed).
 #' @param verbose A logical value indicating whether to print progress information. Default is \code{TRUE}.
 #' @param conda_env A character string specifying the name of the conda environment to use 
 #'   via \code{reticulate}. Default is "fastrerandomize".
@@ -82,7 +79,6 @@ generate_randomizations_exact <- function(n_units, n_treated,
                                    randomization_accept_prob = 1,
                                    approximate_inv = TRUE, 
                                    threshold_func = NULL,
-                                   seed = NULL, 
                                    verbose = TRUE,
                                    conda_env = "fastrerandomize", 
                                    conda_env_required = TRUE){

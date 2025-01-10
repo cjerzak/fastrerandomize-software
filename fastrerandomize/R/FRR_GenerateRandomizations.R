@@ -10,7 +10,6 @@
 #' @param randomization_accept_prob A numeric value between 0 and 1 specifying the probability threshold for accepting randomizations based on balance.
 #' @param threshold_func A 'JAX' function that computes a balance measure for each randomization. Only used for Monte Carlo sampling.
 #' @param max_draws An integer specifying the maximum number of randomizations to draw in Monte Carlo sampling.
-#' @param seed An integer seed for random number generation in Monte Carlo sampling.
 #' @param batch_size An integer specifying batch size for Monte Carlo processing.
 #' @param randomization_type A string specifying the type of randomization: either \code{"exact"} or \code{"monte_carlo"}.
 #' @param file A string specifying where to save candidate randomizations (if saving, not returning).
@@ -82,7 +81,6 @@ generate_randomizations <- function(n_units,
                                    batch_size = 10^5, 
                                    randomization_type = "monte_carlo", 
                                    approximate_inv = TRUE, 
-                                   seed = NULL, 
                                    verbose = TRUE,
                                    file = NULL, 
                                    return_type = "R", 
@@ -106,8 +104,7 @@ generate_randomizations <- function(n_units,
                                                 threshold_func = threshold_func, 
                                                 verbose = verbose, 
                                                 conda_env = conda_env, 
-                                                conda_env_required = conda_env_required,
-                                                seed = seed)
+                                                conda_env_required = conda_env_required)
     } else if (randomization_type == "monte_carlo"){
         if (verbose){
             message("Using monte carlo randomization")
@@ -120,7 +117,6 @@ generate_randomizations <- function(n_units,
                                                                     threshold_func = threshold_func, 
                                                                     max_draws = max_draws, 
                                                                     batch_size = batch_size, 
-                                                                    seed = seed, 
                                                                     conda_env = conda_env, 
                                                                     conda_env_required = conda_env_required,
                                                                     verbose = verbose)
