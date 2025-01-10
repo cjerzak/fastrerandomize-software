@@ -104,16 +104,20 @@ initialize_jax <- function(conda_env = "fastrerandomize",
                             fastrr_env$RowBroadcast(samp_,fastrr_env$jnp$subtract(1.,w_)),1L,keepdims = T), n0)
       CovWts <- fastrr_env$jnp$add(fastrr_env$jnp$reciprocal(n0), fastrr_env$jnp$reciprocal(n1))
       CovInv <- fastrr_env$jax$lax$cond(pred = approximate_inv,
+                                        
+                             # if using diagonal approximation           
                              true_fun = function(){CovPooled <- fastrr_env$jnp$var(samp_, 0L); 
-                             CovInv <- fastrr_env$jnp$diag( fastrr_env$jnp$reciprocal( fastrr_env$jnp$multiply(CovPooled,CovWts) ));
+                             CovInv <- fastrr_env$jnp$diag( fastrr_env$jnp$reciprocal( CovPooled) )
                              return(CovInv)},
+                             
+                             # if using no diagonal approximation 
                              false_fun = function(){CovPooled <- fastrr_env$jnp$cov(samp_,rowvar = FALSE); 
-                             CovInv <- fastrr_env$jnp$reciprocal( fastrr_env$jnp$multiply(CovPooled, CovWts) ) ;
+                             CovInv <- fastrr_env$jnp$linalg$inv( CovPooled )
                              return( CovInv )})
       xbar_diff <- fastrr_env$jnp$subtract(xbar1, xbar2)
-      Tstat <- fastrr_env$jnp$matmul(
+      Tstat <- fastrr_env$jnp$multiply((n0 * n1) / (n0 + n1), fastrr_env$jnp$matmul(
                                      fastrr_env$jnp$matmul(fastrr_env$jnp$transpose(xbar_diff), CovInv) ,
-                                     xbar_diff)
+                                     xbar_diff)) 
     })
     
     fastrr_env$VectorizedFastHotel2T2 <- fastrr_env$jax$jit(VectorizedFastHotel2T2_R <- fastrr_env$jax$vmap(function(
