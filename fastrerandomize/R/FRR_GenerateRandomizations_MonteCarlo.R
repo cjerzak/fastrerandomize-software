@@ -191,7 +191,7 @@ generate_randomizations_mc <- function(n_units, n_treated,
       approximate_inv ) )
   }
 
-  message(sprintf("MC Loop Time (s): %.4f", as.numeric(difftime(Sys.time(), t0, units = "secs"))))
+  if(verbose){ message(sprintf("MC Loop Time (s): %.4f", as.numeric(difftime(Sys.time(), t0, units = "secs"))))}
     
   # After processing all batches, the candidate_randomizations are the top_perms
   return(list(

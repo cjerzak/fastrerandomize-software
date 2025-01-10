@@ -68,7 +68,7 @@ randomizations will be saved or loaded from. If \code{NULL}, randomizations
 remain in memory. Default is NULL.}
 
 \item{conda_env}{A character string specifying the name of the conda environment to use
-via \code{reticulate}. Default is "fastrerandomize".}
+via \code{reticulate}. Default is \code{"fastrerandomize"}.}
 
 \item{conda_env_required}{A logical indicating whether the specified conda environment
 must be strictly used. If \code{TRUE}, an error is thrown if the environment is not found.

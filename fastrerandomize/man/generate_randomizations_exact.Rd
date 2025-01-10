@@ -12,7 +12,7 @@ generate_randomizations_exact(
   approximate_inv = TRUE,
   threshold_func = NULL,
   seed = NULL,
-  file = NULL,
+  verbose = TRUE,
   conda_env = "fastrerandomize",
   conda_env_required = TRUE
 )
@@ -23,7 +23,7 @@ generate_randomizations_exact(
 \item{n_treated}{An integer specifying the number of units to be assigned to treatment}
 
 \item{X}{A numeric matrix of covariates where rows represent units and columns
-represent different covariates. Default is NULL, in which case all possible
+represent different covariates. Default is \code{NULL}, in which case all possible
 randomizations are returned without balance filtering.}
 
 \item{randomization_accept_prob}{A numeric value between 0 and 1 specifying the
@@ -33,19 +33,17 @@ Default is 1 (accept all randomizations).}
 \item{approximate_inv}{A logical value indicating whether to use an approximate inverse 
 (diagonal of the covariance matrix) instead of the full matrix inverse when computing 
 balance metrics. This can speed up computations for high-dimensional covariates.
-Default is TRUE.}
+Default is \code{TRUE}.}
 
 \item{threshold_func}{A function that calculates balance statistics for candidate
-randomizations. Default is VectorizedFastHotel2T2 which computes Hotelling's T²
+randomizations. Default is \code{VectorizedFastHotel2T2} which computes Hotelling's T-squared
 statistic.}
 
 \item{seed}{An integer seed for random number generation, used when enumerating 
 or filtering exact randomizations with potentially randomized steps (e.g., 
-random draws in thresholding). Default is NULL (no fixed seed).}
+random draws in thresholding). Default is \code{NULL} (no fixed seed).}
 
-\item{file}{A character string specifying the path (including filename) where candidate 
-randomizations will be saved. If \code{NULL}, the function returns the randomizations 
-in memory. Default is NULL.}
+\item{verbose}{A logical value indicating whether to print progress information. Default is \code{TRUE}.}
 
 \item{conda_env}{A character string specifying the name of the conda environment to use 
 via \code{reticulate}. Default is "fastrerandomize".}
@@ -63,7 +61,7 @@ The function returns a \emph{list} with two elements:
 Generates all possible treatment assignments for a completely randomized experiment,
 optionally filtering them based on covariate balance criteria. The function can
 generate either all possible randomizations or a subset that meets specified
-balance thresholds using Hotelling's T² statistic.
+balance thresholds using Hotelling's T-squared statistic.
 }
 \details{
 The function works in two main steps:

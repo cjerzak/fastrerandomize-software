@@ -7,9 +7,9 @@
 print2(text, quiet = FALSE)
 }
 \arguments{
-\item{text}{A character string containing the message to be printed}
+\item{text}{A character string containing the message to be printed.}
 
-\item{quiet}{A logical value indicating whether to suppress output. Default is FALSE}
+\item{quiet}{A logical value indicating whether to suppress output. Default is \code{FALSE}.}
 }
 \value{
 No return value, called for side effect of printing with timestamp.
@@ -36,5 +36,5 @@ for(i in 1:3) {
 
 }
 \seealso{
-\code{Sys.time} for the underlying timestamp functionality
+\code{Sys.time} for the underlying timestamp functionality.
 }

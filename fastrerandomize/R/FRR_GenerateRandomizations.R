@@ -111,7 +111,7 @@ generate_randomizations <- function(n_units,
                                                 seed = seed)
     } else if (randomization_type == "monte_carlo"){
         if (verbose){
-            print("Using monte carlo randomization")
+            message("Using monte carlo randomization")
         }
         candidate_randomizations <- fastrerandomize::generate_randomizations_mc(
                                                                     n_units = n_units, 

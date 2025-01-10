@@ -9,7 +9,7 @@ fastrerandomize_test(p_value, FI, tau_obs, fastrr_env = NULL, call = NULL, ...)
 \arguments{
 \item{p_value}{A numeric value representing the p-value of the test.}
 
-\item{FI}{A numeric vector (length 2) representing the fiducial interval, or NULL if not requested.}
+\item{FI}{A numeric vector (length 2) representing the fiducial interval, or \code{NULL} if not requested.}
 
 \item{tau_obs}{A numeric value (or vector) representing the estimated treatment effect.}
 
