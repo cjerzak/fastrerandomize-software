@@ -9,8 +9,8 @@
 #' @param X A numeric matrix of covariates used for balance checking. Cannot be NULL.
 #' @param randomization_accept_prob A numeric value between 0 and 1 specifying the probability threshold for accepting randomizations based on balance. Default is 1
 #' @param threshold_func A JAX function that computes a balance measure for each randomization. Must be vectorized using \code{jax$vmap} with \code{in_axes = list(NULL, 0L, NULL, NULL)}, and inputs covariates (matrix of X), treatment_assignment (vector of 0s and 1s), n0 (scalar), n1 (scalar). Default is \code{VectorizedFastHotel2T2} which uses Hotelling's T-squared statistic.
-#' @param max_draws An integer specifying the maximum number of randomizations to draw. Default is \code{100000L}. 
-#' @param batch_size An integer specifying how many randomizations to process at once. Default is \code{10000L}. Lower values use less memory but may be slower. 
+#' @param max_draws An integer specifying the maximum number of randomizations to draw.
+#' @param batch_size An integer specifying how many randomizations to process at once. Lower values use less memory but may be slower. 
 #' @param approximate_inv A logical value indicating whether to use an approximate inverse 
 #'   (diagonal of the covariance matrix) instead of the full matrix inverse when computing 
 #'   balance metrics. This can speed up computations for high-dimensional covariates.
