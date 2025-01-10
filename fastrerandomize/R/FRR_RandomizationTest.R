@@ -25,6 +25,7 @@
 #' @param file A character string specifying the path (including filename) where candidate 
 #'   randomizations will be saved or loaded from. If \code{NULL}, randomizations 
 #'   remain in memory. Default is NULL.
+#' @param verbose A logical value indicating whether to print progress information. Default is \code{TRUE}.  
 #' @param conda_env A character string specifying the name of the conda environment to use 
 #'   via \code{reticulate}. Default is \code{"fastrerandomize"}.
 #' @param conda_env_required A logical indicating whether the specified conda environment 
@@ -107,6 +108,7 @@ randomization_test <- function(
                                batch_size = 10^5, 
                                randomization_type = "monte_carlo", 
                                approximate_inv = TRUE,
+                               verbose = TRUE, 
                                file = NULL, 
                                conda_env = "fastrerandomize", conda_env_required = TRUE
                                ){

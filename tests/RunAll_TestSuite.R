@@ -11,6 +11,7 @@
     # devtools::install_github(repo = "cjerzak/fastrerandomize-software/fastrerandomize")
 
     options(error = NULL)
+    verbose <- FALSE
     t_GenData <- try({
       set.seed(999L, kind = "Wichmann-Hill")
       X <- matrix(rnorm(20*5), 20, 5)
@@ -28,6 +29,7 @@
           X = X,
           randomization_accept_prob = 0.1,
           randomization_type = type_,
+          verbose = verbose, 
           max_draws = 10000L, 
           batch_size = 100L)
       },T)
@@ -39,6 +41,7 @@
           obsY = rnorm(ncol(RandomizationSet_$randomizations))+2*W_,
           candidate_randomizations = RandomizationSet_$randomizations,
           findFI = findFI, 
+          verbose = verbose, 
           X = X)
         if(!is.null(RRTest_$FI)){ 
           print(sprintf("FI: {%s}", paste(round(RRTest_$FI,2),collapse = ", " )))
