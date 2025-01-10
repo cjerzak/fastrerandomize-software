@@ -4,12 +4,12 @@
 #' Generates all possible treatment assignments for a completely randomized experiment,
 #' optionally filtering them based on covariate balance criteria. The function can
 #' generate either all possible randomizations or a subset that meets specified
-#' balance thresholds using Hotelling's T² statistic.
+#' balance thresholds using Hotelling's T-squared statistic.
 #'
 #' @param n_units An integer specifying the total number of experimental units
 #' @param n_treated An integer specifying the number of units to be assigned to treatment
 #' @param X A numeric matrix of covariates where rows represent units and columns
-#'   represent different covariates. Default is NULL, in which case all possible
+#'   represent different covariates. Default is \code{NULL}, in which case all possible
 #'   randomizations are returned without balance filtering.
 #' @param randomization_accept_prob A numeric value between 0 and 1 specifying the
 #'   quantile threshold for accepting randomizations based on balance statistics.
@@ -17,25 +17,23 @@
 #' @param approximate_inv A logical value indicating whether to use an approximate inverse 
 #'   (diagonal of the covariance matrix) instead of the full matrix inverse when computing 
 #'   balance metrics. This can speed up computations for high-dimensional covariates.
-#'   Default is TRUE.
+#'   Default is \code{TRUE}.
 #' @param seed An integer seed for random number generation, used when enumerating 
 #'   or filtering exact randomizations with potentially randomized steps (e.g., 
-#'   random draws in thresholding). Default is NULL (no fixed seed).
-#' @param file A character string specifying the path (including filename) where candidate 
-#'   randomizations will be saved. If \code{NULL}, the function returns the randomizations 
-#'   in memory. Default is NULL.
+#'   random draws in thresholding). Default is \code{NULL} (no fixed seed).
+#' @param verbose A logical value indicating whether to print progress information. Default is \code{TRUE}.
 #' @param conda_env A character string specifying the name of the conda environment to use 
 #'   via \code{reticulate}. Default is "fastrerandomize".
 #' @param conda_env_required A logical indicating whether the specified conda environment 
 #'   must be strictly used. If \code{TRUE}, an error is thrown if the environment is not found. 
 #'   Default is TRUE.
 #' @param threshold_func A function that calculates balance statistics for candidate
-#'   randomizations. Default is VectorizedFastHotel2T2 which computes Hotelling's T²
+#'   randomizations. Default is \code{VectorizedFastHotel2T2} which computes Hotelling's T-squared
 #'   statistic.
 #'
-#' @return A JAX NumPy array where each row represents a valid treatment assignment
-#'   vector (binary: 1 for treated, 0 for control) that meets the balance criteria
-#'   if specified.
+#' @return The function returns a \emph{list} with two elements:
+#' \code{candidate_randomizations}: an array of randomization vectors
+#' \code{M_candidate_randomizations}: an array of their balance measures. 
 #'
 #' @details
 #' The function works in two main steps:
@@ -85,7 +83,7 @@ generate_randomizations_exact <- function(n_units, n_treated,
                                    approximate_inv = TRUE, 
                                    threshold_func = NULL,
                                    seed = NULL, 
-                                   file = NULL,
+                                   verbose = TRUE,
                                    conda_env = "fastrerandomize", 
                                    conda_env_required = TRUE){
   if(is.null(check_jax_availability(conda_env=conda_env))) { return(NULL) }

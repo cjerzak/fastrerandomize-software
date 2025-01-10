@@ -1,7 +1,5 @@
 initialize_jax <- function(conda_env = "fastrerandomize", 
                            conda_env_required = TRUE) {
-  print2("Loading fastrerandomize environment...")
-  
   # Load reticulate (Declared in Imports: in DESCRIPTION)
   reticulate::use_condaenv(condaenv = conda_env, required = conda_env_required)
   
@@ -15,10 +13,8 @@ initialize_jax <- function(conda_env = "fastrerandomize",
   # Disable 64-bit computations
   fastrr_env$jax$config$update("jax_enable_x64", FALSE)
   fastrr_env$jaxFloatType <- fastrr_env$jnp$float32
-  print2("Success loading JAX!")
   
   # Setup core JAX functions and store them in fastrr_env
-  print2("Setup of core JAX functions...")
   {
     fastrr_env$InsertOnes <- fastrr_env$jax$jit( function(treat_indices_, zeros_){
       zeros_ <- zeros_$at[treat_indices_]$add(1L)
@@ -164,5 +160,4 @@ initialize_jax <- function(conda_env = "fastrerandomize",
       return( Tstats ) 
     }
   }
-  print2("Success setting up core JAX functions!")
 }

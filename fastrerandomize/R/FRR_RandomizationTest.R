@@ -6,7 +6,7 @@
 #' @param c_initial A numeric value representing the initial criterion for the randomization. Default is `2`.
 #' @param alpha The significance level for the test. Default is `0.05`.
 #' @param candidate_randomizations A numeric matrix of candidate randomizations.
-#' @param candidate_randomizations_array An optional JAX array of candidate randomizations. If not provided, the function coerces `candidate_randomizations` into a JAX array.
+#' @param candidate_randomizations_array An optional 'JAX' array of candidate randomizations. If not provided, the function coerces `candidate_randomizations` into a 'JAX' array.
 #' @param n0_array An optional array specifying the number of control units.
 #' @param n1_array An optional array specifying the number of treated units.
 #' @param randomization_accept_prob An numeric scalar or vector of probabilities for accepting each randomization.
@@ -26,15 +26,16 @@
 #'   randomizations will be saved or loaded from. If \code{NULL}, randomizations 
 #'   remain in memory. Default is NULL.
 #' @param conda_env A character string specifying the name of the conda environment to use 
-#'   via \code{reticulate}. Default is "fastrerandomize".
+#'   via \code{reticulate}. Default is \code{"fastrerandomize"}.
 #' @param conda_env_required A logical indicating whether the specified conda environment 
 #'   must be strictly used. If \code{TRUE}, an error is thrown if the environment is not found. 
 #'   Default is \code{TRUE}.
 #'   
-#' @return A list consisting of \itemize{
+#' @return Returns an S3 object with slots: \itemize{
 #'   \item `p_value` A numeric value or vector representing the p-value of the test (or the expected p-value under the prior structure specified in the function inputs).
-#'   \item `FI` A numeric vector representing the fiducial interval if `findFI=TRUE`.
-#'   \item `tau_obs` A numeric value or vector representing the estimated treatment effect(s)
+#'   \item `FI` A numeric vector representing the fiducial interval if \code{findFI=TRUE}.
+#'   \item `tau_obs` A numeric value or vector representing the estimated treatment effect(s).
+#'   \item `fastrr_env` The fastrerandomize environment. 
 #' }
 #'
 #' @section References:
@@ -45,9 +46,6 @@
 #' @examples
 #' \dontrun{
 #' # A small synthetic demonstration with 6 units, 3 treated and 3 controls:
-#' 
-#' # Seed for reproducability 
-#' set.seed(12345)
 #'
 #' # Generate pre-treatment covariates
 #' X <- matrix(rnorm(24*2), ncol = 2)

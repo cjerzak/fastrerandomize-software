@@ -55,9 +55,9 @@ must be strictly used. If \code{TRUE}, an error is thrown if the environment is 
 Default is TRUE.}
 }
 \value{
-A JAX NumPy array where each row represents a valid treatment assignment
-  vector (binary: 1 for treated, 0 for control) that meets the balance criteria
-  if specified.
+The function returns a \emph{list} with two elements:
+\code{candidate_randomizations}: an array of randomization vectors
+\code{M_candidate_randomizations}: an array of their balance measures.
 }
 \description{
 Generates all possible treatment assignments for a completely randomized experiment,

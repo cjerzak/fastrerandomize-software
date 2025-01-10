@@ -2,7 +2,7 @@
 % Please edit documentation in R/FRR_HelperFxns.R
 \name{check_jax_availability}
 \alias{check_jax_availability}
-\title{Check if Python and JAX are available}
+\title{Check if 'Python' and 'JAX' are available}
 \usage{
 check_jax_availability(conda_env = "fastrerandomize", conda = "auto")
 }
@@ -13,10 +13,10 @@ Default is `"fastrerandomize"`.}
 \item{conda}{The path to a conda executable, or `"auto"`. Default is `"auto"`.}
 }
 \value{
-Returns `TRUE` (invisibly) if both Python and JAX are available; otherwise returns `NULL`.
+Returns `TRUE` (invisibly) if both 'Python' and 'JAX' are available; otherwise returns `NULL`.
 }
 \description{
-This function checks if Python and JAX can be accessed via `reticulate`. If not,
+This function checks if 'Python' and 'JAX' can be accessed via `reticulate`. If not,
 it returns `NULL` and prints a message suggesting to run `build_backend()`.
 }
 \examples{

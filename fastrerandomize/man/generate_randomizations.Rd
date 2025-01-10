@@ -31,7 +31,7 @@ generate_randomizations(
 
 \item{randomization_accept_prob}{A numeric value between 0 and 1 specifying the probability threshold for accepting randomizations based on balance}
 
-\item{threshold_func}{A JAX function that computes a balance measure for each randomization. Only used for Monte Carlo sampling.}
+\item{threshold_func}{A 'JAX' function that computes a balance measure for each randomization. Only used for Monte Carlo sampling.}
 
 \item{max_draws}{An integer specifying the maximum number of randomizations to draw in Monte Carlo sampling}
 
@@ -52,7 +52,7 @@ Default is \code{TRUE}.}
 
 \item{return_type}{A string specifying the format of the returned randomizations and balance
 measures. Allowed values are "R" for base R objects (e.g., \code{matrix}, \code{numeric})
-or "jax" for JAX/NumPy arrays. Default is "R".}
+or "jax" for 'JAX' arrays. Default is "R".}
 
 \item{conda_env}{A character string specifying the name of the conda environment to use
 via \code{reticulate}. Default is "fastrerandomize".}
@@ -62,8 +62,12 @@ must be strictly used. If \code{TRUE}, an error is thrown if the environment is 
 Default is TRUE.}
 }
 \value{
-A JAX array containing the accepted randomizations, where each row represents
-one possible treatment assignment vector
+Returns an S3 object with slots: \itemize{
+\item \code{assignments} An array where each row represents one possible treatment assignment vector containing the accepted randomizations.
+\item \code{balance_measures} A numeric vector containing the balance measure for each corresponding randomization.
+\item \code{fastrr_env} The fastrerandomize environment.
+\item \code{file_output} If file is specified, results are saved to the given file path instead of being returned.
+}
 }
 \description{
 This function generates randomizations for experimental design using either exact enumeration

@@ -12,7 +12,7 @@ print2(text, quiet = FALSE)
 \item{quiet}{A logical value indicating whether to suppress output. Default is FALSE}
 }
 \value{
-No return value, called for side effect of printing
+No return value, called for side effect of printing with timestamp.
 }
 \description{
 This function prints messages prefixed with the current timestamp in a standardized format.

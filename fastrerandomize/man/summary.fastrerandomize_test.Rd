@@ -12,7 +12,7 @@
 \item{...}{Further arguments passed to or from other methods.}
 }
 \value{
-Returns an (invisible) list with detailed test results.
+Returns an (invisible) list with a summary of \code{fastrerandomize_test} class objects.
 }
 \description{
 Summary method for fastrerandomize_test objects

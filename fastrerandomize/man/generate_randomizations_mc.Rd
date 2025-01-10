@@ -12,7 +12,6 @@ generate_randomizations_mc(
   threshold_func = NULL,
   max_draws = 1e+05,
   batch_size = 1000,
-  seed = NULL,
   approximate_inv = TRUE,
   verbose = FALSE,
   file = NULL,
@@ -35,8 +34,6 @@ generate_randomizations_mc(
 
 \item{batch_size}{An integer specifying how many randomizations to process at once. Default is 10000. Lower values use less memory but may be slower}
 
-\item{seed}{An integer seed for random number generation. Default is 42}
-
 \item{approximate_inv}{A logical value indicating whether to use an approximate inverse
 (diagonal of the covariance matrix) instead of the full matrix inverse when computing
 balance metrics. This can speed up computations for high-dimensional covariates.
@@ -56,7 +53,9 @@ must be strictly used. If \code{TRUE}, an error is thrown if the environment is 
 Default is \code{TRUE}.}
 }
 \value{
-A JAX array containing the accepted randomizations, where each row represents one possible treatment assignment vector
+The function returns a \emph{list} with two elements:
+\code{candidate_randomizations}: an array of randomization vectors
+\code{M_candidate_randomizations}: an array of their balance measures.
 }
 \description{
 This function performs sampling with replacement to generate randomizations in a memory-efficient way.

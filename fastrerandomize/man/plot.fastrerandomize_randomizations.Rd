@@ -2,15 +2,20 @@
 % Please edit documentation in R/FRR_S3Constructors.R
 \name{plot.fastrerandomize_randomizations}
 \alias{plot.fastrerandomize_randomizations}
-\title{Plot method for fastrerandomize_randomizations objects}
+\title{Plot method for fastrerandomize_test objects}
 \usage{
 \method{plot}{fastrerandomize_randomizations}(x, ...)
 }
 \arguments{
-\item{x}{An object of class \code{fastrerandomize_randomizations}.}
+\item{x}{An object of class \code{fastrerandomize_test}.}
 
-\item{...}{Further arguments passed to base \code{\link{plot}} functions.}
+\item{...}{Further graphical parameters passed to \code{\link{plot}}.}
+}
+\value{
+No return value. This function is called for the side effect of
+generating a histogram of the accepted balance measures of object with class \code{fastrerandomize_randomizations}.
 }
 \description{
-Plot method for fastrerandomize_randomizations objects
+Plots the observed treatment effect and, if available, the fiducial interval 
+on a horizontal axis.
 }

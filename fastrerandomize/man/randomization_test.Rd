@@ -36,7 +36,7 @@ randomization_test(
 
 \item{candidate_randomizations}{A numeric matrix of candidate randomizations.}
 
-\item{candidate_randomizations_array}{An optional JAX array of candidate randomizations. If not provided, the function coerces \code{candidate_randomizations} into a JAX array.}
+\item{candidate_randomizations_array}{An optional 'JAX' array of candidate randomizations. If not provided, the function coerces \code{candidate_randomizations} into a 'JAX' array.}
 
 \item{n0_array}{An optional array specifying the number of control units.}
 
@@ -75,10 +75,11 @@ must be strictly used. If \code{TRUE}, an error is thrown if the environment is 
 Default is \code{TRUE}.}
 }
 \value{
-A list consisting of \itemize{
+Returns an S3 object with slots: \itemize{
 \item \code{p_value} A numeric value or vector representing the p-value of the test (or the expected p-value under the prior structure specified in the function inputs).
 \item \code{FI} A numeric vector representing the fiducial interval if \code{findFI=TRUE}.
-\item \code{tau_obs} A numeric value or vector representing the estimated treatment effect(s)
+\item \code{tau_obs} A numeric value or vector representing the estimated treatment effect(s).
+\item \code{fastrr_env} The fastrerandomize environment.
 }
 }
 \description{
@@ -94,9 +95,6 @@ Fast randomization test
 \examples{
 \dontrun{
 # A small synthetic demonstration with 6 units, 3 treated and 3 controls:
-
-# Seed for reproducability 
-set.seed(12345)
 
 # Generate pre-treatment covariates
 X <- matrix(rnorm(24*2), ncol = 2)

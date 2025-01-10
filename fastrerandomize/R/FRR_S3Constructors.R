@@ -33,6 +33,9 @@ fastrerandomize_class <- function(randomizations, balance = NULL, fastrr_env=NUL
 #' @param ... Further arguments passed to or from other methods.
 #'
 #' @method print fastrerandomize_randomizations
+#' 
+#' @return Prints an object of class \code{fastrerandomize_randomizations}.
+#' 
 #' @export
 print.fastrerandomize_randomizations <- function(x, ...) {
   cat("Object of class 'fastrerandomize_randomizations'\n\n")
@@ -87,12 +90,18 @@ summary.fastrerandomize_randomizations <- function(object, ...) {
   ))
 }
 
-#' Plot method for fastrerandomize_randomizations objects
+#' Plot method for fastrerandomize_test objects
 #'
-#' @param x An object of class \code{fastrerandomize_randomizations}.
-#' @param ... Further arguments passed to base \code{\link{plot}} functions.
+#' @description 
+#' Plots the observed treatment effect and, if available, the fiducial interval 
+#' on a horizontal axis.
 #'
-#' @method plot fastrerandomize_randomizations
+#' @param x An object of class \code{fastrerandomize_test}.
+#' @param ... Further graphical parameters passed to \code{\link{plot}}.
+#'
+#' @return No return value. This function is called for the side effect of
+#' generating a histogram of the accepted balance measures of object with class \code{fastrerandomize_randomizations}. 
+#'   
 #' @export
 plot.fastrerandomize_randomizations <- function(x, ...) {
   if (is.null(x$balance)) {
@@ -111,7 +120,7 @@ plot.fastrerandomize_randomizations <- function(x, ...) {
 #' Constructor for fastrerandomize randomization test objects
 #'
 #' @param p_value A numeric value representing the p-value of the test.
-#' @param FI A numeric vector (length 2) representing the fiducial interval, or NULL if not requested.
+#' @param FI A numeric vector (length 2) representing the fiducial interval, or \code{NULL} if not requested.
 #' @param tau_obs A numeric value (or vector) representing the estimated treatment effect.
 #' @param fastrr_env Associated `fastrr_env` environment.  
 #' @param call An optional function call, stored for reference.
@@ -147,6 +156,9 @@ fastrerandomize_test <- function(
 #' @param ... Further arguments passed to or from other methods.
 #'
 #' @method print fastrerandomize_test
+#' 
+#' @return No return value, prints object of class \code{fastrerandomize_test}.
+#' 
 #' @export
 print.fastrerandomize_test <- function(x, ...) {
   cat("Object of class 'fastrerandomize_test'\n\n")
@@ -173,7 +185,7 @@ print.fastrerandomize_test <- function(x, ...) {
 #' @param object An object of class \code{fastrerandomize_test}.
 #' @param ... Further arguments passed to or from other methods.
 #'
-#' @return Returns an (invisible) list with detailed test results.
+#' @return Returns an (invisible) list with a summary of \code{fastrerandomize_test} class objects. 
 #'
 #' @method summary fastrerandomize_test
 #' @export
@@ -213,6 +225,8 @@ summary.fastrerandomize_test <- function(object, ...) {
 #'
 #' @param x An object of class \code{fastrerandomize_test}.
 #' @param ... Further graphical parameters passed to \code{\link{plot}}.
+#' 
+#' @return No output returned. Performs side effect of plotting \code{fastrerandomize_test} class objects. 
 #'
 #' @method plot fastrerandomize_test
 #' @export

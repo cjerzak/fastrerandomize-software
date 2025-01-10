@@ -11,6 +11,9 @@
 
 \item{...}{Further arguments passed to or from other methods.}
 }
+\value{
+Prints an object of class \code{fastrerandomize_randomizations}.
+}
 \description{
 Print method for fastrerandomize_randomizations objects
 }

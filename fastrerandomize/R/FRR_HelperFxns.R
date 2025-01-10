@@ -3,10 +3,10 @@
 #' This function prints messages prefixed with the current timestamp in a standardized format.
 #' Messages can be suppressed using the quiet parameter.
 #'
-#' @param text A character string containing the message to be printed
-#' @param quiet A logical value indicating whether to suppress output. Default is FALSE
+#' @param text A character string containing the message to be printed.
+#' @param quiet A logical value indicating whether to suppress output. Default is \code{FALSE}. 
 #'
-#' @return No return value, called for side effect of printing
+#' @return No return value, called for side effect of printing with timestamp. 
 #'
 #' @examples
 #' # Print a basic message with timestamp
@@ -25,7 +25,7 @@
 #' to the provided message. 
 #'
 #' @seealso
-#' \code{Sys.time} for the underlying timestamp functionality
+#' \code{Sys.time} for the underlying timestamp functionality. 
 #'
 #' @export
 #' @md
@@ -36,16 +36,16 @@ print2 <- function(text,
   }
 }
 
-#' Check if Python and JAX are available
+#' Check if 'Python' and 'JAX' are available
 #'
-#' This function checks if Python and JAX can be accessed via `reticulate`. If not,
+#' This function checks if 'Python' and 'JAX' can be accessed via `reticulate`. If not,
 #' it returns `NULL` and prints a message suggesting to run `build_backend()`.
 #'
 #' @param conda_env A character string specifying the name of the conda environment. 
 #'   Default is `"fastrerandomize"`.
 #' @param conda The path to a conda executable, or `"auto"`. Default is `"auto"`.
 #'
-#' @return Returns `TRUE` (invisibly) if both Python and JAX are available; otherwise returns `NULL`.
+#' @return Returns `TRUE` (invisibly) if both 'Python' and 'JAX' are available; otherwise returns `NULL`.
 #'
 #' @examples
 #' \dontrun{
@@ -73,7 +73,7 @@ check_jax_availability <- function(conda_env = "fastrerandomize",
     return(NULL)
   }
   
-  # Check if JAX is installed
+  # Check if 'JAX' is installed
   if(!reticulate::py_module_available("jax")){
     message("JAX is not installed. Please build the backend using ",
             "fastrerandomize::build_backend(conda_env = '", conda_env, "', conda = '", conda, "').")

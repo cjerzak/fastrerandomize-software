@@ -2,7 +2,7 @@
 % Please edit documentation in R/FRR_BuildBackend.R
 \name{build_backend}
 \alias{build_backend}
-\title{An optional function to build the environment for fastrerandomize. Builds a conda environment in which jax and np are installed. Users can also create a conda environment where jax and np are installed themselves.}
+\title{A function to build the environment for fastrerandomize. Builds a conda environment in which 'JAX' and 'np' are installed. Users can also create a conda environment where 'JAX' and 'np' are installed themselves.}
 \usage{
 build_backend(conda_env = "fastrerandomize", conda = "auto")
 }
@@ -12,14 +12,22 @@ build_backend(conda_env = "fastrerandomize", conda = "auto")
 \item{conda}{(default = \code{auto}) The path to a conda executable. Using \code{"auto"} allows reticulate to attempt to automatically find an appropriate conda binary.}
 }
 \value{
-Builds the computational environment for \code{fastrerandomize}. This function requires an Internet connection.
-You may find out a list of conda Python paths via: \code{Sys.which("python")}
+Invisibly returns NULL; this function is used for its side effects
+of creating and configuring a conda environment for \code{fastrerandomize}.
+This function requires an Internet connection.
+You can find out a list of conda Python paths via: \code{Sys.which("python")}
 }
 \description{
-An optional function to build the environment for fastrerandomize. Builds a conda environment in which jax and np are installed. Users can also create a conda environment where jax and np are installed themselves.
+A function to build the environment for fastrerandomize. Builds a conda environment in which 'JAX' and 'np' are installed. Users can also create a conda environment where 'JAX' and 'np' are installed themselves.
 }
 \examples{
-# For a tutorial, see
-# github.com/cjerzak/fastrerandomize-software/
+\dontrun{
+# Create a conda environment named "fastrerandomize"
+# and install the required Python packages (jax, numpy, etc.)
+build_backend(conda_env = "fastrerandomize", conda = "auto")
+
+# If you want to specify a particular conda path:
+# build_backend(conda_env = "fastrerandomize", conda = "/usr/local/bin/conda")
+}
 
 }

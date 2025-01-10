@@ -11,6 +11,9 @@
 
 \item{...}{Further graphical parameters passed to \code{\link{plot}}.}
 }
+\value{
+No output returned. Performs side effect of plotting \code{fastrerandomize_test} class objects.
+}
 \description{
 Plots a simple visualization of the observed effect and the 
 fiducial interval (if present) on a horizontal axis.

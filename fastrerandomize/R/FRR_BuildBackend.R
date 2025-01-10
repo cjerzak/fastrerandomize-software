@@ -1,14 +1,22 @@
-#' An optional function to build the environment for fastrerandomize. Builds a conda environment in which jax and np are installed. Users can also create a conda environment where jax and np are installed themselves. 
+#' A function to build the environment for fastrerandomize. Builds a conda environment in which 'JAX' and 'np' are installed. Users can also create a conda environment where 'JAX' and 'np' are installed themselves. 
 #'
 #' @param conda_env (default = `"fastrerandomize"`) Name of the conda environment in which to place the backends.
 #' @param conda (default = `auto`) The path to a conda executable. Using `"auto"` allows reticulate to attempt to automatically find an appropriate conda binary.
 
-#' @return Builds the computational environment for `fastrerandomize`. This function requires an Internet connection.
-#' You may find out a list of conda Python paths via: `Sys.which("python")`
+#' @return Invisibly returns NULL; this function is used for its side effects 
+#' of creating and configuring a conda environment for `fastrerandomize`. 
+#' This function requires an Internet connection.
+#' You can find out a list of conda Python paths via: `Sys.which("python")`
 #'
 #' @examples
-#' # For a tutorial, see
-#' # github.com/cjerzak/fastrerandomize-software/
+#' \dontrun{
+#' # Create a conda environment named "fastrerandomize"
+#' # and install the required Python packages (jax, numpy, etc.)
+#' build_backend(conda_env = "fastrerandomize", conda = "auto")
+#'
+#' # If you want to specify a particular conda path:
+#' # build_backend(conda_env = "fastrerandomize", conda = "/usr/local/bin/conda")
+#' }
 #'
 #' @export
 #' @md
@@ -31,5 +39,4 @@ build_backend <- function(conda_env = "fastrerandomize", conda = "auto"){
   for(pack_ in Packages2Install){
       try_ <- try(reticulate::py_install(pack_, conda = conda, pip = TRUE, envname = conda_env), TRUE)
   }
-  print("Done building fastrerandomize backend!")
 }
