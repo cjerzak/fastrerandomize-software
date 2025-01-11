@@ -94,8 +94,8 @@ initialize_jax <- function(conda_env = "fastrerandomize",
     
     fastrr_env$RowBroadcast <- fastrr_env$jax$vmap(function(mat, vec){
       fastrr_env$jnp$multiply(mat, vec)}, in_axes = list(1L, NULL))
-    
-    fastrr_env$FastHotel2T2 <- ( function(samp_, w_, n0, n1, approximate_inv = FALSE){
+      
+    fastrr_env$FastHotel2T2 <- ( function(samp_, samp_cov_inv, samp_cov_inv_approx, w_,  n0, n1, approximate_inv = FALSE){
     
       # set up calc
       xbar1 <- fastrr_env$jnp$divide(fastrr_env$jnp$sum(
@@ -103,36 +103,47 @@ initialize_jax <- function(conda_env = "fastrerandomize",
       xbar2 <- fastrr_env$jnp$divide(fastrr_env$jnp$sum(
                             fastrr_env$RowBroadcast(samp_,fastrr_env$jnp$subtract(1.,w_)),1L,keepdims = T), n0)
       CovWts <- fastrr_env$jnp$add(fastrr_env$jnp$reciprocal(n0), fastrr_env$jnp$reciprocal(n1))
-      CovInv <- fastrr_env$jax$lax$cond(pred = approximate_inv,
+      xbar_diff <- fastrr_env$jnp$subtract(xbar1, xbar2)
+      CovInv_TIMES_xbar_diff <- fastrr_env$jax$lax$cond(pred = approximate_inv,
                                         
                              # if using diagonal approximation           
-                             true_fun = function(){CovPooled <- fastrr_env$jnp$var(samp_, 0L); 
-                             CovInv <- fastrr_env$jnp$diag( fastrr_env$jnp$reciprocal( CovPooled) )
-                             return(CovInv)},
+                             true_fun = function(){
+                               #CovPooled <- fastrr_env$jnp$var(samp_, 0L); 
+                               #samp_cov_inv <- fastrr_env$jnp$reciprocal(CovPooled)
+                               #CovInv_TIMES_xbar_diff_ <- fastrr_env$jnp$matmul(fastrr_env$jnp$diag( fastrr_env$jnp$reciprocal( CovPooled) ), xbar_diff)
+                               CovInv_TIMES_xbar_diff_ <- fastrr_env$jnp$multiply(fastrr_env$jnp$expand_dims(samp_cov_inv_approx, 1L),  xbar_diff)  # no need for matrix casting 
+                               
+                               return(CovInv_TIMES_xbar_diff_)
+                              },
                              
-                             # if using no diagonal approximation 
-                             false_fun = function(){CovPooled <- fastrr_env$jnp$cov(samp_,rowvar = FALSE); 
-                             CovInv <- fastrr_env$jnp$linalg$inv( CovPooled )
-                             return( CovInv )})
-      xbar_diff <- fastrr_env$jnp$subtract(xbar1, xbar2)
-      Tstat <- fastrr_env$jnp$multiply((n0 * n1) / (n0 + n1), fastrr_env$jnp$matmul(
-                                     fastrr_env$jnp$matmul(fastrr_env$jnp$transpose(xbar_diff), CovInv) ,
-                                     xbar_diff)) 
+                             # if using no diagonal approximation (avoiding matrix inverse for numerical stability)
+                             false_fun = function(){
+                               #CovPooled <- fastrr_env$jnp$cov(samp_,rowvar = FALSE); 
+                               #samp_cov_inv <- fastrr_env$jnp$linalg$inv(samp_,rowvar = FALSE); 
+                               CovInv_TIMES_xbar_diff_ <- fastrr_env$jnp$matmul(samp_cov_inv, xbar_diff)
+                               
+                               return( CovInv_TIMES_xbar_diff_ )
+                              }
+                             )
+      Tstat <- fastrr_env$jnp$multiply( (n0 * n1) / (n0 + n1), 
+                                    fastrr_env$jnp$matmul(fastrr_env$jnp$transpose(xbar_diff), CovInv_TIMES_xbar_diff) )
     })
     
-    fastrr_env$VectorizedFastHotel2T2 <- fastrr_env$jax$jit(VectorizedFastHotel2T2_R <- fastrr_env$jax$vmap(function(
-    samp_, w_, 
-    n0, n1, 
-    approximate_inv = FALSE){
-      fastrr_env$FastHotel2T2(samp_, w_, 
+    fastrr_env$VectorizedFastHotel2T2 <- fastrr_env$jax$jit(VectorizedFastHotel2T2_R <- fastrr_env$jax$vmap(
+            function(
+                     samp_, samp_cov_inv_, samp_cov_inv_approx_,
+                     w_, 
+                     n0, n1, approximate_inv = FALSE){
+      fastrr_env$FastHotel2T2(samp_, samp_cov_inv_, samp_cov_inv_approx_, 
+                              w_, 
                               n0, n1, approximate_inv)},
-    in_axes = list(NULL, 0L, NULL, NULL, NULL)) 
+    in_axes = list(NULL, NULL, NULL, 0L, NULL, NULL, NULL)) 
     )
     
-    fastrr_env$BatchedVectorizedFastHotel2T2 <- function(samp_, w_, 
-                                               n0, n1, 
-                                               NWBatch, 
-                                               approximate_inv = FALSE){
+    fastrr_env$BatchedVectorizedFastHotel2T2 <- function(
+                                               samp_, samp_cov_inv_, samp_cov_inv_approx_,
+                                               w_, 
+                                               n0, n1, NWBatch, approximate_inv = FALSE){
       N_w <- w_$shape[0]  # Total number of w_ vectors
       num_batches <- as.integer( (N_w + NWBatch - 1) / NWBatch )  # Calculate number of batches
       
@@ -143,7 +154,10 @@ initialize_jax <- function(conda_env = "fastrerandomize",
         w_batch <- w_[start_idx:end_idx, ]
         
         # Compute the statistics for the current batch
-        Tstat_batch <- fastrr_env$VectorizedFastHotel2T2(samp_, w_batch, n0, n1, approximate_inv)
+        Tstat_batch <- fastrr_env$VectorizedFastHotel2T2(samp_, samp_cov_inv_, samp_cov_inv_approx_,  
+                                                         w_batch, 
+                                                         n0, n1,
+                                                         approximate_inv)
         
         # Accumulate results
         carry <- fastrr_env$jnp$concatenate(list(carry, Tstat_batch), axis=0)

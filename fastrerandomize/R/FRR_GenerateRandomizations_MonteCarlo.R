@@ -105,6 +105,22 @@ generate_randomizations_mc <- function(n_units, n_treated,
   # Convert X to JAX array (float16 can cause issues with matrix inverse)
   X_jax <- fastrr_env$jnp$array(as.matrix(X), dtype = fastrr_env$jnp$float32)
   
+  # pre-compute matrix inverse 
+  {
+    SAMP_COV_INV_APPROX <- fastrr_env$jnp$reciprocal( fastrr_env$jnp$var( fastrr_env$jnp$array(as.matrix(X)), axis = 0L) )
+  {
+    SAMP_COV_INV <-  fastrr_env$jnp$cov( fastrr_env$jnp$array(as.matrix(X)), rowvar = FALSE) 
+    IS_METAL_BACKEND <- grepl(reticulate::py_str( fastrr_env$jax$devices()[[1]] ), pattern = "METAL")
+    if(IS_METAL_BACKEND){ 
+      SAMP_COV_INV <- SAMP_COV_INV$to_device(fastrr_env$jax$devices("cpu")[[1]])
+    }
+    SAMP_COV_INV <- fastrr_env$jnp$linalg$inv(SAMP_COV_INV)
+    if(IS_METAL_BACKEND){ 
+      SAMP_COV_INV <- SAMP_COV_INV$to_device(fastrr_env$jax$devices("METAL")[[1]])
+    }
+  }
+  }
+
   # Set up sample sizes for treatment/control
   n0_array <- fastrr_env$jnp$array(as.integer(n_units - n_treated))
   n1_array <- fastrr_env$jnp$array(as.integer(n_treated))
@@ -144,6 +160,8 @@ generate_randomizations_mc <- function(n_units, n_treated,
     # Calculate balance measures (e.g., Hotelling T-squared) for each permutation in the batch
     M_results_batch_ <- fastrr_env$jnp$squeeze( threshold_func(
       X_jax,
+      SAMP_COV_INV,
+      SAMP_COV_INV_APPROX, 
       perms_batch,
       n0_array, 
       n1_array, 
@@ -183,12 +201,14 @@ generate_randomizations_mc <- function(n_units, n_treated,
                                    base_vector_jax)
     
     # check work 
-    M_results_batch_ <- fastrr_env$jnp$squeeze( threshold_func(
-      X_jax,
-      top_perms,
-      n0_array, 
-      n1_array, 
-      approximate_inv ) )
+    #M_results_batch_ <- fastrr_env$jnp$squeeze( threshold_func(
+      #X_jax,
+      #SAMP_COV_INV,
+      #SAMP_COV_INV_APPROX, 
+      #top_perms,
+      #n0_array, 
+      #n1_array, 
+      #approximate_inv ) )
   }
 
   if(verbose){ message(sprintf("MC Loop Time (s): %.4f", as.numeric(difftime(Sys.time(), t0, units = "secs"))))}
