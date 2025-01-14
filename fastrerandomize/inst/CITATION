@@ -5,15 +5,15 @@ bibentry(
   key     = "FastRerandomize",
   title    = "FastRerandomize: An R Package for Hardware-Accelerated Rerandomization for Improved Balance",
   author   = c(
-    person("Fucheng Warren", "Zhu",   role = c("aut", "cre"), comment = c(ORCID = "0009-0001-5692-7572")),
-    person("Aniket Sachin",   "Kamat", role = "aut",         comment = c(ORCID = "0009-0003-6411-1084")),
-    person("Connor",           "Jerzak", role = "aut",        comment = c(ORCID = "0000-0003-1914-8905")),
-    person("Rebecca",          "Goldstein", role = "aut",     comment = c(ORCID = "0000-0002-9944-8440"))
+    person("Fucheng Warren", "Zhu",   role = "aut", comment = c(ORCID = "0009-0001-5692-7572")),
+    person("Aniket Sachin",   "Kamat", role = "aut", comment = c(ORCID = "0009-0003-6411-1084")),
+    person("Connor", "Jerzak", role = c("aut","cre"), comment = c(ORCID = "0000-0003-1914-8905")),
+    person("Rebecca", "Goldstein", role = "aut", comment = c(ORCID = "0000-0002-9944-8440"))
   ),
   year     = "2025",
   version  = "0.1",
   note     = "R package version 0.1",
-  url      = "https://github.com/cjerzak/fastrerandomize-software"
+  url      = "https://doi.org/10.32614/CRAN.package.fastrerandomize"
 )
 
-citFooter("For more information, see the GitHub repository above.")
+citFooter("For more information, see https://github.com/cjerzak/fastrerandomize-software.")

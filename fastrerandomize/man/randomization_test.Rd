@@ -21,6 +21,7 @@ randomization_test(
   randomization_type = "monte_carlo",
   approximate_inv = TRUE,
   file = NULL,
+  verbose = TRUE,
   conda_env = "fastrerandomize",
   conda_env_required = TRUE
 )
@@ -66,6 +67,8 @@ Default is \code{TRUE}.}
 \item{file}{A character string specifying the path (including filename) where candidate
 randomizations will be saved or loaded from. If \code{NULL}, randomizations
 remain in memory. Default is NULL.}
+
+\item{verbose}{A logical value indicating whether to print progress information. Default is \code{TRUE}.}
 
 \item{conda_env}{A character string specifying the name of the conda environment to use
 via \code{reticulate}. Default is \code{"fastrerandomize"}.}

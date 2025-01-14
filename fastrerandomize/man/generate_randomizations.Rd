@@ -11,13 +11,12 @@ generate_randomizations(
   randomization_accept_prob,
   threshold_func = NULL,
   max_draws = 10^6,
-  batch_size = 10^5,
+  batch_size = 1000,
   randomization_type = "monte_carlo",
   approximate_inv = TRUE,
-  seed = NULL,
-  verbose = TRUE,
   file = NULL,
   return_type = "R",
+  verbose = TRUE,
   conda_env = "fastrerandomize",
   conda_env_required = TRUE
 )
@@ -44,15 +43,13 @@ generate_randomizations(
 balance metrics. This can speed up computations for high-dimensional covariates.
 Default is \code{TRUE}.}
 
-\item{seed}{An integer seed for random number generation in Monte Carlo sampling.}
-
-\item{verbose}{A logical value indicating whether to print progress information. Default is \code{TRUE}.}
-
 \item{file}{A string specifying where to save candidate randomizations (if saving, not returning).}
 
 \item{return_type}{A string specifying the format of the returned randomizations and balance
 measures. Allowed values are \code{"R"} for base R objects (e.g., \code{matrix}, \code{numeric})
 or \code{"jax"} for 'JAX' arrays. Default is \code{"R"}.}
+
+\item{verbose}{A logical value indicating whether to print progress information. Default is \code{TRUE}.}
 
 \item{conda_env}{A character string specifying the name of the conda environment to use
 via \code{reticulate}. Default is \code{"fastrerandomize"}.}

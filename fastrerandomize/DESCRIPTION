@@ -1,7 +1,7 @@
 Package: fastrerandomize
 Title: Hardware-Accelerated Rerandomization
     for Improved Balance
-Version: 0.1
+Version: 0.2
 Authors@R: 
     c(person(given = "Fucheng Warren",
              family = "Zhu",

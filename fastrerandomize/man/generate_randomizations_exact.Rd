@@ -11,7 +11,6 @@ generate_randomizations_exact(
   randomization_accept_prob = 1,
   approximate_inv = TRUE,
   threshold_func = NULL,
-  seed = NULL,
   verbose = TRUE,
   conda_env = "fastrerandomize",
   conda_env_required = TRUE
@@ -38,10 +37,6 @@ Default is \code{TRUE}.}
 \item{threshold_func}{A function that calculates balance statistics for candidate
 randomizations. Default is \code{VectorizedFastHotel2T2} which computes Hotelling's T-squared
 statistic.}
-
-\item{seed}{An integer seed for random number generation, used when enumerating 
-or filtering exact randomizations with potentially randomized steps (e.g., 
-random draws in thresholding). Default is \code{NULL} (no fixed seed).}
 
 \item{verbose}{A logical value indicating whether to print progress information. Default is \code{TRUE}.}
 

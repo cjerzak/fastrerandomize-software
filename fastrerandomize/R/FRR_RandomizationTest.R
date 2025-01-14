@@ -1,9 +1,11 @@
 #' Fast randomization test
+#' 
+#' 
+#'
 #'
 #' @param obsW A numeric vector where `0`'s correspond to control units and `1`'s to treated units.
-#' @param X A numeric matrix of covariates.
 #' @param obsY An optional numeric vector of observed outcomes. If not provided, the function assumes a NULL value.
-#' @param c_initial A numeric value representing the initial criterion for the randomization. Default is `2`.
+#' @param X A numeric matrix of covariates.
 #' @param alpha The significance level for the test. Default is `0.05`.
 #' @param candidate_randomizations A numeric matrix of candidate randomizations.
 #' @param candidate_randomizations_array An optional 'JAX' array of candidate randomizations. If not provided, the function coerces `candidate_randomizations` into a 'JAX' array.
@@ -11,6 +13,7 @@
 #' @param n1_array An optional array specifying the number of treated units.
 #' @param randomization_accept_prob An numeric scalar or vector of probabilities for accepting each randomization.
 #' @param findFI A logical value indicating whether to find the fiducial interval. Default is FALSE.
+#' @param c_initial A numeric value representing the initial criterion for the randomization. Default is `2`.
 #' @param max_draws An integer specifying the maximum number of candidate randomizations 
 #'   to generate (or to consider) for the test when \code{randomization_type = "monte_carlo"}. 
 #'   Default is \code{1e6}.
@@ -92,8 +95,7 @@
 #' @export
 #' @md
 
-randomization_test <- function(
-                               obsW = NULL,
+randomization_test <- function(obsW = NULL,
                                obsY = NULL,
                                X = NULL,
                                alpha = 0.05,
@@ -108,9 +110,10 @@ randomization_test <- function(
                                batch_size = 10^5, 
                                randomization_type = "monte_carlo", 
                                approximate_inv = TRUE,
-                               verbose = TRUE, 
                                file = NULL, 
-                               conda_env = "fastrerandomize", conda_env_required = TRUE
+                               verbose = TRUE, 
+                               conda_env = "fastrerandomize", 
+                               conda_env_required = TRUE
                                ){
   if( is.null(check_jax_availability(conda_env=conda_env)) ) { return(NULL) }
 
