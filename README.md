@@ -10,6 +10,8 @@
 
 [<img src="https://img.shields.io/badge/Demo-View%20Demo-blue" alt="Demo Button">](https://cran.r-project.org/web/packages/fastrerandomize/vignettes/MainVignette.html)
 
+[<img src="https://img.shields.io/badge/CRAN-View%20on%20CRAN-green" alt="CRAN Button">](https://cran.r-project.org/web/packages/fastrerandomize/index.html)
+
 *Note:* `fastrerandomize` has been successfully tested on [CPU](https://en.wikipedia.org/wiki/Central_processing_unit), [CUDA](https://en.wikipedia.org/wiki/CUDA), and [METAL](https://en.wikipedia.org/wiki/Metal_(API)) frameworks. Special thanks to [Aniket Kamat](https://github.com/aniketkamat) and [Fucheng Warren Zhu](https://github.com/WarrenZhu050413) for their work on the latest package build! 
 
 # What is `fastrerandomize`?<a id="description"></a>
