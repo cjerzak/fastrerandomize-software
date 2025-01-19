@@ -4,6 +4,7 @@
 | [**Installation**](#installation)
 | [**Tutorial**](#tutorial)
 | [**Data**](#data)
+| [**CRAN**](https://cran.r-project.org/web/packages/fastrerandomize/index.html)
 | [**References**](#references)
 | [**Documentation**](https://github.com/cjerzak/fastrerandomize-software/blob/main/fastrerandomize.pdf)
 
