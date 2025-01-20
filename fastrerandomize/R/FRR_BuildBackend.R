@@ -36,7 +36,5 @@ build_backend <- function(conda_env = "fastrerandomize", conda = "auto"){
   if( Sys.info()["machine"] == "arm64" & Sys.info()["sysname"] == "Darwin" ){
     Packages2Install <- c(Packages2Install,"jax-metal==0.1.1")
   }
-  for(pack_ in Packages2Install){
-      try_ <- try(reticulate::py_install(pack_, conda = conda, pip = TRUE, envname = conda_env), TRUE)
-  }
+  reticulate::py_install(Packages2Install, conda = conda, pip = TRUE, envname = conda_env)
 }
