@@ -27,14 +27,16 @@ build_backend <- function(conda_env = "fastrerandomize", conda = "auto"){
                            conda = conda,
                            python_version = "3.11")
   
-  # Install Python packages within the environment
+  # Define packages to install 
   Packages2Install <- c("numpy==1.26.4",
                         "jax==0.4.38",
                         "jaxlib==0.4.38")
   
-  # Install METAL where available 
+  # Add packages to install in METAL case 
   if( Sys.info()["machine"] == "arm64" & Sys.info()["sysname"] == "Darwin" ){
     Packages2Install <- c(Packages2Install,"jax-metal==0.1.1")
   }
+  
+  # Install packages 
   reticulate::py_install(Packages2Install, conda = conda, pip = TRUE, envname = conda_env)
 }
