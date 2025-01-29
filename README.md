@@ -21,10 +21,10 @@ We employ a [JAX backend](https://en.wikipedia.org/wiki/Google_JAX) to make exac
 
 # Package Installation and Loading <a id="installation"></a>
 ```
-# Install devtools if needed 
-# install.packages("devtools")
+# Install fastrerandomize stable version
+# install.packages("fastrerandomize")
 
-# Install fastrerandomize if you haven't already
+# Install fastrerandomize development version
 # devtools::install_github(repo = "cjerzak/fastrerandomize-software/fastrerandomize")
 
 # Load the package
