@@ -96,3 +96,4 @@ output2output <- function(x, return_type = "R"){
 }
 
 fastrr_env <- new.env( parent = emptyenv() )
+

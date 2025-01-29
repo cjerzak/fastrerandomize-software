@@ -96,7 +96,7 @@ initialize_jax <- function(conda_env = "fastrerandomize",
       fastrr_env$jnp$multiply(mat, vec)}, in_axes = list(1L, NULL))
       
     fastrr_env$FastHotel2T2 <- ( function(samp_, samp_cov_inv, samp_cov_inv_approx, w_,  n0, n1, approximate_inv = FALSE){
-    
+      
       # set up calc
       xbar1 <- fastrr_env$jnp$divide(fastrr_env$jnp$sum(
                             fastrr_env$RowBroadcast(samp_, w_),1L,keepdims = T), n1)
