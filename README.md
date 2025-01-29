@@ -21,7 +21,7 @@ We employ a [JAX backend](https://en.wikipedia.org/wiki/Google_JAX) to make exac
 
 # Package Installation and Loading <a id="installation"></a>
 ```
-# Install fastrerandomize stable version
+# Install fastrerandomize stable version from CRAN
 # install.packages("fastrerandomize")
 
 # Install fastrerandomize development version
