@@ -1,0 +1,17 @@
+name: R Unit Tests
+on:
+  push:
+    paths:
+      - '**.R'
+      - 'tests/**'
+      - '.github/workflows/tests.yml'
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: r-lib/actions/setup-r@v2
+      - name: Run unit tests
+        run: Rscript tests/run_tests.R

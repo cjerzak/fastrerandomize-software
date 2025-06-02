@@ -1,4 +1,5 @@
 # `fastrerandomize`: An R Package for Ultra-Fast Rerandomization Using Accelerated Computing 
+[![Tests](https://github.com/cjerzak/fastrerandomize-software/actions/workflows/tests.yml/badge.svg)](https://github.com/cjerzak/fastrerandomize-software/actions/workflows/tests.yml)
 
 [**What is `fastrerandomize`?**](#description)
 | [**Installation**](#installation)
