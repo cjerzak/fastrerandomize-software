@@ -17,7 +17,7 @@
 # What is `fastrerandomize`?<a id="description"></a>
 The `fastrerandomize` contains functions such as `randomization_test`, which offers a streamlined approach for performing randomization tests after using rerandomization in the research design. 
 
-We employ a [JAX backend](https://en.wikipedia.org/wiki/Google_JAX) to make exact rerandomization inference possible even for larger experiments where the number of randomizations is in the hundreds of millions or where experimentors seek to maintain balanced randomizations across thousands of features. 
+We employ a [JAX backend](https://en.wikipedia.org/wiki/Google_JAX) to make exact rerandomization inference possible even for larger experiments where the number of randomizations is in the hundreds of millions or where experimenters seek to maintain balanced randomizations across thousands of features.
 
 # Package Installation and Loading <a id="installation"></a>
 ```
@@ -35,7 +35,7 @@ fastrerandomize::build_backend()
 ```
 
 # Tutorial<a id="tutorial"></a>
-Let's get started with a tutorial. We're first going to use the package for generate a pool of acceptable rerandomizations. 
+Let's get started with a tutorial. We're first going to use the package to generate a pool of acceptable rerandomizations.
 ```
 # First, specify some analysis parameters
 n_units <- 20; n_treated <- 10 
@@ -43,7 +43,7 @@ n_units <- 20; n_treated <- 10
 # Generate covariate data 
 X <- matrix(rnorm(n_units*5),nrow = n_units)
 
-# Generate set of acceptable randomizations based randomization_accept_prob.
+# Generate a set of acceptable randomizations based on randomization_accept_prob.
 # When randomization_accept_prob = 1, all randomizations are accepted. 
 # When randomization_accept_prob < 1, only well-balanced randomizations are accepted. 
 # When randomization_accept_prob = 1/|Size of cand. randomization set|, 1 randomization is accepted.
