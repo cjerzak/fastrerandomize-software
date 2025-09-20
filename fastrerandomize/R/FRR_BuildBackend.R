@@ -51,20 +51,20 @@ build_backend <- function(conda_env = "fastrerandomize_env", conda = "auto"){
       
       # Prefer CUDA 13 if the driver is new enough; otherwise CUDA 12; else CPU fallback
       if (!is.na(drv_major) && drv_major >= 580) {
-        msg("Driver %s detected (>=580): installing JAX 0.5.0 CUDA 13 wheels.", drv[1])
+        msg("Driver %s detected (>=580): installing JAX CUDA 13 wheels.", drv[1])
         tryCatch(pip_install('jax[cuda13]'), error = function(e) {
           msg("CUDA 13 wheels failed (%s); falling back to CUDA 12.", e$message)
           pip_install('jax[cuda12]')
         })
       } else if (!is.na(drv_major) && drv_major >= 525) {
-        msg("Driver %s detected (>=525,<580): installing JAX 0.5.0 CUDA 12 wheels.", drv[1])
+        msg("Driver %s detected (>=525,<580): installing JAX  CUDA 12 wheels.", drv[1])
         pip_install('jax[cuda12]')
       } else {
-        msg("Driver %s too old for CUDA wheels; installing CPU-only JAX 0.5.0.", drv[1])
+        msg("Driver %s too old for CUDA wheels; installing CPU-only JAX.", drv[1])
         pip_install('jax')
       }
     } else {
-      msg("Installing CPU-only JAX 0.5.0.")
+      msg("Installing CPU-only JAX.")
       pip_install('jax')
     }
   }
