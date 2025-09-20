@@ -42,7 +42,7 @@ print2 <- function(text,
 #' it returns `NULL` and prints a message suggesting to run `build_backend()`.
 #'
 #' @param conda_env A character string specifying the name of the conda environment. 
-#'   Default is `"fastrerandomize"`.
+#'   Default is `"fastrerandomize_env"`.
 #' @param conda The path to a conda executable, or `"auto"`. Default is `"auto"`.
 #'
 #' @return Returns `TRUE` (invisibly) if both 'Python' and 'JAX' are available; otherwise returns `NULL`.
@@ -53,7 +53,7 @@ print2 <- function(text,
 #' }
 #'
 #' @export
-check_jax_availability <- function(conda_env = "fastrerandomize", 
+check_jax_availability <- function(conda_env = "fastrerandomize_env", 
                                    conda = "auto"){
   
   # Try to use the specified conda environment

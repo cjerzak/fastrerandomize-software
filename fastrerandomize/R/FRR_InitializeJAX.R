@@ -1,4 +1,4 @@
-initialize_jax <- function(conda_env = "fastrerandomize", 
+initialize_jax <- function(conda_env = "fastrerandomize_env", 
                            conda_env_required = TRUE) {
   # Load reticulate (Declared in Imports: in DESCRIPTION)
   reticulate::use_condaenv(condaenv = conda_env, required = conda_env_required)

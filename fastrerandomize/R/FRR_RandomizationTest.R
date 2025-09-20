@@ -30,7 +30,7 @@
 #'   remain in memory. Default is NULL.
 #' @param verbose A logical value indicating whether to print progress information. Default is \code{TRUE}.  
 #' @param conda_env A character string specifying the name of the conda environment to use 
-#'   via \code{reticulate}. Default is \code{"fastrerandomize"}.
+#'   via \code{reticulate}. Default is \code{"fastrerandomize_env"}.
 #' @param conda_env_required A logical indicating whether the specified conda environment 
 #'   must be strictly used. If \code{TRUE}, an error is thrown if the environment is not found. 
 #'   Default is \code{TRUE}.
@@ -112,7 +112,7 @@ randomization_test <- function(obsW = NULL,
                                approximate_inv = TRUE,
                                file = NULL, 
                                verbose = TRUE, 
-                               conda_env = "fastrerandomize", 
+                               conda_env = "fastrerandomize_env", 
                                conda_env_required = TRUE
                                ){
   if( is.null(check_jax_availability(conda_env=conda_env)) ) { return(NULL) }
