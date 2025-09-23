@@ -14,7 +14,7 @@ generate_randomizations_mc(
   batch_size = 1000,
   approximate_inv = TRUE,
   verbose = TRUE,
-  conda_env = "fastrerandomize",
+  conda_env = "fastrerandomize_env",
   conda_env_required = TRUE
 )
 }
@@ -41,7 +41,7 @@ Default is \code{TRUE}.}
 \item{verbose}{A logical value indicating whether to print detailed information about batch processing progress, and GPU memory usage. Default is \code{FALSE}.}
 
 \item{conda_env}{A character string specifying the name of the conda environment to use
-via \code{reticulate}. Default is \code{"fastrerandomize"}.}
+via \code{reticulate}. Default is \code{"fastrerandomize_env"}.}
 
 \item{conda_env_required}{A logical indicating whether the specified conda environment
 must be strictly used. If \code{TRUE}, an error is thrown if the environment is not found.

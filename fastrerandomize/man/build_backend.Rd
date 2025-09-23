@@ -4,10 +4,10 @@
 \alias{build_backend}
 \title{A function to build the environment for fastrerandomize. Builds a conda environment in which 'JAX' and 'np' are installed. Users can also create a conda environment where 'JAX' and 'np' are installed themselves.}
 \usage{
-build_backend(conda_env = "fastrerandomize", conda = "auto")
+build_backend(conda_env = "fastrerandomize_env", conda = "auto")
 }
 \arguments{
-\item{conda_env}{(default = \code{"fastrerandomize"}) Name of the conda environment in which to place the backends.}
+\item{conda_env}{(default = \code{"fastrerandomize_env"}) Name of the conda environment in which to place the backends.}
 
 \item{conda}{(default = \code{auto}) The path to a conda executable. Using \code{"auto"} allows reticulate to attempt to automatically find an appropriate conda binary.}
 }
@@ -22,12 +22,12 @@ A function to build the environment for fastrerandomize. Builds a conda environm
 }
 \examples{
 \dontrun{
-# Create a conda environment named "fastrerandomize"
+# Create a conda environment named "fastrerandomize_env"
 # and install the required Python packages (jax, numpy, etc.)
-build_backend(conda_env = "fastrerandomize", conda = "auto")
+build_backend(conda_env = "fastrerandomize_env", conda = "auto")
 
 # If you want to specify a particular conda path:
-# build_backend(conda_env = "fastrerandomize", conda = "/usr/local/bin/conda")
+# build_backend(conda_env = "fastrerandomize_env", conda = "/usr/local/bin/conda")
 }
 
 }

@@ -12,7 +12,7 @@ generate_randomizations_exact(
   approximate_inv = TRUE,
   threshold_func = NULL,
   verbose = TRUE,
-  conda_env = "fastrerandomize",
+  conda_env = "fastrerandomize_env",
   conda_env_required = TRUE
 )
 }
@@ -41,7 +41,7 @@ statistic.}
 \item{verbose}{A logical value indicating whether to print progress information. Default is \code{TRUE}.}
 
 \item{conda_env}{A character string specifying the name of the conda environment to use 
-via \code{reticulate}. Default is "fastrerandomize".}
+via \code{reticulate}. Default is "fastrerandomize_env".}
 
 \item{conda_env_required}{A logical indicating whether the specified conda environment 
 must be strictly used. If \code{TRUE}, an error is thrown if the environment is not found. 

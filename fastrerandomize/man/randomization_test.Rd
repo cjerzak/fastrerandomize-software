@@ -22,7 +22,7 @@ randomization_test(
   approximate_inv = TRUE,
   file = NULL,
   verbose = TRUE,
-  conda_env = "fastrerandomize",
+  conda_env = "fastrerandomize_env",
   conda_env_required = TRUE
 )
 }
@@ -71,7 +71,7 @@ remain in memory. Default is NULL.}
 \item{verbose}{A logical value indicating whether to print progress information. Default is \code{TRUE}.}
 
 \item{conda_env}{A character string specifying the name of the conda environment to use
-via \code{reticulate}. Default is \code{"fastrerandomize"}.}
+via \code{reticulate}. Default is \code{"fastrerandomize_env"}.}
 
 \item{conda_env_required}{A logical indicating whether the specified conda environment
 must be strictly used. If \code{TRUE}, an error is thrown if the environment is not found.

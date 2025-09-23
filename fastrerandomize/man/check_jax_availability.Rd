@@ -4,11 +4,11 @@
 \alias{check_jax_availability}
 \title{Check if 'Python' and 'JAX' are available}
 \usage{
-check_jax_availability(conda_env = "fastrerandomize", conda = "auto")
+check_jax_availability(conda_env = "fastrerandomize_env", conda = "auto")
 }
 \arguments{
 \item{conda_env}{A character string specifying the name of the conda environment. 
-Default is `"fastrerandomize"`.}
+Default is `"fastrerandomize_env"`.}
 
 \item{conda}{The path to a conda executable, or `"auto"`. Default is `"auto"`.}
 }

@@ -25,7 +25,7 @@ build_backend <- function(conda_env = "fastrerandomize_env", conda = "auto"){
   # Create a new conda environment
   reticulate::conda_create(envname = conda_env,
                            conda = conda,
-                           python_version = "3.12")
+                           python_version = "3.13")
   
   os <- Sys.info()[["sysname"]]
   machine <- Sys.info()["machine"]
@@ -57,7 +57,7 @@ build_backend <- function(conda_env = "fastrerandomize_env", conda = "auto"){
           pip_install('jax[cuda12]')
         })
       } else if (!is.na(drv_major) && drv_major >= 525) {
-        msg("Driver %s detected (>=525,<580): installing JAX  CUDA 12 wheels.", drv[1])
+        msg("Driver %s detected (>=525,<580): installing JAX CUDA 12 wheels.", drv[1])
         pip_install('jax[cuda12]')
       } else {
         msg("Driver %s too old for CUDA wheels; installing CPU-only JAX.", drv[1])
