@@ -31,12 +31,9 @@ Dm3 <- fast_distance(A, B, metric = "minkowski", p = 3, weights = w)
 # Mahalanobis (diagonal approx, fast & robust)
 Dmah_diag <- fast_distance(X, metric = "mahalanobis", approximate_inv = TRUE)
 
-# Mahalanobis with full inverse (computed internally)
-Dmah_full <- fast_distance(X, metric = "mahalanobis", approximate_inv = FALSE)
-
 # Return a base R 'dist' object
 D_dist <- fast_distance(X, metric = "euclidean", as_dist = TRUE)
   
-fastrerandomize::print2("Done with Geo-rerandomization tutorial!")
+fastrerandomize::print2("Done with distance tutorial!")
 }
 
