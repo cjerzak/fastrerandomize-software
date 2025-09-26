@@ -174,8 +174,112 @@ initialize_jax <- function(conda_env = "fastrerandomize_env",
         body_fun=function( i, carry ){ process_batch(i, carry)},
         init_val=carry_init
       )
-      
       return( Tstats ) 
+    }
+  }
+  
+  # ------------------------------------------------------------------
+  # Pairwise distance kernels (JAX; float32, broadcasted, jitted)
+  # ------------------------------------------------------------------
+  {
+    if (!exists("PairwiseSqEuclidean", envir = fastrr_env, inherits = FALSE)) {
+      fastrr_env$PairwiseSqEuclidean <- fastrr_env$jax$jit(function(A_, B_) {
+        diff_ <- fastrr_env$jnp$subtract(
+          fastrr_env$jnp$expand_dims(A_, 1L),
+          fastrr_env$jnp$expand_dims(B_, 0L)
+        )
+        fastrr_env$jnp$sum(fastrr_env$jnp$square(diff_), 2L)
+      })
+    }
+    if (!exists("PairwiseEuclidean", envir = fastrr_env, inherits = FALSE)) {
+      fastrr_env$PairwiseEuclidean <- fastrr_env$jax$jit(function(A_, B_) {
+        fastrr_env$jnp$sqrt(fastrr_env$PairwiseSqEuclidean(A_, B_) + 1e-12)
+      })
+    }
+    if (!exists("PairwiseManhattan", envir = fastrr_env, inherits = FALSE)) {
+      fastrr_env$PairwiseManhattan <- fastrr_env$jax$jit(function(A_, B_) {
+        diff_ <- fastrr_env$jnp$subtract(
+          fastrr_env$jnp$expand_dims(A_, 1L),
+          fastrr_env$jnp$expand_dims(B_, 0L)
+        )
+        fastrr_env$jnp$sum(fastrr_env$jnp$abs(diff_), 2L)
+      })
+    }
+    if (!exists("PairwiseChebyshev", envir = fastrr_env, inherits = FALSE)) {
+      fastrr_env$PairwiseChebyshev <- fastrr_env$jax$jit(function(A_, B_) {
+        diff_ <- fastrr_env$jnp$subtract(
+          fastrr_env$jnp$expand_dims(A_, 1L),
+          fastrr_env$jnp$expand_dims(B_, 0L)
+        )
+        fastrr_env$jnp$max(fastrr_env$jnp$abs(diff_), 2L)
+      })
+    }
+    if (!exists("PairwiseCosine", envir = fastrr_env, inherits = FALSE)) {
+      fastrr_env$PairwiseCosine <- fastrr_env$jax$jit(function(A_, B_) {
+        eps <- fastrr_env$jnp$array(1e-12, dtype = fastrr_env$jnp$float32)
+        # Normalize rows
+        A_norms <- fastrr_env$jnp$clip(
+          fastrr_env$jnp$linalg$norm(A_, ord = 2L, axis = 1L, keepdims = TRUE),
+          a_min = eps, a_max = 1e30
+        )
+        B_norms <- fastrr_env$jnp$clip(
+          fastrr_env$jnp$linalg$norm(B_, ord = 2L, axis = 1L, keepdims = TRUE),
+          a_min = eps, a_max = 1e30
+        )
+        A_n <- fastrr_env$jnp$divide(A_, A_norms)
+        B_n <- fastrr_env$jnp$divide(B_, B_norms)
+        sims <- fastrr_env$jnp$matmul(A_n, fastrr_env$jnp$transpose(B_n))
+        fastrr_env$jnp$subtract(1.0, fastrr_env$jnp$clip(sims, -1.0, 1.0))
+      })
+    }
+    if (!exists("PairwiseMinkowski", envir = fastrr_env, inherits = FALSE)) {
+      fastrr_env$PairwiseMinkowski <- fastrr_env$jax$jit(function(A_, B_, p_) {
+        diff_ <- fastrr_env$jnp$subtract(
+          fastrr_env$jnp$expand_dims(A_, 1L),
+          fastrr_env$jnp$expand_dims(B_, 0L)
+        )
+        fastrr_env$jnp$power(
+          fastrr_env$jnp$sum(
+            fastrr_env$jnp$power(fastrr_env$jnp$abs(diff_), p_), 2L),
+          fastrr_env$jnp$divide(1.0, p_)
+        )
+      })
+    }
+    if (!exists("PairwiseWeightedMinkowski", envir = fastrr_env, inherits = FALSE)) {
+      fastrr_env$PairwiseWeightedMinkowski <- fastrr_env$jax$jit(function(A_, B_, w_, p_) {
+        # w_ length p; broadcast to (1,1,p)
+        diff_ <- fastrr_env$jnp$subtract(
+          fastrr_env$jnp$expand_dims(A_, 1L),
+          fastrr_env$jnp$expand_dims(B_, 0L)
+        )
+        powered <- fastrr_env$jnp$power(fastrr_env$jnp$abs(diff_), p_)
+        w_b <- fastrr_env$jnp$expand_dims(fastrr_env$jnp$expand_dims(w_, 0L), 0L)
+        fastrr_env$jnp$power(
+          fastrr_env$jnp$sum(fastrr_env$jnp$multiply(powered, w_b), 2L),
+          fastrr_env$jnp$divide(1.0, p_)
+        )
+      })
+    }
+    if (!exists("PairwiseMahalanobisFull", envir = fastrr_env, inherits = FALSE)) {
+      fastrr_env$PairwiseMahalanobisFull <- fastrr_env$jax$jit(function(A_, B_, S_inv_) {
+        diff_ <- fastrr_env$jnp$subtract(
+          fastrr_env$jnp$expand_dims(A_, 1L),
+          fastrr_env$jnp$expand_dims(B_, 0L)
+        )
+        tmp <- fastrr_env$jnp$matmul(diff_, S_inv_)
+        fastrr_env$jnp$sum(fastrr_env$jnp$multiply(tmp, diff_), 2L)  # squared Mahalanobis
+      })
+    }
+    if (!exists("PairwiseMahalanobisDiag", envir = fastrr_env, inherits = FALSE)) {
+      fastrr_env$PairwiseMahalanobisDiag <- fastrr_env$jax$jit(function(A_, B_, diag_inv_) {
+        diff_ <- fastrr_env$jnp$subtract(
+          fastrr_env$jnp$expand_dims(A_, 1L),
+          fastrr_env$jnp$expand_dims(B_, 0L)
+        )
+        fastrr_env$jnp$sum(
+          fastrr_env$jnp$multiply(fastrr_env$jnp$square(diff_), diag_inv_), 2L
+        )
+      })
     }
   }
 }
