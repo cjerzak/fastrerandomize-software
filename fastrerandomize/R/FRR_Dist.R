@@ -97,7 +97,8 @@ fast_distance <- function(
     conda_env_required = TRUE
 ){
   # Ensure JAX is available and kernels are initialized
-  if (is.null(check_jax_availability(conda_env = conda_env))) return(NULL)
+  browser()
+  if (is.null(check_jax_availability(conda_env = conda_env))){ return(NULL) } 
   if (!"PairwiseEuclidean" %in% ls(envir = fastrr_env)) {
     initialize_jax(conda_env = conda_env, conda_env_required = conda_env_required)
   }

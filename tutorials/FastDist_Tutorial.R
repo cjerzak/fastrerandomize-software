@@ -1,8 +1,7 @@
 {
 ##############################################################################
-# Fast distance calcs, tutorial (advanced)
+# Fast distance calcs, tutorial 
 ##############################################################################
-
 options(error = NULL)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -12,8 +11,9 @@ options(error = NULL)
 # devtools::install_github(repo = "cjerzak/fastrerandomize-software/fastrerandomize")
 
 # Build backend(s) if needed
-# causalimages::BuildBackend()
 # fastrerandomize::build_backend()  
+
+library(fastrerandomize)
 
 # Simple Euclidean within-matrix distances (returns an n x n matrix)
 X <- matrix(rnorm(50 * 8), 50, 8)
