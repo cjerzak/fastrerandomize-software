@@ -339,8 +339,7 @@ summary.fastrerandomize_diagnostic <- function(object, ...) {
   invisible(object)
 }
 
-
-# usage 
+# usage example 
 if(FALSE){
   # Observed SMDs; want realized RMSE and conservative upper bound
   out <- diagnose_rerandomization(
