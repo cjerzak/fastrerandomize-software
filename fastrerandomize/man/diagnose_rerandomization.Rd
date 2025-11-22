@@ -40,7 +40,7 @@ Must lie in [0,1). If `NULL`, RMSEs that require R^2 are returned as NA, but the
 "per-sigma" formulas that do not need R^2 are still shown when possible.}
 
 \item{rmse_goal}{Optional numeric target for RMSE (same units as Y). If supplied
-(with sigma and R2), the smallest q achieving this ex-ante goal is returned.}
+(with sigma and R2), the largest q achieving this ex-ante goal is returned.}
 
 \item{tau}{Optional effect size |tau| (same units as Y) to back out an RMSE goal
 via a normal approximation to power.}
@@ -72,7 +72,7 @@ A list of class `"fastrerandomize_diagnostic"` with elements:
 Implements the calculations in Theorem 1 and Appendix D of the paper involving: 
 (1) Realized RMSE from an observed Mahalanobis distance M (or SMDs);
 (2) Ex-ante RMSE when accepting assignments with M <= a (equivalently, with acceptance probability q under complete randomization);
-(3) Smallest acceptance probability q that attains a user-specified precision goal,provided via an RMSE target or via a power target (alpha, 1-beta, |tau|).
+(3) largest acceptance probability q that attains a user-specified precision goal,provided via an RMSE target or via a power target (alpha, 1-beta, |tau|).
 }
 \details{
 Realized (conditional) RMSE: with standardized/whitened X and typical
