@@ -3,7 +3,7 @@
 #' Implements the calculations in Theorem 1 and Appendix D of the paper involving: 
 #' (1) Realized RMSE from an observed Mahalanobis distance M (or SMDs);
 #' (2) Ex-ante RMSE when accepting assignments with M <= a (equivalently, with acceptance probability q under complete randomization);
-#' (3) Smallest acceptance probability q that attains a user-specified precision goal,provided via an RMSE target or via a power target (alpha, 1-beta, |tau|).
+#' (3) largest acceptance probability q that attains a user-specified precision goal,provided via an RMSE target or via a power target (alpha, 1-beta, |tau|).
 #'
 #' @param smd Optional numeric vector of standardized mean differences; if supplied,
 #'   M is computed as sum(smd^2), and d = length(smd).
@@ -17,7 +17,7 @@
 #'   Must lie in [0,1). If `NULL`, RMSEs that require R^2 are returned as NA, but the
 #'   "per-sigma" formulas that do not need R^2 are still shown when possible.
 #' @param rmse_goal Optional numeric target for RMSE (same units as Y). If supplied
-#'   (with sigma and R2), the smallest q achieving this ex-ante goal is returned.
+#'   (with sigma and R2), the largest q achieving this ex-ante goal is returned.
 #' @param tau Optional effect size |tau| (same units as Y) to back out an RMSE goal
 #'   via a normal approximation to power.
 #' @param alpha Size of a two-sided test (default 0.05).
@@ -353,7 +353,7 @@ if(FALSE){
   out$realized$rmse            # plug-in realized RMSE (if sigma & R2 supplied)
   out$realized$rmse_upper      # conservative upper bound
   
-  # Power planning: smallest q that achieves 1-β power at size α for |τ|
+  # Power planning: largest q that achieves 1-β power at size α for |τ|
   plan <- diagnose_rerandomization(
     smd = observed_smds,
     n_T = n_treated, n_C = n_control,
