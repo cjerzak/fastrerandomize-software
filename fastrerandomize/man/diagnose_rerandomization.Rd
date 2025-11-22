@@ -96,8 +96,7 @@ where \eqn{v_a(d) = \Pr(\chi^2_{d+2}\le c)/\Pr(\chi^2_d\le c)} and
 
 Power inversion (Appendix D): for two-sided size \eqn{\alpha}
 and power \(1-\beta\), a normal approximation suggests the RMSE goal
-\eqn{|\tau| / \{z_{1-\alpha/2}+z_{1-\beta}\}} (one-sided: replace
-\eqn{z_{1-\alpha/2}} by \eqn{z_{1-\alpha}}).
+\eqn{|\tau| / \{z_{1-\alpha/2}+z_{1-\beta}\}}.
 }
 \examples{
 # Example 1: observed SMDs, realized precision only (dimensionless factors)
@@ -111,7 +110,9 @@ out2 <- diagnose_rerandomization(smd = smd, n_T = 100, n_C = 100, sigma = 1.2, R
 # Example 3: choose q to hit a power target (two-sided alpha=.05, 80\% power, |tau|=0.2)
 out3 <- diagnose_rerandomization(smd = smd, n_T = 100, n_C = 100, sigma = 1.2, R2 = 0.4,
                 tau = 0.2, alpha = 0.05, power = 0.80)
-out3$recommendation$q_star  # recommended randomization_accept_prob
+                
+# Analyze rerandomization recommendation given contextual factors
+out3$recommendation
 
 # Example 4: choose q to hit an absolute RMSE goal directly
 out4 <- diagnose_rerandomization(M = sum(smd^2), d = length(smd), n_T = 100, n_C = 100,
