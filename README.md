@@ -106,7 +106,7 @@ Connor T. Jerzak and Rebecca Goldstein. "Degrees of Randomness in Rerandomizatio
          year={2023}}
 ```
 
-# Performance - n = 100<a id="performance"></a>
+# Performance: n = 100<a id="performance"></a>
 
 <a href="https://planetarycausalinference.org/book-launch/#gh-light-mode-only">
   <img src="https://connorjerzak.com/wp-content/uploads/2025/11/figure1.webp#gh-light-mode-only" alt="Figure – light" width="600">
@@ -116,7 +116,7 @@ Connor T. Jerzak and Rebecca Goldstein. "Degrees of Randomness in Rerandomizatio
   <img src="https://connorjerzak.com/wp-content/uploads/2025/11/figure1_dark.webp#gh-dark-mode-only" alt="Figure – dark" width="600">
 </a>
 
-# Performance - n = 1000
+# Performance: n = 1000
 
 <a href="https://planetarycausalinference.org/book-launch/#gh-light-mode-only">
   <img src="https://connorjerzak.com/wp-content/uploads/2025/11/figure2.webp#gh-light-mode-only" alt="Figure – light" width="600">
