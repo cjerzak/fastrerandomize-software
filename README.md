@@ -105,6 +105,18 @@ Connor T. Jerzak and Rebecca Goldstein. "Degrees of Randomness in Rerandomizatio
          year={2023}}
 ```
 
+
+
+<a href="https://planetarycausalinference.org/book-launch/#gh-light-mode-only">
+  <img src="https://connorjerzak.com/wp-content/uploads/2025/11/figure1.webp#gh-light-mode-only" alt="Figure – light" width="200">
+</a>
+
+<a href="https://planetarycausalinference.org/book-launch/#gh-dark-mode-only">
+  <img src="https://connorjerzak.com/wp-content/uploads/2025/11/figure1_dark.webp#gh-dark-mode-only" alt="Figure – dark" width="200">
+</a>
+
+
+<!--
 _
 
 *Package functions* 
@@ -124,4 +136,4 @@ _
 
 
 [<img src="https://github.com/cjerzak/fastrerandomize-software/blob/main/misc/figures/CPU_v_GPU_FALSE_1000.png?raw=true">](https://arxiv.org/pdf/2501.07642)
-
+-->
