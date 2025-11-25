@@ -22,21 +22,21 @@ We employ a [JAX backend](https://en.wikipedia.org/wiki/Google_JAX) to make exac
 
 # Performance: n = 100<a id="performance"></a>
 
-<a href="https://planetarycausalinference.org/book-launch/#gh-light-mode-only">
+<a href="https://arxiv.org/abs/2501.07642/#gh-light-mode-only">
   <img src="https://connorjerzak.com/wp-content/uploads/2025/11/figure1.webp#gh-light-mode-only" alt="Figure – light" width="600">
 </a>
 
-<a href="https://planetarycausalinference.org/book-launch/#gh-dark-mode-only">
+<a href="https://arxiv.org/abs/2501.07642/#gh-dark-mode-only">
   <img src="https://connorjerzak.com/wp-content/uploads/2025/11/figure1_dark.webp#gh-dark-mode-only" alt="Figure – dark" width="600">
 </a>
 
 # Performance: n = 1000
 
-<a href="https://planetarycausalinference.org/book-launch/#gh-light-mode-only">
+<a href="https://arxiv.org/abs/2501.07642/#gh-light-mode-only">
   <img src="https://connorjerzak.com/wp-content/uploads/2025/11/figure2.webp#gh-light-mode-only" alt="Figure – light" width="600">
 </a>
 
-<a href="https://planetarycausalinference.org/book-launch/#gh-dark-mode-only">
+<a href="https://arxiv.org/abs/2501.07642/#gh-dark-mode-only">
   <img src="https://connorjerzak.com/wp-content/uploads/2025/11/figure2_dark.webp#gh-dark-mode-only" alt="Figure – dark" width="600">
 </a>
 
