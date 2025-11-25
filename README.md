@@ -1,10 +1,10 @@
 # `fastrerandomize`: An R Package for Ultra-Fast Rerandomization Using Accelerated Computing 
 
 [**What is `fastrerandomize`?**](#description)
+| [**Performance**](#performance)
 | [**Installation**](#installation)
 | [**Tutorial**](#tutorial)
 | [**Data**](#data)
-| [**Performance**](#performance)
 | [**CRAN**](https://cran.r-project.org/web/packages/fastrerandomize/index.html)
 | [**Documentation**](https://github.com/cjerzak/fastrerandomize-software/blob/main/fastrerandomize.pdf)
 | [**References**](#references)
@@ -19,6 +19,26 @@
 The `fastrerandomize` contains functions such as `randomization_test`, which offers a streamlined approach for performing randomization tests after using rerandomization in the research design. 
 
 We employ a [JAX backend](https://en.wikipedia.org/wiki/Google_JAX) to make exact rerandomization inference possible even for larger experiments where the number of randomizations is in the hundreds of millions or where experimenters seek to maintain balanced randomizations across thousands of features.
+
+# Performance: n = 100<a id="performance"></a>
+
+<a href="https://planetarycausalinference.org/book-launch/#gh-light-mode-only">
+  <img src="https://connorjerzak.com/wp-content/uploads/2025/11/figure1.webp#gh-light-mode-only" alt="Figure – light" width="600">
+</a>
+
+<a href="https://planetarycausalinference.org/book-launch/#gh-dark-mode-only">
+  <img src="https://connorjerzak.com/wp-content/uploads/2025/11/figure1_dark.webp#gh-dark-mode-only" alt="Figure – dark" width="600">
+</a>
+
+# Performance: n = 1000
+
+<a href="https://planetarycausalinference.org/book-launch/#gh-light-mode-only">
+  <img src="https://connorjerzak.com/wp-content/uploads/2025/11/figure2.webp#gh-light-mode-only" alt="Figure – light" width="600">
+</a>
+
+<a href="https://planetarycausalinference.org/book-launch/#gh-dark-mode-only">
+  <img src="https://connorjerzak.com/wp-content/uploads/2025/11/figure2_dark.webp#gh-dark-mode-only" alt="Figure – dark" width="600">
+</a>
 
 # Package Installation and Loading <a id="installation"></a>
 ```
@@ -105,26 +125,6 @@ Connor T. Jerzak and Rebecca Goldstein. "Degrees of Randomness in Rerandomizatio
          journal={ArXiv Preprint},
          year={2023}}
 ```
-
-# Performance: n = 100<a id="performance"></a>
-
-<a href="https://planetarycausalinference.org/book-launch/#gh-light-mode-only">
-  <img src="https://connorjerzak.com/wp-content/uploads/2025/11/figure1.webp#gh-light-mode-only" alt="Figure – light" width="600">
-</a>
-
-<a href="https://planetarycausalinference.org/book-launch/#gh-dark-mode-only">
-  <img src="https://connorjerzak.com/wp-content/uploads/2025/11/figure1_dark.webp#gh-dark-mode-only" alt="Figure – dark" width="600">
-</a>
-
-# Performance: n = 1000
-
-<a href="https://planetarycausalinference.org/book-launch/#gh-light-mode-only">
-  <img src="https://connorjerzak.com/wp-content/uploads/2025/11/figure2.webp#gh-light-mode-only" alt="Figure – light" width="600">
-</a>
-
-<a href="https://planetarycausalinference.org/book-launch/#gh-dark-mode-only">
-  <img src="https://connorjerzak.com/wp-content/uploads/2025/11/figure2_dark.webp#gh-dark-mode-only" alt="Figure – dark" width="600">
-</a>
 
 
 
