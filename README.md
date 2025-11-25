@@ -4,9 +4,10 @@
 | [**Installation**](#installation)
 | [**Tutorial**](#tutorial)
 | [**Data**](#data)
+| [**Performance**](#performance)
 | [**CRAN**](https://cran.r-project.org/web/packages/fastrerandomize/index.html)
-| [**References**](#references)
 | [**Documentation**](https://github.com/cjerzak/fastrerandomize-software/blob/main/fastrerandomize.pdf)
+| [**References**](#references)
 
 [<img src="https://img.shields.io/badge/Demo-View%20Demo-blue" alt="Demo Button">](https://cran.r-project.org/web/packages/fastrerandomize/vignettes/MainVignette.html) [<img src="https://img.shields.io/badge/CRAN-View%20on%20CRAN-green" alt="CRAN Button">](https://cran.r-project.org/web/packages/fastrerandomize/index.html) [<img src="https://img.shields.io/badge/Website-Visit%20Website-orange" alt="Website">](https://fastrerandomize.github.io)
 
@@ -105,15 +106,26 @@ Connor T. Jerzak and Rebecca Goldstein. "Degrees of Randomness in Rerandomizatio
          year={2023}}
 ```
 
-
+# Performance - `n` = 100<a id="performance"></a>
 
 <a href="https://planetarycausalinference.org/book-launch/#gh-light-mode-only">
-  <img src="https://connorjerzak.com/wp-content/uploads/2025/11/figure1.webp#gh-light-mode-only" alt="Figure – light" width="200">
+  <img src="https://connorjerzak.com/wp-content/uploads/2025/11/figure1.webp#gh-light-mode-only" alt="Figure – light" width="600">
 </a>
 
 <a href="https://planetarycausalinference.org/book-launch/#gh-dark-mode-only">
-  <img src="https://connorjerzak.com/wp-content/uploads/2025/11/figure1_dark.webp#gh-dark-mode-only" alt="Figure – dark" width="200">
+  <img src="https://connorjerzak.com/wp-content/uploads/2025/11/figure1_dark.webp#gh-dark-mode-only" alt="Figure – dark" width="600">
 </a>
+
+# Performance - `n` = 1000
+
+<a href="https://planetarycausalinference.org/book-launch/#gh-light-mode-only">
+  <img src="https://connorjerzak.com/wp-content/uploads/2025/11/figure2.webp#gh-light-mode-only" alt="Figure – light" width="600">
+</a>
+
+<a href="https://planetarycausalinference.org/book-launch/#gh-dark-mode-only">
+  <img src="https://connorjerzak.com/wp-content/uploads/2025/11/figure2_dark.webp#gh-dark-mode-only" alt="Figure – dark" width="600">
+</a>
+
 
 
 <!--
