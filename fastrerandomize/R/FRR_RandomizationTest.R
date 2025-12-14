@@ -5,30 +5,14 @@
 #'
 #' @param obsW A numeric vector where `0`'s correspond to control units and `1`'s to treated units.
 #' @param obsY An optional numeric vector of observed outcomes. If not provided, the function assumes a NULL value.
-#' @param X A numeric matrix of covariates.
 #' @param alpha The significance level for the test. Default is `0.05`.
 #' @param candidate_randomizations A numeric matrix of candidate randomizations.
 #' @param candidate_randomizations_array An optional 'JAX' array of candidate randomizations. If not provided, the function coerces `candidate_randomizations` into a 'JAX' array.
 #' @param n0_array An optional array specifying the number of control units.
 #' @param n1_array An optional array specifying the number of treated units.
-#' @param randomization_accept_prob An numeric scalar or vector of probabilities for accepting each randomization.
 #' @param findFI A logical value indicating whether to find the fiducial interval. Default is FALSE.
-#' @param c_initial A numeric value representing the initial criterion for the randomization. Default is `2`.
-#' @param max_draws An integer specifying the maximum number of candidate randomizations 
-#'   to generate (or to consider) for the test when \code{randomization_type = "monte_carlo"}. 
-#'   Default is \code{1e6}.
-#' @param batch_size An integer specifying the batch size for Monte Carlo sampling. 
-#'   Batches are processed one at a time for memory efficiency. Default is \code{1e5}.
-#' @param randomization_type A string specifying the type of randomization for the test. 
-#'   Allowed values are "exact" or "monte_carlo". Default is "monte_carlo".
-#' @param approximate_inv A logical value indicating whether to use an approximate inverse 
-#'   (diagonal of the covariance matrix) instead of the full matrix inverse when computing 
-#'   balance metrics. This can speed up computations for high-dimensional covariates.
-#'   Default is \code{TRUE}.
-#' @param file A character string specifying the path (including filename) where candidate 
-#'   randomizations will be saved or loaded from. If \code{NULL}, randomizations 
-#'   remain in memory. Default is NULL.
-#' @param verbose A logical value indicating whether to print progress information. Default is \code{TRUE}.  
+#' @param c_initial A numeric value representing the initial criterion for the fiducial interval
+#'   search. Default is `2`.
 #' @param conda_env A character string specifying the name of the conda environment to use 
 #'   via \code{reticulate}. Default is \code{"fastrerandomize_env"}.
 #' @param conda_env_required A logical indicating whether the specified conda environment 
@@ -73,16 +57,14 @@
 #' results_base <- randomization_test(
 #'   obsW = W,
 #'   obsY = obsY,
-#'   X = X,
-#'   candidate_randomizations = RandomizationSet_MC$randomizations,
+#'   candidate_randomizations = RandomizationSet_MC$randomizations
 #' )
 #' print(results_base)
 #'
-#' # Perform randomization test
+#' # Perform randomization test with fiducial interval
 #' result_fi <- randomization_test(
 #'   obsW = W,
 #'   obsY = obsY,
-#'   X = X,
 #'   candidate_randomizations = RandomizationSet_MC$randomizations,
 #'   findFI = TRUE
 #' )
@@ -97,22 +79,14 @@
 
 randomization_test <- function(obsW = NULL,
                                obsY = NULL,
-                               X = NULL,
                                alpha = 0.05,
                                candidate_randomizations = NULL,
                                candidate_randomizations_array = NULL,
                                n0_array = NULL,
                                n1_array = NULL,
-                               randomization_accept_prob = 1.,
                                findFI = FALSE,
                                c_initial = 2,
-                               max_draws = 10^6, 
-                               batch_size = 10^5, 
-                               randomization_type = "monte_carlo", 
-                               approximate_inv = TRUE,
-                               file = NULL, 
-                               verbose = TRUE, 
-                               conda_env = "fastrerandomize_env", 
+                               conda_env = "fastrerandomize_env",
                                conda_env_required = TRUE
                                ){
   if( is.null(check_jax_availability(conda_env=conda_env)) ) { return(NULL) }
@@ -126,15 +100,19 @@ randomization_test <- function(obsW = NULL,
   if(is.null(n1_array)){ n1_array <- fastrr_env$jnp$array(sum(obsW == 1)) }
 
   if(!is.null(obsW)){obsW <- c(unlist(obsW))}
-  if(!is.null(X)){X <- as.matrix(X)}
   if(!is.null(obsY)){obsY <- c(unlist(obsY))}
 
-  #if(is.null(candidate_randomizations_array) & is.null(candidate_randomizations)){
+  # Validate that at least one of candidate_randomizations or candidate_randomizations_array is provided
+  if(is.null(candidate_randomizations) && is.null(candidate_randomizations_array)){
+      stop("Either 'candidate_randomizations' or 'candidate_randomizations_array' must be provided.")
+  }
+
+  # Convert between formats as needed
   if(is.null(candidate_randomizations)){
       candidate_randomizations <- fastrr_env$np$array( candidate_randomizations_array )
   }
   if(is.null(candidate_randomizations_array)){
-      candidate_randomizations_array <- fastrr_env$jnp$array(candidate_randomizations, 
+      candidate_randomizations_array <- fastrr_env$jnp$array(candidate_randomizations,
                                                              dtype = fastrr_env$jnp$float32)
   }
 
@@ -160,13 +138,15 @@ randomization_test <- function(obsW = NULL,
       obsW_array <- fastrr_env$jnp$array( obsW )
 
       n_search_attempts <- 500
-      exhaustive_search  <-  length(obsW) <= n_search_attempts
       bound_counter <- 0
       upperBound_storage_vec <- lowerBound_storage_vec <- rep(NA, n_search_attempts)
       {
         bound_counter <- bound_counter + 1
-        lowerBound_estimate_step_t <- tau_obs-3*tau_obs
-        upperBound_estimate_step_t <- tau_obs+3*tau_obs
+        # Use absolute value to ensure proper bracket regardless of tau_obs sign
+        # Ensure minimum range of 1 to handle tau_obs near zero
+        bound_range <- max(abs(tau_obs) * 3, 1)
+        lowerBound_estimate_step_t <- tau_obs - bound_range
+        upperBound_estimate_step_t <- tau_obs + bound_range
 
         #setting optimal c
         c_step_t <- c_initial
@@ -220,7 +200,10 @@ randomization_test <- function(obsW = NULL,
 
       # stage 2
       {
-        tau_pseudo_seq <- seq(FI[1]-1, FI[2]*2,length.out=100)
+        # Use symmetric expansion around the initial bounds to handle negative values correctly
+        fi_range <- abs(FI[2] - FI[1])
+        expansion <- max(fi_range * 0.5, abs(tau_obs) * 0.5, 1)
+        tau_pseudo_seq <- seq(FI[1] - expansion, FI[2] + expansion, length.out = 100)
         pvals_vec <- sapply(tau_pseudo_seq, function(tau_pseudo){
           stat_vec_at_tau_pseudo <- fastrr_env$np$array(     fastrr_env$vec1_get_stat_vec_at_tau_pseudo(
                                                                                   candidate_randomizations_array,# treatment_pseudo

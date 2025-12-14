@@ -103,7 +103,8 @@ fast_distance <- function(
   }
   
   metric <- match.arg(metric)
-  if (is.null(B)) B <- A
+  B_was_null <- is.null(B)
+  if (B_was_null) B <- A
   
   A <- as.matrix(A)
   B <- as.matrix(B)
@@ -216,7 +217,7 @@ fast_distance <- function(
   D_jax <- if (length(chunks) == 1L) chunks[[1]] else fastrr_env$jnp$concatenate(chunks, 0L)
   
   # Convert / shape output
-  if (as_dist && is.null(B)) {
+  if (as_dist && B_was_null) {
     if (return_type == "R") {
       D_R <- as.matrix(output2output(D_jax, return_type = "R"))
       return(stats::as.dist(D_R))

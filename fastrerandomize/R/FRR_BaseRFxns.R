@@ -88,9 +88,9 @@ generate_randomizations_R <- function(n_units, n_treated, X, accept_prob, random
     assignment_mat <- assignment_mat[keep_idx, , drop = FALSE]
     T2vals <- T2vals[keep_idx]
     
-    # acceptance threshold
+    # acceptance threshold (use <= to include values exactly at the quantile)
     cutoff <- quantile(T2vals, probs = accept_prob)
-    keep_final <- (T2vals < cutoff)
+    keep_final <- (T2vals <= cutoff)
     assignment_mat_accepted <- assignment_mat[keep_final, , drop = FALSE]
     T2vals_accepted <- T2vals[keep_final]
     
@@ -122,8 +122,9 @@ generate_randomizations_R <- function(n_units, n_treated, X, accept_prob, random
     assignment_mat <- assignment_mat[keep_idx, , drop = FALSE]
     all_T2 <- all_T2[keep_idx]
     
+    # acceptance threshold (use <= to include values exactly at the quantile)
     cutoff <- quantile(all_T2, probs = accept_prob)
-    keep_final <- (all_T2 < cutoff)
+    keep_final <- (all_T2 <= cutoff)
     assignment_mat_accepted <- assignment_mat[keep_final, , drop = FALSE]
     T2vals_accepted <- all_T2[keep_final]
   }

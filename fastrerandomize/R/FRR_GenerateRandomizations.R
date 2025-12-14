@@ -99,25 +99,27 @@ generate_randomizations <- function(n_units,
         candidate_randomizations <- fastrerandomize::generate_randomizations_exact(
                                                 n_units = n_units,
                                                 n_treated = n_treated,
-                                                X = X, 
-                                                randomization_accept_prob = randomization_accept_prob, 
-                                                threshold_func = threshold_func, 
-                                                verbose = verbose, 
-                                                conda_env = conda_env, 
+                                                X = X,
+                                                randomization_accept_prob = randomization_accept_prob,
+                                                approximate_inv = approximate_inv,
+                                                threshold_func = threshold_func,
+                                                verbose = verbose,
+                                                conda_env = conda_env,
                                                 conda_env_required = conda_env_required)
     } else if (randomization_type == "monte_carlo"){
         if (verbose){
             message("Using monte carlo randomization")
         }
         candidate_randomizations <- fastrerandomize::generate_randomizations_mc(
-                                                                    n_units = n_units, 
-                                                                    n_treated = n_treated, 
-                                                                    X = X, 
-                                                                    randomization_accept_prob = randomization_accept_prob, 
-                                                                    threshold_func = threshold_func, 
-                                                                    max_draws = max_draws, 
-                                                                    batch_size = batch_size, 
-                                                                    conda_env = conda_env, 
+                                                                    n_units = n_units,
+                                                                    n_treated = n_treated,
+                                                                    X = X,
+                                                                    randomization_accept_prob = randomization_accept_prob,
+                                                                    threshold_func = threshold_func,
+                                                                    max_draws = max_draws,
+                                                                    batch_size = batch_size,
+                                                                    approximate_inv = approximate_inv,
+                                                                    conda_env = conda_env,
                                                                     conda_env_required = conda_env_required,
                                                                     verbose = verbose)
     } else {

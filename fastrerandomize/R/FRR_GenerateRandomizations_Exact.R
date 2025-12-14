@@ -92,8 +92,8 @@ generate_randomizations_exact <- function(
   if(is.null(threshold_func)){ threshold_func <- fastrr_env$VectorizedFastHotel2T2 }
   
   max_rand_num <- choose(n_units, n_treated)
-  assertthat::assert_that( max_rand_num*min(randomization_accept_prob) > 10, 
-              msg = "Value of min(randomization_accept_prob) indices less than 10 accepted randomizations. Increase min(randomization_accept_prob)!")
+  assertthat::assert_that( max_rand_num * randomization_accept_prob > 10,
+              msg = "Value of randomization_accept_prob results in fewer than 10 accepted randomizations. Increase randomization_accept_prob!")
   
   # Get all combinations of positions to set to 1
   combinations <- fastrr_env$jnp$array(  utils::combn(n_units, n_treated) - 1L )
@@ -138,10 +138,10 @@ generate_randomizations_exact <- function(
       fastrr_env$jnp$array(randomization_accept_prob)
     )
 
-    # Keep only randomizations with balance measure below threshold
+    # Keep only randomizations with balance measure at or below threshold (use less_equal to include ties)
     candidate_randomizations <- fastrr_env$jnp$take(
       candidate_randomizations,
-      indices = (takeM_ <- fastrr_env$jnp$where(fastrr_env$jnp$less(M_results,a_threshold))[[1]] ),
+      indices = (takeM_ <- fastrr_env$jnp$where(fastrr_env$jnp$less_equal(M_results, a_threshold))[[1]] ),
       axis = 0L
     )
     M_results <- fastrr_env$jnp$take( M_results, indices = takeM_, axis = 0L )

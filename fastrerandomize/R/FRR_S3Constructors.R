@@ -137,17 +137,18 @@ fastrerandomize_test <- function(
     call = NULL,
     ...
 ){
-  structure(
-    list(
-      p_value = p_value,
-      FI = FI,
-      tau_obs = tau_obs,
-      fastrr_env = fastrr_env, 
-      call = call,
-      ...
-    ),
-    class = "fastrerandomize_test"
+  # Capture extra arguments properly as named list elements
+  extras <- list(...)
+  base_list <- list(
+    p_value = p_value,
+    FI = FI,
+    tau_obs = tau_obs,
+    fastrr_env = fastrr_env,
+    call = call
   )
+  # Merge base list with any extra named arguments
+  full_list <- c(base_list, extras)
+  structure(full_list, class = "fastrerandomize_test")
 }
 
 #' Print method for fastrerandomize_test objects

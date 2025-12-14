@@ -75,9 +75,16 @@ build_backend <- function(conda_env = "fastrerandomize_env", conda = "auto"){
   # (Optional) neutralize LD_LIBRARY_PATH inside this env to prevent overrides
   if (os == "Linux") {
     try({
-      actdir <- file.path(Sys.getenv("HOME"), "miniconda3/envs", conda_env, "etc", "conda", "activate.d")
-      dir.create(actdir, recursive = TRUE, showWarnings = FALSE)
-      writeLines("unset LD_LIBRARY_PATH", file.path(actdir, "00-unset-ld.sh"))
+      # Dynamically find the conda environment path instead of assuming ~/miniconda3/
+      conda_envs <- reticulate::conda_list(conda = conda)
+      env_python <- conda_envs$python[conda_envs$name == conda_env]
+      if (length(env_python) > 0) {
+        # Python path is typically: <env_path>/bin/python, so go up two directories
+        env_path <- dirname(dirname(env_python[1]))
+        actdir <- file.path(env_path, "etc", "conda", "activate.d")
+        dir.create(actdir, recursive = TRUE, showWarnings = FALSE)
+        writeLines("unset LD_LIBRARY_PATH", file.path(actdir, "00-unset-ld.sh"))
+      }
     }, silent = TRUE)
   }
   

@@ -173,8 +173,8 @@ generate_randomizations_mc <- function(n_units,
   })
   
   AllKeys <- fastrr_env$jax$random$split(key, as.integer(max_draws))
-  AllKeySelectionIndices <- split( as.integer( (1L:max_draws) - 1L), 
-                                   sapply(1:num_batches, function(x){rep(x,times = batch_size)}))
+  batch_ids <- ceiling(seq_len(max_draws) / batch_size)
+  AllKeySelectionIndices <- split(as.integer((1L:max_draws) - 1L), batch_ids)
   top_M_results <- sapply(1L:num_batches, function(b_){ # note: vmapping this causes unacceptable memory overhead 
     if(verbose){ message(paste0("On batch ", b_, " of ", num_batches)) }
     top_M_results_ <- top_M_fxn( fastrr_env$jnp$take(AllKeys,
