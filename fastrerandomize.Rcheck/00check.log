@@ -23,10 +23,7 @@ Unknown, possibly misspelled, fields in DESCRIPTION:
 * checking for hidden files and directories ... OK
 * checking for portable file names ... OK
 * checking for sufficient/correct file permissions ... OK
-* checking whether package ‘fastrerandomize’ can be installed ... WARNING
-Found the following significant warnings:
-  Warning: /Users/cjerzak/Documents/fastrerandomize-software/fastrerandomize.Rcheck/00_pkg_src/fastrerandomize/man/diagnose_rerandomization.Rd:98: unknown macro '\beta'
-See ‘/Users/cjerzak/Documents/fastrerandomize-software/fastrerandomize.Rcheck/00install.out’ for details.
+* checking whether package ‘fastrerandomize’ can be installed ... OK
 * checking installed package size ... OK
 * checking package directory ... OK
 * checking for future file timestamps ... OK
@@ -48,35 +45,14 @@ See ‘/Users/cjerzak/Documents/fastrerandomize-software/fastrerandomize.Rcheck/
 * checking S3 generic/method consistency ... OK
 * checking replacement functions ... OK
 * checking foreign function calls ... OK
-* checking R code for possible problems ... NOTE
-diagnose_rerandomization: no visible global function definition for
-  ‘uniroot’
-find_fiducial_interval_R: no visible global function definition for
-  ‘qnorm’
-generate_randomizations_R: no visible global function definition for
-  ‘quantile’
-hotellingT2_R: no visible global function definition for ‘cov’
-Undefined global functions or variables:
-  cov qnorm quantile uniroot
-Consider adding
-  importFrom("stats", "cov", "qnorm", "quantile", "uniroot")
-to your NAMESPACE file.
-* checking Rd files ... WARNING
-prepare_Rd: ./man/diagnose_rerandomization.Rd:98: unknown macro '\beta'
+* checking R code for possible problems ... OK
+* checking Rd files ... OK
 * checking Rd metadata ... OK
 * checking Rd line widths ... OK
 * checking Rd cross-references ... OK
 * checking for missing documentation entries ... OK
 * checking for code/documentation mismatches ... OK
-* checking Rd \usage sections ... WARNING
-Undocumented arguments in Rd file 'diagnose_rerandomization.Rd'
-  ‘n_C’
-
-Functions with \usage entries need to have the appropriate \alias
-entries, and all their arguments documented.
-The \usage entries must correspond to syntactically valid R code.
-See chapter ‘Writing R documentation files’ in the ‘Writing R
-Extensions’ manual.
+* checking Rd \usage sections ... OK
 * checking Rd contents ... OK
 * checking for unstated dependencies in examples ... OK
 * checking contents of ‘data’ directory ... OK
@@ -87,7 +63,7 @@ Extensions’ manual.
 * checking examples ... OK
 * checking for unstated dependencies in vignettes ... OK
 * checking package vignettes ... OK
-* checking re-building of vignette outputs ... [14s/14s] OK
+* checking re-building of vignette outputs ... [14s/13s] OK
 * checking PDF version of manual ... OK
 * checking HTML version of manual ... NOTE
 Skipping checking HTML validation: 'tidy' doesn't look like recent enough HTML Tidy.
@@ -97,4 +73,4 @@ Skipping checking math rendering: package 'V8' unavailable
 * checking for non-standard things in the check directory ... OK
 * checking for detritus in the temp directory ... OK
 * DONE
-Status: 3 WARNINGs, 3 NOTEs
+Status: 2 NOTEs

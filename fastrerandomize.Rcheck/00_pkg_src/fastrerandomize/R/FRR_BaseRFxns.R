@@ -1,14 +1,15 @@
-#' Compute Hotelling's T^2 in base R
+#' Compute Hotelling's T-squared statistic in base R
 #'
-#' This function provides a base R implementation of Hotelling's T^2
+#' This function provides a base R implementation of Hotelling's T-squared
 #' balance measure, renamed with `_R` for clarity that it is the R-based
 #' analog to the JAX version in fastrerandomize.
 #'
 #' @param X A numeric matrix of covariates (observations in rows).
 #' @param W A 0/1 treatment assignment vector of the same length as nrow(X).
 #'
-#' @return A numeric scalar: the Hotelling's T^2 for that assignment. 
+#' @return A numeric scalar: Hotelling's T-squared statistic for that assignment.
 #'
+#' @importFrom stats cov qnorm quantile uniroot
 #' @export
 hotellingT2_R <- function(X, W) {
   # T^2 = (n0 * n1 / (n0 + n1)) * (xbar1 - xbar0)^T * S_inv * (xbar1 - xbar0)

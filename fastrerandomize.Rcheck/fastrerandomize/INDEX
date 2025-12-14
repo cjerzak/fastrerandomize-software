@@ -35,7 +35,8 @@ generate_randomizations_mc
                         Draws a random sample of acceptable
                         randomizations from all possible complete
                         randomizations using Monte Carlo sampling
-hotellingT2_R           Compute Hotelling's T^2 in base R
+hotellingT2_R           Compute Hotelling's T-squared statistic in base
+                        R
 plot.fastrerandomize_randomizations
                         Plot method for fastrerandomize_test objects
 plot.fastrerandomize_test

@@ -6,7 +6,6 @@
 ** inst
 ** byte-compile and prepare package for lazy loading
 ** help
-Warning: /Users/cjerzak/Documents/fastrerandomize-software/fastrerandomize.Rcheck/00_pkg_src/fastrerandomize/man/diagnose_rerandomization.Rd:98: unknown macro '\beta'
 *** installing help indices
 ** building package indices
 ** installing vignettes
