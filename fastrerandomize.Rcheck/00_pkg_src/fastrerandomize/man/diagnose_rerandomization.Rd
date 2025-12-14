@@ -30,9 +30,7 @@ you must also supply `d` (the number of covariates used in M).}
 
 \item{d}{Optional integer number of covariates (needed if supplying only `M`).}
 
-\item{n_T}{Integer, number of treated units.}
-
-\item{n_C}{Integer, number of control units.}
+\item{n_T, }{n_C Integers, numbers treated and control.}
 
 \item{sigma}{Optional outcome noise SD (sigma). If `NULL`, absolute RMSEs cannot be
 formed; dimensionless "per-sigma" factors are still returned.}
@@ -96,9 +94,9 @@ where \eqn{v_a(d) = \Pr(\chi^2_{d+2}\le c)/\Pr(\chi^2_d\le c)} and
 \eqn{v(q;d) = \Pr(\chi^2_{d+2}\le \chi^2_{d;q})/q}, with
 \eqn{\chi^2_{d;q}} the q-th quantile.
 
-Power inversion (Appendix D): for two-sided size \eqn{\alpha}{alpha}
-and power \eqn{1-\beta}{1-beta}, a normal approximation suggests the RMSE goal
-\eqn{|\tau| / (z_{1-\alpha/2}+z_{1-\beta})}{|tau| / (z_(1-alpha/2)+z_(1-beta))}.
+Power inversion (Appendix D): for two-sided size \eqn{\alpha}
+and power \(1-\beta\), a normal approximation suggests the RMSE goal
+\eqn{|\tau| / \{z_{1-\alpha/2}+z_{1-\beta}\}}.
 }
 \examples{
 # Example 1: observed SMDs, realized precision only (dimensionless factors)

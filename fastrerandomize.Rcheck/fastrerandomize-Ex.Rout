@@ -1,0 +1,408 @@
+
+R version 4.5.1 (2025-06-13) -- "Great Square Root"
+Copyright (C) 2025 The R Foundation for Statistical Computing
+Platform: aarch64-apple-darwin20
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> pkgname <- "fastrerandomize"
+> source(file.path(R.home("share"), "R", "examples-header.R"))
+> options(warn = 1)
+> base::assign(".ExTimings", "fastrerandomize-Ex.timings", pos = 'CheckExEnv')
+> base::cat("name\tuser\tsystem\telapsed\n", file=base::get(".ExTimings", pos = 'CheckExEnv'))
+> base::assign(".format_ptime",
++ function(x) {
++   if(!is.na(x[4L])) x[1L] <- x[1L] + x[4L]
++   if(!is.na(x[5L])) x[2L] <- x[2L] + x[5L]
++   options(OutDec = '.')
++   format(x[1L:3L], digits = 7L)
++ },
++ pos = 'CheckExEnv')
+> 
+> ### * </HEADER>
+> library('fastrerandomize')
+> 
+> base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
+> base::assign(".old_wd", base::getwd(), pos = 'CheckExEnv')
+> cleanEx()
+> nameEx("build_backend")
+> ### * build_backend
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: build_backend
+> ### Title: A function to build the environment for fastrerandomize. Builds
+> ###   a conda environment in which 'JAX' and 'np' are installed. Users can
+> ###   also create a conda environment where 'JAX' and 'np' are installed
+> ###   themselves.
+> ### Aliases: build_backend
+> 
+> ### ** Examples
+> 
+> ## Not run: 
+> ##D # Create a conda environment named "fastrerandomize_env"
+> ##D # and install the required Python packages (jax, numpy, etc.)
+> ##D build_backend(conda_env = "fastrerandomize_env", conda = "auto")
+> ##D 
+> ##D # If you want to specify a particular conda path:
+> ##D # build_backend(conda_env = "fastrerandomize_env", conda = "/usr/local/bin/conda")
+> ## End(Not run)
+> 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("build_backend", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("check_jax_availability")
+> ### * check_jax_availability
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: check_jax_availability
+> ### Title: Check if 'Python' and 'JAX' are available
+> ### Aliases: check_jax_availability
+> 
+> ### ** Examples
+> 
+> ## Not run: 
+> ##D   check_jax_availability()
+> ## End(Not run)
+> 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("check_jax_availability", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("diagnose_rerandomization")
+> ### * diagnose_rerandomization
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: diagnose_rerandomization
+> ### Title: Diagnostic map from observed (or targeted) balance to precision
+> ###   and stringency
+> ### Aliases: diagnose_rerandomization
+> 
+> ### ** Examples
+> 
+> # Example 1: observed SMDs, realized precision only (dimensionless factors)
+> smd <- c(0.10, -0.05, 0.08, 0.02)  # standardized mean differences
+> out1 <- diagnose_rerandomization(smd = smd, n_T = 100, n_C = 100)
+> print(out1)
+diagnose_rerandomization(): diagnostic map
+  n_T = 100, n_C = 100, d = 4
+  M (sum SMD^2) = 0.0193
+
+Realized precision (from observed M):
+  RMSE (per sigma): NA
+  Conservative upper bound (per sigma): NA
+> 
+> # Example 2: same, but supply sigma and R^2 for absolute RMSE
+> out2 <- diagnose_rerandomization(smd = smd, n_T = 100, n_C = 100, sigma = 1.2, R2 = 0.4)
+> 
+> # Example 3: choose q to hit a power target (two-sided alpha=.05, 80% power, |tau|=0.2)
+> out3 <- diagnose_rerandomization(smd = smd, n_T = 100, n_C = 100, sigma = 1.2, R2 = 0.4,
++                 tau = 0.2, alpha = 0.05, power = 0.80)
+>                 
+> # Analyze rerandomization recommendation given contextual factors
+> out3$recommendation
+$feasible
+[1] FALSE
+
+$reason
+[1] "Target RMSE is below the irreducible noise floor sqrt(S)*sigma; even infinite stringency (q->0, v->0) cannot attain it when R2>0."
+
+> 
+> # Example 4: choose q to hit an absolute RMSE goal directly
+> out4 <- diagnose_rerandomization(M = sum(smd^2), d = length(smd), n_T = 100, n_C = 100,
++                 sigma = 1.2, R2 = 0.4, rmse_goal = 0.25)
+> 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("diagnose_rerandomization", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("fast_distance")
+> ### * fast_distance
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: fast_distance
+> ### Title: JAX-accelerated distance calculations
+> ### Aliases: fast_distance
+> 
+> ### ** Examples
+> 
+> ## Not run: 
+> ##D # Simple Euclidean within-matrix distances (returns an n x n matrix)
+> ##D X <- matrix(rnorm(50 * 8), 50, 8)
+> ##D D <- fast_distance(X, metric = "euclidean")
+> ##D 
+> ##D # Cosine distance between two sets
+> ##D A <- matrix(rnorm(100 * 16), 100, 16)
+> ##D B <- matrix(rnorm(120 * 16), 120, 16)
+> ##D Dcos <- fast_distance(A, B, metric = "cosine")
+> ##D 
+> ##D # Minkowski with p = 3 and feature weights
+> ##D w <- runif(ncol(A))
+> ##D Dm3 <- fast_distance(A, B, metric = "minkowski", p = 3, weights = w)
+> ##D 
+> ##D # Mahalanobis (diagonal approx, fast & robust)
+> ##D Dmah_diag <- fast_distance(X, metric = "mahalanobis", approximate_inv = TRUE)
+> ##D 
+> ##D # Mahalanobis with full inverse (computed internally)
+> ##D Dmah_full <- fast_distance(X, metric = "mahalanobis", approximate_inv = FALSE)
+> ##D 
+> ##D # Return a base R 'dist' object
+> ##D D_dist <- fast_distance(X, metric = "euclidean", as_dist = TRUE)
+> ## End(Not run)
+> 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("fast_distance", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("generate_randomizations")
+> ### * generate_randomizations
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: generate_randomizations
+> ### Title: Generate randomizations for a rerandomization-based experimental
+> ###   design
+> ### Aliases: generate_randomizations
+> 
+> ### ** Examples
+> 
+> 
+> ## Not run: 
+> ##D # Generate synthetic data 
+> ##D X <- matrix(rnorm(20*5), 20, 5)
+> ##D 
+> ##D # Generate randomizations using exact enumeration
+> ##D RandomizationSet_Exact <- generate_randomizations(
+> ##D                n_units = nrow(X), 
+> ##D                n_treated = round(nrow(X)/2), 
+> ##D                X = X, 
+> ##D                randomization_accept_prob=0.1,
+> ##D                randomization_type="exact")
+> ##D 
+> ##D # Generate randomizations using Monte Carlo sampling
+> ##D RandomizationSet_MC <- generate_randomizations(
+> ##D                n_units = nrow(X), 
+> ##D                n_treated = round(nrow(X)/2), 
+> ##D                X = X,
+> ##D                randomization_accept_prob = 0.1,
+> ##D                randomization_type = "monte_carlo",
+> ##D                max_draws = 100000,
+> ##D                batch_size = 1000)
+> ##D  
+> ## End(Not run)
+> 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("generate_randomizations", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("generate_randomizations_exact")
+> ### * generate_randomizations_exact
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: generate_randomizations_exact
+> ### Title: Generate Complete Randomizations with Optional Balance
+> ###   Constraints
+> ### Aliases: generate_randomizations_exact
+> 
+> ### ** Examples
+> 
+> 
+> ## Not run: 
+> ##D # Generate synthetic data 
+> ##D X <- matrix(rnorm(60), nrow = 10)  # 10 units, 6 covariates
+> ##D 
+> ##D # Generate balanced randomizations with covariates
+> ##D BalancedRandomizations <- generate_randomizations_exact(
+> ##D   n_units = 10,
+> ##D   n_treated = 5,
+> ##D   X = X,
+> ##D   randomization_accept_prob = 0.25  # Keep top 25% most balanced
+> ##D )
+> ## End(Not run)
+> 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("generate_randomizations_exact", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("generate_randomizations_mc")
+> ### * generate_randomizations_mc
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: generate_randomizations_mc
+> ### Title: Draws a random sample of acceptable randomizations from all
+> ###   possible complete randomizations using Monte Carlo sampling
+> ### Aliases: generate_randomizations_mc
+> 
+> ### ** Examples
+> 
+> 
+> ## Not run: 
+> ##D # Generate synthetic data 
+> ##D X <- matrix(rnorm(100*5), 100, 5) # 5 covariates
+> ##D 
+> ##D # Generate 1000 randomizations for 100 units with 50 treated
+> ##D rand_less_strict <- generate_randomizations_mc(
+> ##D                n_units = 100, 
+> ##D                n_treated = 50, 
+> ##D                X = X, 
+> ##D                randomization_accept_prob=0.01, 
+> ##D                max_draws = 100000,
+> ##D                batch_size = 1000)
+> ##D 
+> ##D # Use a stricter balance criterion
+> ##D rand_more_strict <- generate_randomizations_mc(
+> ##D                n_units = 100, 
+> ##D                n_treated = 50, 
+> ##D                X = X, 
+> ##D                randomization_accept_prob=0.001, 
+> ##D                max_draws = 1000000,
+> ##D                batch_size = 1000)
+> ## End(Not run)
+> 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("generate_randomizations_mc", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("print2")
+> ### * print2
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: print2
+> ### Title: Print timestamped messages with optional quieting
+> ### Aliases: print2
+> 
+> ### ** Examples
+> 
+> # Print a basic message with timestamp
+> print2("Processing started")
+[1] "[2025-12-14 17:13:12] Processing started"
+> 
+> # Suppress output
+> print2("This won't show", quiet = TRUE)
+> 
+> # Use in a loop
+> for(i in 1:3) {
++   print2(sprintf("Processing item %d", i))
++ }
+[1] "[2025-12-14 17:13:12] Processing item 1"
+[1] "[2025-12-14 17:13:12] Processing item 2"
+[1] "[2025-12-14 17:13:12] Processing item 3"
+> 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("print2", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("randomization_test")
+> ### * randomization_test
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: randomization_test
+> ### Title: Fast randomization test
+> ### Aliases: randomization_test
+> 
+> ### ** Examples
+> 
+> ## Not run: 
+> ##D # A small synthetic demonstration with 6 units, 3 treated and 3 controls:
+> ##D 
+> ##D # Generate pre-treatment covariates
+> ##D X <- matrix(rnorm(24*2), ncol = 2)
+> ##D 
+> ##D # Generate candidate randomizations
+> ##D RandomizationSet_MC <- generate_randomizations(
+> ##D   n_units = nrow(X),
+> ##D   n_treated = round(nrow(X)/2),
+> ##D   X = X,
+> ##D   randomization_accept_prob = 0.1,
+> ##D   randomization_type = "monte_carlo",
+> ##D   max_draws = 100000,
+> ##D   batch_size = 1000
+> ##D )
+> ##D 
+> ##D # Generate outcome
+> ##D W <- RandomizationSet_MC$randomizations[1,]
+> ##D obsY <- rnorm(nrow(X), mean = 2 * W)
+> ##D 
+> ##D # Perform randomization test
+> ##D results_base <- randomization_test(
+> ##D   obsW = W,
+> ##D   obsY = obsY,
+> ##D   candidate_randomizations = RandomizationSet_MC$randomizations
+> ##D )
+> ##D print(results_base)
+> ##D 
+> ##D # Perform randomization test with fiducial interval
+> ##D result_fi <- randomization_test(
+> ##D   obsW = W,
+> ##D   obsY = obsY,
+> ##D   candidate_randomizations = RandomizationSet_MC$randomizations,
+> ##D   findFI = TRUE
+> ##D )
+> ##D print(result_fi)
+> ## End(Not run)
+> 
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("randomization_test", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> ### * <FOOTER>
+> ###
+> cleanEx()
+> options(digits = 7L)
+> base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
+Time elapsed:  0.969 0.036 1.009 0 0 
+> grDevices::dev.off()
+null device 
+          1 
+> ###
+> ### Local variables: ***
+> ### mode: outline-minor ***
+> ### outline-regexp: "\\(> \\)?### [*]+" ***
+> ### End: ***
+> quit('no')

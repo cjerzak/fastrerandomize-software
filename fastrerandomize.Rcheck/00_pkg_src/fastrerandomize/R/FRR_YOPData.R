@@ -1,0 +1,26 @@
+#' YOPData
+#'
+#' @description Data from a re-analysis of the Youth Opportunities Program anti-poverty RCT 
+#' in Uganda, with satellite imagery neural representations linked to RCT units.
+#'
+#' @format A list containing two data frames:
+#' \describe{
+#'   \item{RCTData}{Treatment, outcome, and geolocation information}
+#'   \item{ImageEmbeddings}{CLIP-RSICD neural embeddings of satellite imagery}
+#' }
+#' 
+#' @source 
+#' \itemize{
+#'   \item Blattman, C., Fiala, N. and Martinez, S. (2020). The Long-term Impacts 
+#'   of Grants on Poverty: Nine-year Evidence from Uganda's Youth Opportunities Program. 
+#'   American Economic Review: Insights, 2(3), 287-304.
+#'   
+#'   \item Jerzak, C.T., Johansson, F.D. and Daoud, A. (2023). Image-based Treatment 
+#'   Effect Heterogeneity. Conference on Causal Learning and Reasoning, 531-552. PMLR.
+#' }
+#' 
+#' @name YOPData
+#' @docType data
+#' @usage data(YOPData)
+
+NULL

@@ -1,0 +1,57 @@
+QJEData                 QJEData: Agricultural Treatment Experiment Data
+YOPData                 YOPData
+build_backend           A function to build the environment for
+                        fastrerandomize. Builds a conda environment in
+                        which 'JAX' and 'np' are installed. Users can
+                        also create a conda environment where 'JAX' and
+                        'np' are installed themselves.
+check_jax_availability
+                        Check if 'Python' and 'JAX' are available
+compute_diff_at_tau_for_oneW_R
+                        Compute potential outcome difference in means
+                        for a single assignment under a hypothesized
+                        tau in base R
+diagnose_rerandomization
+                        Diagnostic map from observed (or targeted)
+                        balance to precision and stringency
+diff_in_means_R         Simple difference in means in base R
+fast_distance           JAX-accelerated distance calculations
+fastrerandomize_class   Constructor for fastrerandomize randomizations
+fastrerandomize_test    Constructor for fastrerandomize randomization
+                        test objects
+find_fiducial_interval_R
+                        Fiducial interval logic in base R, for
+                        randomization test
+generate_randomizations
+                        Generate randomizations for a
+                        rerandomization-based experimental design
+generate_randomizations_R
+                        Generate randomizations in base R, filtering by
+                        Hotelling's T^2 acceptance
+generate_randomizations_exact
+                        Generate Complete Randomizations with Optional
+                        Balance Constraints
+generate_randomizations_mc
+                        Draws a random sample of acceptable
+                        randomizations from all possible complete
+                        randomizations using Monte Carlo sampling
+hotellingT2_R           Compute Hotelling's T^2 in base R
+plot.fastrerandomize_randomizations
+                        Plot method for fastrerandomize_test objects
+plot.fastrerandomize_test
+                        Plot method for fastrerandomize_test objects
+print.fastrerandomize_randomizations
+                        Print method for fastrerandomize_randomizations
+                        objects
+print.fastrerandomize_test
+                        Print method for fastrerandomize_test objects
+print2                  Print timestamped messages with optional
+                        quieting
+randomization_test      Fast randomization test
+randomization_test_R    Base R randomization test: difference in means
+                        + optional fiducial interval
+summary.fastrerandomize_randomizations
+                        Summary method for
+                        fastrerandomize_randomizations objects
+summary.fastrerandomize_test
+                        Summary method for fastrerandomize_test objects

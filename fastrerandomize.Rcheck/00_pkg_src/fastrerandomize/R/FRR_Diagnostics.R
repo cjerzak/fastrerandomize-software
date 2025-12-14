@@ -10,8 +10,7 @@
 #' @param M Optional scalar Mahalanobis distance M; if provided without `smd`,
 #'   you must also supply `d` (the number of covariates used in M).
 #' @param d Optional integer number of covariates (needed if supplying only `M`).
-#' @param n_T Integer, number of treated units.
-#' @param n_C Integer, number of control units.
+#' @param n_T, n_C Integers, numbers treated and control.
 #' @param sigma Optional outcome noise SD (sigma). If `NULL`, absolute RMSEs cannot be
 #'   formed; dimensionless "per-sigma" factors are still returned.
 #' @param R2 Optional model R^2 for Y ~ X under the linear potential-outcomes model.
@@ -47,9 +46,9 @@
 #' \eqn{v(q;d) = \Pr(\chi^2_{d+2}\le \chi^2_{d;q})/q}, with
 #' \eqn{\chi^2_{d;q}} the q-th quantile.
 #'
-#' Power inversion (Appendix D): for two-sided size \eqn{\alpha}{alpha}
-#' and power \eqn{1-\beta}{1-beta}, a normal approximation suggests the RMSE goal
-#' \eqn{|\tau| / (z_{1-\alpha/2}+z_{1-\beta})}{|tau| / (z_(1-alpha/2)+z_(1-beta))}.
+#' Power inversion (Appendix D): for two-sided size \eqn{\alpha}
+#' and power \(1-\beta\), a normal approximation suggests the RMSE goal
+#' \eqn{|\tau| / \{z_{1-\alpha/2}+z_{1-\beta}\}}.
 #'
 #' @return A list of class `"fastrerandomize_diagnostic"` with elements:
 #' \itemize{

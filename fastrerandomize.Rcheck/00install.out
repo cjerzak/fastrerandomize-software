@@ -1,0 +1,16 @@
+* installing *source* package ‘fastrerandomize’ ...
+** this is package ‘fastrerandomize’ version ‘0.3’
+** using staged installation
+** R
+** data
+** inst
+** byte-compile and prepare package for lazy loading
+** help
+Warning: /Users/cjerzak/Documents/fastrerandomize-software/fastrerandomize.Rcheck/00_pkg_src/fastrerandomize/man/diagnose_rerandomization.Rd:98: unknown macro '\beta'
+*** installing help indices
+** building package indices
+** installing vignettes
+** testing if installed package can be loaded from temporary location
+** testing if installed package can be loaded from final location
+** testing if installed package keeps a record of temporary installation path
+* DONE (fastrerandomize)

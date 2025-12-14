@@ -1,0 +1,100 @@
+* using log directory ‘/Users/cjerzak/Documents/fastrerandomize-software/fastrerandomize.Rcheck’
+* using R version 4.5.1 (2025-06-13)
+* using platform: aarch64-apple-darwin20
+* R was compiled by
+    Apple clang version 16.0.0 (clang-1600.0.26.6)
+    GNU Fortran (GCC) 14.2.0
+* running under: macOS Tahoe 26.2
+* using session charset: UTF-8
+* using option ‘--as-cran’
+* checking for file ‘fastrerandomize/DESCRIPTION’ ... OK
+* this is package ‘fastrerandomize’ version ‘0.3’
+* package encoding: UTF-8
+* checking CRAN incoming feasibility ... [4s/15s] NOTE
+Maintainer: ‘Connor Jerzak <connor.jerzak@gmail.com>’
+
+Unknown, possibly misspelled, fields in DESCRIPTION:
+  ‘RemoteType’ ‘RemotePkgRef’ ‘RemoteUrl’
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... OK
+* checking for portable file names ... OK
+* checking for sufficient/correct file permissions ... OK
+* checking whether package ‘fastrerandomize’ can be installed ... WARNING
+Found the following significant warnings:
+  Warning: /Users/cjerzak/Documents/fastrerandomize-software/fastrerandomize.Rcheck/00_pkg_src/fastrerandomize/man/diagnose_rerandomization.Rd:98: unknown macro '\beta'
+See ‘/Users/cjerzak/Documents/fastrerandomize-software/fastrerandomize.Rcheck/00install.out’ for details.
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking for future file timestamps ... OK
+* checking ‘build’ directory ... OK
+* checking DESCRIPTION meta-information ... OK
+* checking top-level files ... OK
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... OK
+* checking code files for non-ASCII characters ... OK
+* checking R files for syntax errors ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking use of S3 registration ... OK
+* checking dependencies in R code ... OK
+* checking S3 generic/method consistency ... OK
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... NOTE
+diagnose_rerandomization: no visible global function definition for
+  ‘uniroot’
+find_fiducial_interval_R: no visible global function definition for
+  ‘qnorm’
+generate_randomizations_R: no visible global function definition for
+  ‘quantile’
+hotellingT2_R: no visible global function definition for ‘cov’
+Undefined global functions or variables:
+  cov qnorm quantile uniroot
+Consider adding
+  importFrom("stats", "cov", "qnorm", "quantile", "uniroot")
+to your NAMESPACE file.
+* checking Rd files ... WARNING
+prepare_Rd: ./man/diagnose_rerandomization.Rd:98: unknown macro '\beta'
+* checking Rd metadata ... OK
+* checking Rd line widths ... OK
+* checking Rd cross-references ... OK
+* checking for missing documentation entries ... OK
+* checking for code/documentation mismatches ... OK
+* checking Rd \usage sections ... WARNING
+Undocumented arguments in Rd file 'diagnose_rerandomization.Rd'
+  ‘n_C’
+
+Functions with \usage entries need to have the appropriate \alias
+entries, and all their arguments documented.
+The \usage entries must correspond to syntactically valid R code.
+See chapter ‘Writing R documentation files’ in the ‘Writing R
+Extensions’ manual.
+* checking Rd contents ... OK
+* checking for unstated dependencies in examples ... OK
+* checking contents of ‘data’ directory ... OK
+* checking data for non-ASCII characters ... OK
+* checking data for ASCII and uncompressed saves ... OK
+* checking installed files from ‘inst/doc’ ... OK
+* checking files in ‘vignettes’ ... OK
+* checking examples ... OK
+* checking for unstated dependencies in vignettes ... OK
+* checking package vignettes ... OK
+* checking re-building of vignette outputs ... [14s/14s] OK
+* checking PDF version of manual ... OK
+* checking HTML version of manual ... NOTE
+Skipping checking HTML validation: 'tidy' doesn't look like recent enough HTML Tidy.
+Please obtain a recent version of HTML Tidy by downloading a binary
+release or compiling the source code from <https://www.html-tidy.org/>.
+Skipping checking math rendering: package 'V8' unavailable
+* checking for non-standard things in the check directory ... OK
+* checking for detritus in the temp directory ... OK
+* DONE
+Status: 3 WARNINGs, 3 NOTEs
