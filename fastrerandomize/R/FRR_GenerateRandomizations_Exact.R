@@ -104,18 +104,22 @@ generate_randomizations_exact <- function(
     # Set up sample sizes for treatment/control
     n0_array <- fastrr_env$jnp$array(  (n_units - n_treated) )
     n1_array <- fastrr_env$jnp$array(  n_treated )
-    
-    # pre-compute matrix inverse 
+
+    # pre-compute matrix inverse
     {
       SAMP_COV_INV_APPROX <- fastrr_env$jnp$reciprocal( fastrr_env$jnp$var( fastrr_env$jnp$array(as.matrix(X)), axis = 0L) )
       {
-        SAMP_COV_INV <-  fastrr_env$jnp$cov( fastrr_env$jnp$array(as.matrix(X)), rowvar = FALSE) 
+        SAMP_COV_INV <-  fastrr_env$jnp$cov( fastrr_env$jnp$array(as.matrix(X)), rowvar = FALSE)
         IS_METAL_BACKEND <- grepl(reticulate::py_str( fastrr_env$jax$devices()[[1]] ), pattern = "METAL")
-        if(IS_METAL_BACKEND){ 
+        if(IS_METAL_BACKEND){
           SAMP_COV_INV <- SAMP_COV_INV$to_device(fastrr_env$jax$devices("cpu")[[1]])
         }
+        # Handle single covariate case: cov returns scalar, inv needs 2D
+        if(ncol(X) == 1L) {
+          SAMP_COV_INV <- fastrr_env$jnp$reshape(SAMP_COV_INV, c(1L, 1L))
+        }
         SAMP_COV_INV <- fastrr_env$jnp$linalg$inv(SAMP_COV_INV)
-        if(IS_METAL_BACKEND){ 
+        if(IS_METAL_BACKEND){
           SAMP_COV_INV <- SAMP_COV_INV$to_device(fastrr_env$jax$devices("METAL")[[1]])
         }
       }
