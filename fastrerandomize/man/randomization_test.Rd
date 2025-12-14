@@ -7,21 +7,13 @@
 randomization_test(
   obsW = NULL,
   obsY = NULL,
-  X = NULL,
   alpha = 0.05,
   candidate_randomizations = NULL,
   candidate_randomizations_array = NULL,
   n0_array = NULL,
   n1_array = NULL,
-  randomization_accept_prob = 1,
   findFI = FALSE,
   c_initial = 2,
-  max_draws = 10^6,
-  batch_size = 10^5,
-  randomization_type = "monte_carlo",
-  approximate_inv = TRUE,
-  file = NULL,
-  verbose = TRUE,
   conda_env = "fastrerandomize_env",
   conda_env_required = TRUE
 )
@@ -30,8 +22,6 @@ randomization_test(
 \item{obsW}{A numeric vector where \code{0}'s correspond to control units and \code{1}'s to treated units.}
 
 \item{obsY}{An optional numeric vector of observed outcomes. If not provided, the function assumes a NULL value.}
-
-\item{X}{A numeric matrix of covariates.}
 
 \item{alpha}{The significance level for the test. Default is \code{0.05}.}
 
@@ -43,32 +33,10 @@ randomization_test(
 
 \item{n1_array}{An optional array specifying the number of treated units.}
 
-\item{randomization_accept_prob}{An numeric scalar or vector of probabilities for accepting each randomization.}
-
 \item{findFI}{A logical value indicating whether to find the fiducial interval. Default is FALSE.}
 
-\item{c_initial}{A numeric value representing the initial criterion for the randomization. Default is \code{2}.}
-
-\item{max_draws}{An integer specifying the maximum number of candidate randomizations
-to generate (or to consider) for the test when \code{randomization_type = "monte_carlo"}.
-Default is \code{1e6}.}
-
-\item{batch_size}{An integer specifying the batch size for Monte Carlo sampling.
-Batches are processed one at a time for memory efficiency. Default is \code{1e5}.}
-
-\item{randomization_type}{A string specifying the type of randomization for the test.
-Allowed values are "exact" or "monte_carlo". Default is "monte_carlo".}
-
-\item{approximate_inv}{A logical value indicating whether to use an approximate inverse
-(diagonal of the covariance matrix) instead of the full matrix inverse when computing
-balance metrics. This can speed up computations for high-dimensional covariates.
-Default is \code{TRUE}.}
-
-\item{file}{A character string specifying the path (including filename) where candidate
-randomizations will be saved or loaded from. If \code{NULL}, randomizations
-remain in memory. Default is NULL.}
-
-\item{verbose}{A logical value indicating whether to print progress information. Default is \code{TRUE}.}
+\item{c_initial}{A numeric value representing the initial criterion for the fiducial interval
+search. Default is \code{2}.}
 
 \item{conda_env}{A character string specifying the name of the conda environment to use
 via \code{reticulate}. Default is \code{"fastrerandomize_env"}.}
@@ -121,16 +89,14 @@ obsY <- rnorm(nrow(X), mean = 2 * W)
 results_base <- randomization_test(
   obsW = W,
   obsY = obsY,
-  X = X,
-  candidate_randomizations = RandomizationSet_MC$randomizations,
+  candidate_randomizations = RandomizationSet_MC$randomizations
 )
 print(results_base)
 
-# Perform randomization test
+# Perform randomization test with fiducial interval
 result_fi <- randomization_test(
   obsW = W,
   obsY = obsY,
-  X = X,
   candidate_randomizations = RandomizationSet_MC$randomizations,
   findFI = TRUE
 )
