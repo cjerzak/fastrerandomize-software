@@ -11,8 +11,8 @@ bibentry(
     person("Rebecca", "Goldstein", role = "aut", comment = c(ORCID = "0000-0002-9944-8440"))
   ),
   year     = "2025",
-  version  = "0.1",
-  note     = "R package version 0.1",
+  version  = "0.3",
+  note     = "R package version 0.3",
   url      = "https://doi.org/10.32614/CRAN.package.fastrerandomize"
 )
 

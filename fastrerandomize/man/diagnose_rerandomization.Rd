@@ -95,7 +95,7 @@ where \eqn{v_a(d) = \Pr(\chi^2_{d+2}\le c)/\Pr(\chi^2_d\le c)} and
 \eqn{\chi^2_{d;q}} the q-th quantile.
 
 Power inversion (Appendix D): for two-sided size \eqn{\alpha}
-and power \(1-\beta\), a normal approximation suggests the RMSE goal
+and power \eqn{1-\beta}, a normal approximation suggests the RMSE goal
 \eqn{|\tau| / \{z_{1-\alpha/2}+z_{1-\beta}\}}.
 }
 \examples{
