@@ -44,7 +44,7 @@ Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 RoxygenNote: 7.3.3
 NeedsCompilation: no
-Packaged: 2025-12-22 21:43:11 UTC; cjerzak
+Packaged: 2025-12-22 22:05:18 UTC; cjerzak
 Author: Fucheng Warren Zhu [aut] (ORCID:
     <https://orcid.org/0009-0001-5692-7572>),
   Aniket Sachin Kamat [aut] (ORCID:

@@ -74,7 +74,7 @@ A list of class `"fastrerandomize_diagnostic"` with elements:
 Implements the calculations in Theorem 1 and Appendix D of the paper involving: 
 (1) Realized RMSE from an observed Mahalanobis distance M (or SMDs);
 (2) Ex-ante RMSE when accepting assignments with M < a (equivalently, with acceptance probability q under complete randomization);
-(3) largest acceptance probability q that attains a user-specified precision goal,provided via an RMSE target or via a power target (alpha, 1-beta, |tau|).
+(3) largest acceptance probability q that attains a user-specified precision goal, provided via an RMSE target or via a power target (alpha, 1-beta, |tau|).
 }
 \details{
 Realized (conditional) RMSE: with standardized/whitened X and typical

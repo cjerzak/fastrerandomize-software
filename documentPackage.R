@@ -26,7 +26,6 @@
   system( paste(shQuote(file.path(R.home("bin"), "R")),
                 "R CMD build --resave-data", shQuote(package_path)) )
   
-  
   # check as cran
   system( paste(shQuote(file.path(R.home("bin"), "R")),
                 "R CMD check --as-cran",

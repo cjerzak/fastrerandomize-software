@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.4.5)  22 DEC 2025 16:44
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.4.5)  22 DEC 2025 17:06
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -347,8 +347,8 @@ File: l3backend-pdftex.def 2024-02-20 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count294
 \l__pdf_internal_box=\box58
 )
-(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpnImD0k/Rd2pdf2636
-1aafcaa/Rd2.aux)
+(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpN4ux7w/Rd2pdfc086
+1609c8e7/Rd2.aux)
 \openout1 = `Rd2.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
@@ -386,21 +386,23 @@ LaTeX Font Info:    ... okay on input line 8.
 )
 Package hyperref Info: Link coloring ON on input line 8.
 
-(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpnImD0k/Rd2pdf2636
-1aafcaa/Rd2.out)
-(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpnImD0k/Rd2pdf2636
-1aafcaa/Rd2.out)
+(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpN4ux7w/Rd2pdfc086
+1609c8e7/Rd2.out)
+(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpN4ux7w/Rd2pdfc086
+1609c8e7/Rd2.out)
 \@outlinefile=\write4
 \openout4 = `Rd2.out'.
 
 LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 3
 0.
- (/usr/local/texlive/2024/texmf-dist/tex/latex/psnfss/ts1ptm.fd
+
+(/usr/local/texlive/2024/texmf-dist/tex/latex/psnfss/ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 )
 LaTeX Font Info:    Trying to load font information for T1+zi4 on input line 31
 .
- (/usr/local/texlive/2024/texmf-dist/tex/latex/inconsolata/t1zi4.fd
+
+(/usr/local/texlive/2024/texmf-dist/tex/latex/inconsolata/t1zi4.fd
 File: t1zi4.fd 2018/01/14 T1/zi4 (Inconsolata)
 )
 LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
@@ -423,8 +425,8 @@ LaTeX Font Info:    Trying to load font information for U+rsfs on input line 31
 (/usr/local/texlive/2024/texmf-dist/tex/latex/jknapltx/ursfs.fd
 File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
 )
-(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpnImD0k/Rd2pdf2636
-1aafcaa/Rd2.toc [1
+(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpN4ux7w/Rd2pdfc086
+1609c8e7/Rd2.toc [1
 
 
 {/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/usr/loc
@@ -530,8 +532,8 @@ in-ter-val. De-fault is FALSE.
  []
 
 [22] [23] [24]
-(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpnImD0k/Rd2pdf2636
-1aafcaa/Rd2.ind [25]
+(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpN4ux7w/Rd2pdfc086
+1609c8e7/Rd2.ind [25]
 Overfull \hbox (3.3567pt too wide) in paragraph at lines 63--65
 []\T1/zi4/m/n/10 summary.fastrerandomize_randomizations\T1/ptm/m/n/10 , 
  []
@@ -540,8 +542,8 @@ Overfull \hbox (3.3567pt too wide) in paragraph at lines 63--65
 
 
 ])
-(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpnImD0k/Rd2pdf2636
-1aafcaa/Rd2.aux)
+(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpN4ux7w/Rd2pdfc086
+1609c8e7/Rd2.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
@@ -551,7 +553,7 @@ Package rerunfilecheck Info: File `Rd2.out' has not changed.
  ) 
 Here is how much of TeX's memory you used:
  10775 strings out of 474116
- 164160 string characters out of 5743683
+ 164173 string characters out of 5743683
  1941187 words of memory out of 5000000
  32739 multiletter control sequences out of 15000+600000
  596880 words of font info for 84 fonts, out of 8000000 for 9000
@@ -579,7 +581,7 @@ sr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr
 /texlive/2024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2
 024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2024/texmf-
 dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (26 pages, 224936 bytes).
+Output written on Rd2.pdf (26 pages, 224491 bytes).
 PDF statistics:
  587 PDF objects out of 1000 (max. 8388607)
  524 compressed objects within 6 object streams

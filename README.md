@@ -18,7 +18,7 @@
 *Note:* `fastrerandomize` has been successfully tested on [CPU](https://en.wikipedia.org/wiki/Central_processing_unit), [CUDA](https://en.wikipedia.org/wiki/CUDA), and [METAL](https://en.wikipedia.org/wiki/Metal_(API)) frameworks. Special thanks to [Aniket Kamat](https://github.com/aniketkamat) and [Fucheng Warren Zhu](https://github.com/WarrenZhu050413) for their work on the latest package build! 
 
 # What is `fastrerandomize`?<a id="description"></a>
-The `fastrerandomize` contains functions such as `randomization_test`, which offers a streamlined approach for performing randomization tests after using rerandomization in the research design. 
+`fastrerandomize` contains functions such as `randomization_test`, which offers a streamlined approach for performing randomization tests after using rerandomization in the research design. 
 
 We employ a [JAX backend](https://en.wikipedia.org/wiki/Google_JAX) to make exact rerandomization inference possible even for larger experiments where the number of randomizations is in the hundreds of millions or where experimenters seek to maintain balanced randomizations across thousands of features.
 

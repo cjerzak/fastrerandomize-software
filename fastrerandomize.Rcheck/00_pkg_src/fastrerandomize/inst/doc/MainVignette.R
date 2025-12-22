@@ -39,13 +39,13 @@ CandRandomizations <- generate_randomizations(
 
 ## ----s3_methods---------------------------------------------------------------
 if(RunMainAnalysis){
-# 4a. Print the object
+# 3a. Print the object
 print(CandRandomizations)
 
-# 4b. Summary
+# 3b. Summary
 summary(CandRandomizations)
 
-# 4c. Plot the balance distribution
+# 3c. Plot the balance distribution
 plot(CandRandomizations)
 }
 

@@ -316,7 +316,7 @@ $reason
 > 
 > # Print a basic message with timestamp
 > print2("Processing started")
-[1] "[2025-12-22 16:43:51] Processing started"
+[1] "[2025-12-22 17:06:14] Processing started"
 > 
 > # Suppress output
 > print2("This won't show", quiet = TRUE)
@@ -325,9 +325,9 @@ $reason
 > for(i in 1:3) {
 +   print2(sprintf("Processing item %d", i))
 + }
-[1] "[2025-12-22 16:43:51] Processing item 1"
-[1] "[2025-12-22 16:43:51] Processing item 2"
-[1] "[2025-12-22 16:43:51] Processing item 3"
+[1] "[2025-12-22 17:06:14] Processing item 1"
+[1] "[2025-12-22 17:06:14] Processing item 2"
+[1] "[2025-12-22 17:06:14] Processing item 3"
 > 
 > 
 > 
@@ -396,7 +396,7 @@ $reason
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  0.983 0.043 1.03 0 0 
+Time elapsed:  1.044 0.041 1.087 0 0 
 > grDevices::dev.off()
 null device 
           1 

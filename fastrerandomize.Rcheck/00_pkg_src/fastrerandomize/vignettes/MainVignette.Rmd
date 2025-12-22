@@ -75,28 +75,28 @@ CandRandomizations <- generate_randomizations(
 }
 ```
 
-## 4. S3 Methods: Print, Summary, and Plot
+## 3. S3 Methods: Print, Summary, and Plot
 
 `generate_randomizations()` returns an S3 object of class `fastrerandomize_randomizations`. We can use its associated print, summary, and plot methods to inspect the candidate randomizations.
 
 ```{r s3_methods}
 if(RunMainAnalysis){
-# 4a. Print the object
+# 3a. Print the object
 print(CandRandomizations)
 
-# 4b. Summary
+# 3b. Summary
 summary(CandRandomizations)
 
-# 4c. Plot the balance distribution
+# 3c. Plot the balance distribution
 plot(CandRandomizations)
 }
 ```
 
-## 3. Randomization Test
+## 4. Randomization Test
 
 Next, we showcase a randomization-based inference procedure using fastrerandomize.
 
-### 3a. Setup Simulated Outcomes
+### 4a. Setup Simulated Outcomes
 
 We simulate an outcome Y that depends on our covariates X, the chosen randomization, and some true treatment effect τ. Here, we pick the first acceptable randomization from our set as our "observed" assignment, Wobs.
 
@@ -110,7 +110,7 @@ Yobs <- as.numeric( as.matrix(X) %*% as.matrix(CoefY) + Wobs * tau_true + rnorm(
 }
 ```
 
-### 3b. Run the Randomization Test
+### 4b. Run the Randomization Test
 
 We pass our observed treatment assignment (`obsW`), observed outcomes (`obsY`), and the full matrix of candidate randomizations (`candidate_randomizations`) to `randomization_test()`. This test:
 

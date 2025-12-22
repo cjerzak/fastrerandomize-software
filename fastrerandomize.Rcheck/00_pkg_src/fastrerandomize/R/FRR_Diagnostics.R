@@ -3,7 +3,7 @@
 #' Implements the calculations in Theorem 1 and Appendix D of the paper involving: 
 #' (1) Realized RMSE from an observed Mahalanobis distance M (or SMDs);
 #' (2) Ex-ante RMSE when accepting assignments with M < a (equivalently, with acceptance probability q under complete randomization);
-#' (3) largest acceptance probability q that attains a user-specified precision goal,provided via an RMSE target or via a power target (alpha, 1-beta, |tau|).
+#' (3) largest acceptance probability q that attains a user-specified precision goal, provided via an RMSE target or via a power target (alpha, 1-beta, |tau|).
 #'
 #' @param smd Optional numeric vector of standardized mean differences; if supplied,
 #'   M is computed as sum(smd^2), and d = length(smd).
