@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.4.5)  14 DEC 2025 17:59
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2024.4.5)  22 DEC 2025 16:44
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -347,8 +347,8 @@ File: l3backend-pdftex.def 2024-02-20 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count294
 \l__pdf_internal_box=\box58
 )
-(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpnUFRTo/Rd2pdfd33c
-46bc1fac/Rd2.aux)
+(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpnImD0k/Rd2pdf2636
+1aafcaa/Rd2.aux)
 \openout1 = `Rd2.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
@@ -386,23 +386,21 @@ LaTeX Font Info:    ... okay on input line 8.
 )
 Package hyperref Info: Link coloring ON on input line 8.
 
-(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpnUFRTo/Rd2pdfd33c
-46bc1fac/Rd2.out)
-(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpnUFRTo/Rd2pdfd33c
-46bc1fac/Rd2.out)
+(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpnImD0k/Rd2pdf2636
+1aafcaa/Rd2.out)
+(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpnImD0k/Rd2pdf2636
+1aafcaa/Rd2.out)
 \@outlinefile=\write4
 \openout4 = `Rd2.out'.
 
 LaTeX Font Info:    Trying to load font information for TS1+ptm on input line 3
 0.
-
-(/usr/local/texlive/2024/texmf-dist/tex/latex/psnfss/ts1ptm.fd
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/psnfss/ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 )
 LaTeX Font Info:    Trying to load font information for T1+zi4 on input line 31
 .
-
-(/usr/local/texlive/2024/texmf-dist/tex/latex/inconsolata/t1zi4.fd
+ (/usr/local/texlive/2024/texmf-dist/tex/latex/inconsolata/t1zi4.fd
 File: t1zi4.fd 2018/01/14 T1/zi4 (Inconsolata)
 )
 LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
@@ -424,48 +422,49 @@ LaTeX Font Info:    Trying to load font information for U+rsfs on input line 31
 
 (/usr/local/texlive/2024/texmf-dist/tex/latex/jknapltx/ursfs.fd
 File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
-) [1
+)
+(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpnImD0k/Rd2pdf2636
+1aafcaa/Rd2.toc [1
 
 
 {/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/usr/loc
 al/texlive/2024/texmf-dist/fonts/enc/dvips/base/8r.enc}{/usr/local/texlive/2024
-/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc}]
-(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpnUFRTo/Rd2pdfd33c
-46bc1fac/Rd2.toc)
+/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc}])
 \tf@toc=\write5
 \openout5 = `Rd2.toc'.
 
- [2]
+
+[2]
 LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
-(Font)              scaled to size 9.0pt on input line 84.
+(Font)              scaled to size 9.0pt on input line 81.
  [3] [4] [5]
-Overfull \hbox (20.33891pt too wide) in paragraph at lines 259--261
+Overfull \hbox (20.33891pt too wide) in paragraph at lines 256--258
 []\T1/zi4/m/n/10 realized[]\T1/ptm/m/n/10 : []\T1/zi4/m/n/10 rmse_factor []\T1/
 ptm/m/n/10 (di-men-sion-less, per sigma), []\T1/zi4/m/n/10 rmse[]\T1/ptm/m/n/10
  , and con-ser-va-tive []\T1/zi4/m/n/10 rmse_upper_factor[]\T1/ptm/m/n/10 ,
  []
 
 
-Overfull \hbox (14.18091pt too wide) in paragraph at lines 263--266
+Overfull \hbox (14.18091pt too wide) in paragraph at lines 260--263
 []\T1/zi4/m/n/10 v_star[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 rmse_exante[]\T1/ptm
 /m/n/10 , []\T1/zi4/m/n/10 expected_M_accepted[]\T1/ptm/m/n/10 , and []\T1/zi4/
 m/n/10 expected_draws_per_accept = 1/q_star[]\T1/ptm/m/n/10 . 
  []
 
 [6] [7]
-Overfull \hbox (34.75021pt too wide) in paragraph at lines 400--400
+Overfull \hbox (34.75021pt too wide) in paragraph at lines 397--397
  []  \T1/zi4/m/n/10 metric = c("euclidean", "sqeuclidean", "manhattan", "chebys
 hev", "cosine", "minkowski",[] 
  []
 
-[8]
-Overfull \hbox (35.26857pt too wide) in paragraph at lines 435--438
+
+Overfull \hbox (35.26857pt too wide) in paragraph at lines 432--435
 []\T1/ptm/m/n/10 Optional in-verse co-vari-ance ma-trix (p x p) for Ma-ha-lanob
 is (ig-nored if []\T1/zi4/m/n/10 approximate_inv
  []
 
-
-Overfull \hbox (54.00911pt too wide) in paragraph at lines 458--460
+[8]
+Overfull \hbox (54.00911pt too wide) in paragraph at lines 455--457
 []\T1/ptm/m/n/10 Character; conda en-vi-ron-ment name used by []\T1/zi4/m/n/10 
 reticulate[]\T1/ptm/m/n/10 . De-fault []\T1/zi4/m/n/10 "fastrerandomize_env"[]\
 T1/ptm/m/n/10 . 
@@ -473,49 +472,49 @@ T1/ptm/m/n/10 .
 
 [9]
 LaTeX Font Info:    Trying to load font information for TS1+zi4 on input line 5
-07.
+04.
  (/usr/local/texlive/2024/texmf-dist/tex/latex/inconsolata/ts1zi4.fd
 File: ts1zi4.fd 2018/01/14 TS1/zi4 (Inconsolata)
 )
 LaTeX Font Info:    Font shape `TS1/zi4/m/n' will be
-(Font)              scaled to size 9.0pt on input line 507.
+(Font)              scaled to size 9.0pt on input line 504.
 
 [10{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}]
-[11]
-Overfull \hbox (5.52805pt too wide) in paragraph at lines 600--601
+
+Overfull \hbox (5.52805pt too wide) in paragraph at lines 597--598
 []\T1/ptm/m/n/10 A string spec-i-fy-ing the type of ran-dom-iza-tion: ei-ther [
 ]\T1/zi4/m/n/10 "exact" []\T1/ptm/m/n/10 or []\T1/zi4/m/n/10 "monte_carlo"[]\T1
 /ptm/m/n/10 . 
  []
 
-[12]
-Overfull \hbox (19.49974pt too wide) in paragraph at lines 650--652
+[11]
+Overfull \hbox (19.49974pt too wide) in paragraph at lines 647--649
 [][][]\T1/zi4/m/n/10 generate_randomizations_exact[][][] []\T1/ptm/m/n/10 for t
 he ex-act enu-mer-a-tion method. [][][]\T1/zi4/m/n/10 generate_randomizations_m
 c[][][]
  []
 
-[13]
-Overfull \hbox (0.97838pt too wide) in paragraph at lines 727--730
+[12] [13]
+Overfull \hbox (0.97838pt too wide) in paragraph at lines 724--727
 \T1/ptm/m/n/10 fault is []\T1/zi4/m/n/10 VectorizedFastHotel2T2 []\T1/ptm/m/n/1
 0 which com-putes Hotelling's T-squared statis-
  []
 
-[14]
-Overfull \hbox (23.53925pt too wide) in paragraph at lines 771--773
+
+Overfull \hbox (23.53925pt too wide) in paragraph at lines 768--770
 [][][]\T1/zi4/m/n/10 generate_randomizations[][][] []\T1/ptm/m/n/10 for full ra
 n-dom-iza-tion gen-er-a-tion func-tion. [][][]\T1/zi4/m/n/10 generate_randomiza
 tions_mc[][][]
  []
 
-
-Overfull \hbox (0.91652pt too wide) in paragraph at lines 797--800
+[14]
+Overfull \hbox (0.91652pt too wide) in paragraph at lines 794--797
 []\T1/ptm/m/n/10 This func-tion per-forms sam-pling with re-place-ment to gen-e
 r-ate ran-dom-iza-tions in a memory-efficient
  []
 
 [15]
-Overfull \hbox (38.53925pt too wide) in paragraph at lines 875--877
+Overfull \hbox (38.53925pt too wide) in paragraph at lines 872--874
 [][][]\T1/zi4/m/n/10 generate_randomizations[][][] []\T1/ptm/m/n/10 for full ra
 n-dom-iza-tion gen-er-a-tion func-tion. [][][]\T1/zi4/m/n/10 generate_randomiza
 tions_exact[][][]
@@ -523,26 +522,26 @@ tions_exact[][][]
 
 [16] [17]
 LaTeX Font Info:    Font shape `TS1/zi4/m/n' will be
-(Font)              scaled to size 10.0pt on input line 992.
- [18] [19] [20] [21] [22]
-Overfull \hbox (1.14697pt too wide) in paragraph at lines 1208--1209
+(Font)              scaled to size 10.0pt on input line 988.
+ [18] [19] [20] [21]
+Overfull \hbox (1.14697pt too wide) in paragraph at lines 1204--1205
 []\T1/ptm/m/n/10 A log-i-cal value in-di-cat-ing whether to find the fidu-cial 
 in-ter-val. De-fault is FALSE. 
  []
 
-[23] [24] [25]
-(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpnUFRTo/Rd2pdfd33c
-46bc1fac/Rd2.ind [26]
+[22] [23] [24]
+(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpnImD0k/Rd2pdf2636
+1aafcaa/Rd2.ind [25]
 Overfull \hbox (3.3567pt too wide) in paragraph at lines 63--65
 []\T1/zi4/m/n/10 summary.fastrerandomize_randomizations\T1/ptm/m/n/10 , 
  []
 
-[27
+[26
 
 
 ])
-(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpnUFRTo/Rd2pdfd33c
-46bc1fac/Rd2.aux)
+(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpnImD0k/Rd2pdf2636
+1aafcaa/Rd2.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2024-02-20>
@@ -551,13 +550,13 @@ Package rerunfilecheck Info: File `Rd2.out' has not changed.
 (rerunfilecheck)             Checksum: 913880F5BBB5AC12E7BCB2B86FC49E82;4599.
  ) 
 Here is how much of TeX's memory you used:
- 10776 strings out of 474116
- 164180 string characters out of 5743683
+ 10775 strings out of 474116
+ 164160 string characters out of 5743683
  1941187 words of memory out of 5000000
  32739 multiletter control sequences out of 15000+600000
  596880 words of font info for 84 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 92i,6n,95p,467b,735s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 92i,6n,95p,467b,737s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
 pdfTeX warning (dest): name{Rfn.plot} has been referenced but does not exist, r
 eplaced by a fixed one
@@ -580,10 +579,10 @@ sr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr
 /texlive/2024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2
 024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2024/texmf-
 dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (27 pages, 225331 bytes).
+Output written on Rd2.pdf (26 pages, 224936 bytes).
 PDF statistics:
- 591 PDF objects out of 1000 (max. 8388607)
- 527 compressed objects within 6 object streams
- 213 named destinations out of 1000 (max. 500000)
+ 587 PDF objects out of 1000 (max. 8388607)
+ 524 compressed objects within 6 object streams
+ 212 named destinations out of 1000 (max. 500000)
  209 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -7,7 +7,7 @@
 \method{print}{fastrerandomize_randomizations}(x, ...)
 }
 \arguments{
-\item{x}{An object of class \code{fastrerandomize_instance}.}
+\item{x}{An object of class \code{fastrerandomize_randomizations}.}
 
 \item{...}{Further arguments passed to or from other methods.}
 }

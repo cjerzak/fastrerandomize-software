@@ -1,5 +1,5 @@
 
-R version 4.5.1 (2025-06-13) -- "Great Square Root"
+R version 4.5.2 (2025-10-31) -- "[Not] Part in a Rumble"
 Copyright (C) 2025 The R Foundation for Statistical Computing
 Platform: aarch64-apple-darwin20
 
@@ -316,7 +316,7 @@ $reason
 > 
 > # Print a basic message with timestamp
 > print2("Processing started")
-[1] "[2025-12-14 17:59:36] Processing started"
+[1] "[2025-12-22 16:43:51] Processing started"
 > 
 > # Suppress output
 > print2("This won't show", quiet = TRUE)
@@ -325,9 +325,9 @@ $reason
 > for(i in 1:3) {
 +   print2(sprintf("Processing item %d", i))
 + }
-[1] "[2025-12-14 17:59:36] Processing item 1"
-[1] "[2025-12-14 17:59:36] Processing item 2"
-[1] "[2025-12-14 17:59:36] Processing item 3"
+[1] "[2025-12-22 16:43:51] Processing item 1"
+[1] "[2025-12-22 16:43:51] Processing item 2"
+[1] "[2025-12-22 16:43:51] Processing item 3"
 > 
 > 
 > 
@@ -396,7 +396,7 @@ $reason
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  1.229 0.036 1.267 0 0 
+Time elapsed:  0.983 0.043 1.03 0 0 
 > grDevices::dev.off()
 null device 
           1 

@@ -38,7 +38,8 @@ generate_randomizations_mc
 hotellingT2_R           Compute Hotelling's T-squared statistic in base
                         R
 plot.fastrerandomize_randomizations
-                        Plot method for fastrerandomize_test objects
+                        Plot method for fastrerandomize_randomizations
+                        objects
 plot.fastrerandomize_test
                         Plot method for fastrerandomize_test objects
 print.fastrerandomize_randomizations

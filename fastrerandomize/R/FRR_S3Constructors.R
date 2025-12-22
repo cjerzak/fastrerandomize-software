@@ -29,7 +29,7 @@ fastrerandomize_class <- function(randomizations, balance = NULL, fastrr_env=NUL
 
 #' Print method for fastrerandomize_randomizations objects
 #'
-#' @param x An object of class \code{fastrerandomize_instance}.
+#' @param x An object of class \code{fastrerandomize_randomizations}.
 #' @param ... Further arguments passed to or from other methods.
 #'
 #' @method print fastrerandomize_randomizations
@@ -90,13 +90,12 @@ summary.fastrerandomize_randomizations <- function(object, ...) {
   ))
 }
 
-#' Plot method for fastrerandomize_test objects
+#' Plot method for fastrerandomize_randomizations objects
 #'
-#' @description 
-#' Plots the observed treatment effect and, if available, the fiducial interval 
-#' on a horizontal axis.
+#' @description
+#' Generates a histogram of the balance measures for accepted randomizations.
 #'
-#' @param x An object of class \code{fastrerandomize_test}.
+#' @param x An object of class \code{fastrerandomize_randomizations}.
 #' @param ... Further graphical parameters passed to \code{\link{plot}}.
 #'
 #' @return No return value. This function is called for the side effect of

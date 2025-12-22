@@ -35,8 +35,11 @@
                 ))  )
   
   # build package tar
-  # R CMD build --resave-data ~/Documents/fastrerandomize-software/fastrerandomize
+  #system("R CMD build --resave-data ~/Documents/fastrerandomize-software/fastrerandomize")
   
   # check (update version as needed)
-  # R CMD check --as-cran ~/Documents/fastrerandomize_0.1.tar.gz
+  # system("R CMD check --as-cran ~/Documents/fastrerandomize_0.1.tar.gz")
+  
+  # install current local build 
+  install.packages( "~/Documents/fastrerandomize-software/fastrerandomize",repos = NULL, type = "source",force = F) # install from local  
 }
