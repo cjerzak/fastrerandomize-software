@@ -10,18 +10,12 @@
 * checking for file ‘fastrerandomize/DESCRIPTION’ ... OK
 * this is package ‘fastrerandomize’ version ‘0.3’
 * package encoding: UTF-8
-* checking CRAN incoming feasibility ... [3s/24s] NOTE
+* checking CRAN incoming feasibility ... [5s/45s] WARNING
 Maintainer: ‘Connor Jerzak <connor.jerzak@gmail.com>’
 
-Found the following (possibly) invalid URLs:
-  URL: https://github.com/cjerzak/fastrerandomize-software
-    From: DESCRIPTION
-    Status: 503
-    Message: Service Unavailable
-  URL: https://github.com/cjerzak/fastrerandomize-software/issues
-    From: DESCRIPTION
-    Status: 503
-    Message: Service Unavailable
+Insufficient package version (submitted: 0.3, existing: 0.3)
+
+Days since last update: 2
 * checking package namespace information ... OK
 * checking package dependencies ... OK
 * checking if this is a source package ... OK
@@ -68,15 +62,15 @@ Found the following (possibly) invalid URLs:
 * checking installed files from ‘inst/doc’ ... OK
 * checking files in ‘vignettes’ ... OK
 * checking examples ... OK
+* checking for unstated dependencies in ‘tests’ ... OK
+* checking tests ... [126s/140s] OK
+  Running ‘testthat.R’ [126s/139s]
 * checking for unstated dependencies in vignettes ... OK
 * checking package vignettes ... OK
-* checking re-building of vignette outputs ... [14s/15s] OK
+* checking re-building of vignette outputs ... [23s/25s] OK
 * checking PDF version of manual ... OK
-* checking HTML version of manual ... NOTE
-Skipping checking HTML validation: 'tidy' doesn't look like recent enough HTML Tidy.
-Please obtain a recent version of HTML Tidy by downloading a binary
-release or compiling the source code from <https://www.html-tidy.org/>.
+* checking HTML version of manual ... OK
 * checking for non-standard things in the check directory ... OK
 * checking for detritus in the temp directory ... OK
 * DONE
-Status: 2 NOTEs
+Status: 1 WARNING

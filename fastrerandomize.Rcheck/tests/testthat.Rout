@@ -1,0 +1,41 @@
+
+R version 4.5.2 (2025-10-31) -- "[Not] Part in a Rumble"
+Copyright (C) 2025 The R Foundation for Statistical Computing
+Platform: aarch64-apple-darwin20
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> # This file is automatically sourced by R CMD check
+> # It runs all tests in the testthat/ directory
+> 
+> library(testthat)
+> library(fastrerandomize)
+> 
+> test_check("fastrerandomize")
+WARNING:2025-12-24 09:17:12,645:jax._src.xla_bridge:1018: Platform 'METAL' is experimental and not all JAX functionality may be correctly supported!
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+W0000 00:00:1766585832.646135 16846287 mps_client.cc:510] WARNING: JAX Apple GPU support is experimental and not all JAX functionality is correctly supported!
+Metal device set to: Apple M4 Max
+I0000 00:00:1766585832.673697 16846287 service.cc:145] XLA service 0x128c23280 initialized for platform METAL (this does not guarantee that XLA will be used). Devices:
+I0000 00:00:1766585832.673892 16846287 service.cc:153]   StreamExecutor device (0): Metal, <undefined>
+I0000 00:00:1766585832.678054 16846287 mps_client.cc:406] Using Simple allocator.
+I0000 00:00:1766585832.678088 16846287 mps_client.cc:384] XLA backend will use up to 30150197248 bytes on device 0 for SimpleAllocator.
+
+systemMemory: 36.00 GB
+maxCacheSize: 14.04 GB
+
+[ FAIL 0 | WARN 0 | SKIP 0 | PASS 61 ]
+> 
+> proc.time()
+   user  system elapsed 
+ 95.940  29.624 139.194 

@@ -18,7 +18,6 @@
 
 ## Improvements
 
-* Added comprehensive test suite with GitHub Actions CI workflow.
 * Updated JAX backend to support CUDA 12 and CUDA 13.
 * Improved documentation throughout the package.
 * Various bug fixes and performance improvements.

@@ -1,3 +1,17 @@
+# fastrerandomize 0.4
+
+## Testing Infrastructure
+
+* Migrated test suite to testthat framework in standard R package location
+  (`tests/testthat/`).
+* Tests now run automatically during `R CMD check`.
+* Added `skip_if_no_jax()` helper for graceful skipping when JAX is unavailable.
+* Test files organized by category:
+    - `test-pure-r.R`: Pure R implementation tests (always run)
+    - `test-jax-integration.R`: JAX-accelerated function tests
+    - `test-distance.R`: Distance metric tests
+    - `test-edge-cases.R`: Boundary condition tests
+
 # fastrerandomize 0.3
 
 ## New Features

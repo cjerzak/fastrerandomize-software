@@ -82,66 +82,66 @@ No file Rd2.toc.
 [1{/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/usr/l
 ocal/texlive/2024/texmf-dist/fonts/enc/dvips/base/8r.enc}{/usr/local/texlive/20
 24/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc}] [2] [3] [4]
-Overfull \hbox (20.33891pt too wide) in paragraph at lines 256--258
+Overfull \hbox (20.33891pt too wide) in paragraph at lines 257--259
 []\T1/zi4/m/n/10 realized[]\T1/ptm/m/n/10 : []\T1/zi4/m/n/10 rmse_factor []\T1/
 ptm/m/n/10 (di-men-sion-less, per sigma), []\T1/zi4/m/n/10 rmse[]\T1/ptm/m/n/10
  , and con-ser-va-tive []\T1/zi4/m/n/10 rmse_upper_factor[]\T1/ptm/m/n/10 ,
 
-Overfull \hbox (14.18091pt too wide) in paragraph at lines 260--263
+Overfull \hbox (14.18091pt too wide) in paragraph at lines 261--264
 []\T1/zi4/m/n/10 v_star[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 rmse_exante[]\T1/ptm
 /m/n/10 , []\T1/zi4/m/n/10 expected_M_accepted[]\T1/ptm/m/n/10 , and []\T1/zi4/
 m/n/10 expected_draws_per_accept = 1/q_star[]\T1/ptm/m/n/10 . 
 [5] [6] [7]
-Overfull \hbox (34.75021pt too wide) in paragraph at lines 397--397
+Overfull \hbox (34.75021pt too wide) in paragraph at lines 398--398
  []  \T1/zi4/m/n/10 metric = c("euclidean", "sqeuclidean", "manhattan", "chebys
 hev", "cosine", "minkowski",[] 
 
-Overfull \hbox (35.26857pt too wide) in paragraph at lines 432--435
+Overfull \hbox (35.26857pt too wide) in paragraph at lines 433--436
 []\T1/ptm/m/n/10 Optional in-verse co-vari-ance ma-trix (p x p) for Ma-ha-lanob
 is (ig-nored if []\T1/zi4/m/n/10 approximate_inv
 [8]
-Overfull \hbox (54.00911pt too wide) in paragraph at lines 455--457
+Overfull \hbox (54.00911pt too wide) in paragraph at lines 456--458
 []\T1/ptm/m/n/10 Character; conda en-vi-ron-ment name used by []\T1/zi4/m/n/10 
 reticulate[]\T1/ptm/m/n/10 . De-fault []\T1/zi4/m/n/10 "fastrerandomize_env"[]\
 T1/ptm/m/n/10 . 
 (/usr/local/texlive/2024/texmf-dist/tex/latex/inconsolata/ts1zi4.fd) [9{/usr/lo
 cal/texlive/2024/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}] [10]
-Overfull \hbox (5.52805pt too wide) in paragraph at lines 597--598
+Overfull \hbox (5.52805pt too wide) in paragraph at lines 598--599
 []\T1/ptm/m/n/10 A string spec-i-fy-ing the type of ran-dom-iza-tion: ei-ther [
 ]\T1/zi4/m/n/10 "exact" []\T1/ptm/m/n/10 or []\T1/zi4/m/n/10 "monte_carlo"[]\T1
 /ptm/m/n/10 . 
 [11]
-Overfull \hbox (19.49974pt too wide) in paragraph at lines 647--649
+Overfull \hbox (19.49974pt too wide) in paragraph at lines 648--650
 [][][]\T1/zi4/m/n/10 generate_randomizations_exact[][][] []\T1/ptm/m/n/10 for t
 he ex-act enu-mer-a-tion method. [][][]\T1/zi4/m/n/10 generate_randomizations_m
 c[][][]
 [12] [13]
-Overfull \hbox (0.97838pt too wide) in paragraph at lines 724--727
+Overfull \hbox (0.97838pt too wide) in paragraph at lines 725--728
 \T1/ptm/m/n/10 fault is []\T1/zi4/m/n/10 VectorizedFastHotel2T2 []\T1/ptm/m/n/1
 0 which com-putes Hotelling's T-squared statis-
 
-Overfull \hbox (23.53925pt too wide) in paragraph at lines 768--770
+Overfull \hbox (23.53925pt too wide) in paragraph at lines 769--771
 [][][]\T1/zi4/m/n/10 generate_randomizations[][][] []\T1/ptm/m/n/10 for full ra
 n-dom-iza-tion gen-er-a-tion func-tion. [][][]\T1/zi4/m/n/10 generate_randomiza
 tions_mc[][][]
 [14]
-Overfull \hbox (0.91652pt too wide) in paragraph at lines 794--797
+Overfull \hbox (0.91652pt too wide) in paragraph at lines 795--798
 []\T1/ptm/m/n/10 This func-tion per-forms sam-pling with re-place-ment to gen-e
 r-ate ran-dom-iza-tions in a memory-efficient
 [15]
-Overfull \hbox (38.53925pt too wide) in paragraph at lines 872--874
+Overfull \hbox (38.53925pt too wide) in paragraph at lines 873--875
 [][][]\T1/zi4/m/n/10 generate_randomizations[][][] []\T1/ptm/m/n/10 for full ra
 n-dom-iza-tion gen-er-a-tion func-tion. [][][]\T1/zi4/m/n/10 generate_randomiza
 tions_exact[][][]
 [16] [17] [18] [19] [20] [21]
-Overfull \hbox (1.14697pt too wide) in paragraph at lines 1204--1205
+Overfull \hbox (1.14697pt too wide) in paragraph at lines 1205--1206
 []\T1/ptm/m/n/10 A log-i-cal value in-di-cat-ing whether to find the fidu-cial 
 in-ter-val. De-fault is FALSE. 
 [22] [23] [24]
 No file Rd2.ind.
 [25]
-(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpN4ux7w/Rd2pdfc086
-1609c8e7/Rd2.aux)
+(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/Rtmp4Mo485/Rd2pdfe9e2
+10ad9934/Rd2.aux)
 
 Package rerunfilecheck Warning: File `Rd2.out' has changed.
 (rerunfilecheck)                Rerun to get outlines right
@@ -170,7 +170,7 @@ sr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr
 /texlive/2024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2
 024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2024/texmf-
 dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (25 pages, 218289 bytes).
+Output written on Rd2.pdf (25 pages, 218798 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.17 [TeX Live 2024] (kpathsea + Thai support).
 Scanning input file Rd2.idx....done (38 entries accepted, 0 rejected).
@@ -246,89 +246,89 @@ ty (/usr/local/texlive/2024/texmf-dist/tex/latex/kvoptions/kvoptions.sty)))
 Writing index file Rd2.idx
 (/usr/local/texlive/2024/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
-(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpN4ux7w/Rd2pdfc086
-1609c8e7/Rd2.aux)
+(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/Rtmp4Mo485/Rd2pdfe9e2
+10ad9934/Rd2.aux)
 (/usr/local/texlive/2024/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 )
-(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpN4ux7w/Rd2pdfc086
-1609c8e7/Rd2.out)
-(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpN4ux7w/Rd2pdfc086
-1609c8e7/Rd2.out)
+(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/Rtmp4Mo485/Rd2pdfe9e2
+10ad9934/Rd2.out)
+(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/Rtmp4Mo485/Rd2pdfe9e2
+10ad9934/Rd2.out)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/umsa.fd)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/umsb.fd)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/jknapltx/ursfs.fd)
-(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpN4ux7w/Rd2pdfc086
-1609c8e7/Rd2.toc [1{/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/p
+(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/Rtmp4Mo485/Rd2pdfe9e2
+10ad9934/Rd2.toc [1{/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/p
 dftex.map}{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/base/8r.enc}{/usr
 /local/texlive/2024/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc}])
 [2] [3] [4] [5]
-Overfull \hbox (20.33891pt too wide) in paragraph at lines 256--258
+Overfull \hbox (20.33891pt too wide) in paragraph at lines 257--259
 []\T1/zi4/m/n/10 realized[]\T1/ptm/m/n/10 : []\T1/zi4/m/n/10 rmse_factor []\T1/
 ptm/m/n/10 (di-men-sion-less, per sigma), []\T1/zi4/m/n/10 rmse[]\T1/ptm/m/n/10
  , and con-ser-va-tive []\T1/zi4/m/n/10 rmse_upper_factor[]\T1/ptm/m/n/10 ,
 
-Overfull \hbox (14.18091pt too wide) in paragraph at lines 260--263
+Overfull \hbox (14.18091pt too wide) in paragraph at lines 261--264
 []\T1/zi4/m/n/10 v_star[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 rmse_exante[]\T1/ptm
 /m/n/10 , []\T1/zi4/m/n/10 expected_M_accepted[]\T1/ptm/m/n/10 , and []\T1/zi4/
 m/n/10 expected_draws_per_accept = 1/q_star[]\T1/ptm/m/n/10 . 
 [6] [7]
-Overfull \hbox (34.75021pt too wide) in paragraph at lines 397--397
+Overfull \hbox (34.75021pt too wide) in paragraph at lines 398--398
  []  \T1/zi4/m/n/10 metric = c("euclidean", "sqeuclidean", "manhattan", "chebys
 hev", "cosine", "minkowski",[] 
 
-Overfull \hbox (35.26857pt too wide) in paragraph at lines 432--435
+Overfull \hbox (35.26857pt too wide) in paragraph at lines 433--436
 []\T1/ptm/m/n/10 Optional in-verse co-vari-ance ma-trix (p x p) for Ma-ha-lanob
 is (ig-nored if []\T1/zi4/m/n/10 approximate_inv
 [8]
-Overfull \hbox (54.00911pt too wide) in paragraph at lines 455--457
+Overfull \hbox (54.00911pt too wide) in paragraph at lines 456--458
 []\T1/ptm/m/n/10 Character; conda en-vi-ron-ment name used by []\T1/zi4/m/n/10 
 reticulate[]\T1/ptm/m/n/10 . De-fault []\T1/zi4/m/n/10 "fastrerandomize_env"[]\
 T1/ptm/m/n/10 . 
 [9] (/usr/local/texlive/2024/texmf-dist/tex/latex/inconsolata/ts1zi4.fd)
 [10{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}]
 
-Overfull \hbox (5.52805pt too wide) in paragraph at lines 597--598
+Overfull \hbox (5.52805pt too wide) in paragraph at lines 598--599
 []\T1/ptm/m/n/10 A string spec-i-fy-ing the type of ran-dom-iza-tion: ei-ther [
 ]\T1/zi4/m/n/10 "exact" []\T1/ptm/m/n/10 or []\T1/zi4/m/n/10 "monte_carlo"[]\T1
 /ptm/m/n/10 . 
 [11]
-Overfull \hbox (19.49974pt too wide) in paragraph at lines 647--649
+Overfull \hbox (19.49974pt too wide) in paragraph at lines 648--650
 [][][]\T1/zi4/m/n/10 generate_randomizations_exact[][][] []\T1/ptm/m/n/10 for t
 he ex-act enu-mer-a-tion method. [][][]\T1/zi4/m/n/10 generate_randomizations_m
 c[][][]
 [12] [13]
-Overfull \hbox (0.97838pt too wide) in paragraph at lines 724--727
+Overfull \hbox (0.97838pt too wide) in paragraph at lines 725--728
 \T1/ptm/m/n/10 fault is []\T1/zi4/m/n/10 VectorizedFastHotel2T2 []\T1/ptm/m/n/1
 0 which com-putes Hotelling's T-squared statis-
 
-Overfull \hbox (23.53925pt too wide) in paragraph at lines 768--770
+Overfull \hbox (23.53925pt too wide) in paragraph at lines 769--771
 [][][]\T1/zi4/m/n/10 generate_randomizations[][][] []\T1/ptm/m/n/10 for full ra
 n-dom-iza-tion gen-er-a-tion func-tion. [][][]\T1/zi4/m/n/10 generate_randomiza
 tions_mc[][][]
 [14]
-Overfull \hbox (0.91652pt too wide) in paragraph at lines 794--797
+Overfull \hbox (0.91652pt too wide) in paragraph at lines 795--798
 []\T1/ptm/m/n/10 This func-tion per-forms sam-pling with re-place-ment to gen-e
 r-ate ran-dom-iza-tions in a memory-efficient
 [15]
-Overfull \hbox (38.53925pt too wide) in paragraph at lines 872--874
+Overfull \hbox (38.53925pt too wide) in paragraph at lines 873--875
 [][][]\T1/zi4/m/n/10 generate_randomizations[][][] []\T1/ptm/m/n/10 for full ra
 n-dom-iza-tion gen-er-a-tion func-tion. [][][]\T1/zi4/m/n/10 generate_randomiza
 tions_exact[][][]
 [16] [17] [18] [19] [20] [21]
-Overfull \hbox (1.14697pt too wide) in paragraph at lines 1204--1205
+Overfull \hbox (1.14697pt too wide) in paragraph at lines 1205--1206
 []\T1/ptm/m/n/10 A log-i-cal value in-di-cat-ing whether to find the fidu-cial 
 in-ter-val. De-fault is FALSE. 
 [22] [23] [24]
-(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpN4ux7w/Rd2pdfc086
-1609c8e7/Rd2.ind [25]
+(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/Rtmp4Mo485/Rd2pdfe9e2
+10ad9934/Rd2.ind [25]
 Overfull \hbox (3.3567pt too wide) in paragraph at lines 63--65
 []\T1/zi4/m/n/10 summary.fastrerandomize_randomizations\T1/ptm/m/n/10 , 
 [26])
-(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpN4ux7w/Rd2pdfc086
-1609c8e7/Rd2.aux)
+(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/Rtmp4Mo485/Rd2pdfe9e2
+10ad9934/Rd2.aux)
 
 Package rerunfilecheck Warning: File `Rd2.out' has changed.
 (rerunfilecheck)                Rerun to get outlines right
@@ -357,7 +357,7 @@ sr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr
 /texlive/2024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2
 024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2024/texmf-
 dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (26 pages, 224040 bytes).
+Output written on Rd2.pdf (26 pages, 224549 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.17 [TeX Live 2024] (kpathsea + Thai support).
 Scanning input file Rd2.idx....done (38 entries accepted, 0 rejected).
@@ -433,89 +433,89 @@ ty (/usr/local/texlive/2024/texmf-dist/tex/latex/kvoptions/kvoptions.sty)))
 Writing index file Rd2.idx
 (/usr/local/texlive/2024/texmf-dist/tex/latex/psnfss/t1ptm.fd)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def)
-(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpN4ux7w/Rd2pdfc086
-1609c8e7/Rd2.aux)
+(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/Rtmp4Mo485/Rd2pdfe9e2
+10ad9934/Rd2.aux)
 (/usr/local/texlive/2024/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 )
-(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpN4ux7w/Rd2pdfc086
-1609c8e7/Rd2.out)
-(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpN4ux7w/Rd2pdfc086
-1609c8e7/Rd2.out)
+(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/Rtmp4Mo485/Rd2pdfe9e2
+10ad9934/Rd2.out)
+(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/Rtmp4Mo485/Rd2pdfe9e2
+10ad9934/Rd2.out)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/inconsolata/t1zi4.fd)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/umsa.fd)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/amsfonts/umsb.fd)
 (/usr/local/texlive/2024/texmf-dist/tex/latex/jknapltx/ursfs.fd)
-(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpN4ux7w/Rd2pdfc086
-1609c8e7/Rd2.toc [1{/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/p
+(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/Rtmp4Mo485/Rd2pdfe9e2
+10ad9934/Rd2.toc [1{/usr/local/texlive/2024/texmf-var/fonts/map/pdftex/updmap/p
 dftex.map}{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/base/8r.enc}{/usr
 /local/texlive/2024/texmf-dist/fonts/enc/dvips/inconsolata/i4-t1-0.enc}])
 [2] [3] [4] [5]
-Overfull \hbox (20.33891pt too wide) in paragraph at lines 256--258
+Overfull \hbox (20.33891pt too wide) in paragraph at lines 257--259
 []\T1/zi4/m/n/10 realized[]\T1/ptm/m/n/10 : []\T1/zi4/m/n/10 rmse_factor []\T1/
 ptm/m/n/10 (di-men-sion-less, per sigma), []\T1/zi4/m/n/10 rmse[]\T1/ptm/m/n/10
  , and con-ser-va-tive []\T1/zi4/m/n/10 rmse_upper_factor[]\T1/ptm/m/n/10 ,
 
-Overfull \hbox (14.18091pt too wide) in paragraph at lines 260--263
+Overfull \hbox (14.18091pt too wide) in paragraph at lines 261--264
 []\T1/zi4/m/n/10 v_star[]\T1/ptm/m/n/10 , []\T1/zi4/m/n/10 rmse_exante[]\T1/ptm
 /m/n/10 , []\T1/zi4/m/n/10 expected_M_accepted[]\T1/ptm/m/n/10 , and []\T1/zi4/
 m/n/10 expected_draws_per_accept = 1/q_star[]\T1/ptm/m/n/10 . 
 [6] [7]
-Overfull \hbox (34.75021pt too wide) in paragraph at lines 397--397
+Overfull \hbox (34.75021pt too wide) in paragraph at lines 398--398
  []  \T1/zi4/m/n/10 metric = c("euclidean", "sqeuclidean", "manhattan", "chebys
 hev", "cosine", "minkowski",[] 
 
-Overfull \hbox (35.26857pt too wide) in paragraph at lines 432--435
+Overfull \hbox (35.26857pt too wide) in paragraph at lines 433--436
 []\T1/ptm/m/n/10 Optional in-verse co-vari-ance ma-trix (p x p) for Ma-ha-lanob
 is (ig-nored if []\T1/zi4/m/n/10 approximate_inv
 [8]
-Overfull \hbox (54.00911pt too wide) in paragraph at lines 455--457
+Overfull \hbox (54.00911pt too wide) in paragraph at lines 456--458
 []\T1/ptm/m/n/10 Character; conda en-vi-ron-ment name used by []\T1/zi4/m/n/10 
 reticulate[]\T1/ptm/m/n/10 . De-fault []\T1/zi4/m/n/10 "fastrerandomize_env"[]\
 T1/ptm/m/n/10 . 
 [9] (/usr/local/texlive/2024/texmf-dist/tex/latex/inconsolata/ts1zi4.fd)
 [10{/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/inconsolata/i4-ts1.enc}]
 
-Overfull \hbox (5.52805pt too wide) in paragraph at lines 597--598
+Overfull \hbox (5.52805pt too wide) in paragraph at lines 598--599
 []\T1/ptm/m/n/10 A string spec-i-fy-ing the type of ran-dom-iza-tion: ei-ther [
 ]\T1/zi4/m/n/10 "exact" []\T1/ptm/m/n/10 or []\T1/zi4/m/n/10 "monte_carlo"[]\T1
 /ptm/m/n/10 . 
 [11]
-Overfull \hbox (19.49974pt too wide) in paragraph at lines 647--649
+Overfull \hbox (19.49974pt too wide) in paragraph at lines 648--650
 [][][]\T1/zi4/m/n/10 generate_randomizations_exact[][][] []\T1/ptm/m/n/10 for t
 he ex-act enu-mer-a-tion method. [][][]\T1/zi4/m/n/10 generate_randomizations_m
 c[][][]
 [12] [13]
-Overfull \hbox (0.97838pt too wide) in paragraph at lines 724--727
+Overfull \hbox (0.97838pt too wide) in paragraph at lines 725--728
 \T1/ptm/m/n/10 fault is []\T1/zi4/m/n/10 VectorizedFastHotel2T2 []\T1/ptm/m/n/1
 0 which com-putes Hotelling's T-squared statis-
 
-Overfull \hbox (23.53925pt too wide) in paragraph at lines 768--770
+Overfull \hbox (23.53925pt too wide) in paragraph at lines 769--771
 [][][]\T1/zi4/m/n/10 generate_randomizations[][][] []\T1/ptm/m/n/10 for full ra
 n-dom-iza-tion gen-er-a-tion func-tion. [][][]\T1/zi4/m/n/10 generate_randomiza
 tions_mc[][][]
 [14]
-Overfull \hbox (0.91652pt too wide) in paragraph at lines 794--797
+Overfull \hbox (0.91652pt too wide) in paragraph at lines 795--798
 []\T1/ptm/m/n/10 This func-tion per-forms sam-pling with re-place-ment to gen-e
 r-ate ran-dom-iza-tions in a memory-efficient
 [15]
-Overfull \hbox (38.53925pt too wide) in paragraph at lines 872--874
+Overfull \hbox (38.53925pt too wide) in paragraph at lines 873--875
 [][][]\T1/zi4/m/n/10 generate_randomizations[][][] []\T1/ptm/m/n/10 for full ra
 n-dom-iza-tion gen-er-a-tion func-tion. [][][]\T1/zi4/m/n/10 generate_randomiza
 tions_exact[][][]
 [16] [17] [18] [19] [20] [21]
-Overfull \hbox (1.14697pt too wide) in paragraph at lines 1204--1205
+Overfull \hbox (1.14697pt too wide) in paragraph at lines 1205--1206
 []\T1/ptm/m/n/10 A log-i-cal value in-di-cat-ing whether to find the fidu-cial 
 in-ter-val. De-fault is FALSE. 
 [22] [23] [24]
-(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpN4ux7w/Rd2pdfc086
-1609c8e7/Rd2.ind [25]
+(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/Rtmp4Mo485/Rd2pdfe9e2
+10ad9934/Rd2.ind [25]
 Overfull \hbox (3.3567pt too wide) in paragraph at lines 63--65
 []\T1/zi4/m/n/10 summary.fastrerandomize_randomizations\T1/ptm/m/n/10 , 
 [26])
-(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/RtmpN4ux7w/Rd2pdfc086
-1609c8e7/Rd2.aux) )
+(/private/var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T/Rtmp4Mo485/Rd2pdfe9e2
+10ad9934/Rd2.aux) )
 (see the transcript file for additional information)
 pdfTeX warning (dest): name{Rfn.plot} has been referenced but does not exist, r
 eplaced by a fixed one
@@ -538,8 +538,8 @@ sr/local/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr
 /texlive/2024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2
 024/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2024/texmf-
 dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (26 pages, 224491 bytes).
+Output written on Rd2.pdf (26 pages, 225003 bytes).
 Transcript written on Rd2.log.
 Saving output to ‘fastrerandomize-manual.pdf’ ...
 Done
-You may want to clean up by 'rm -Rf /var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T//RtmpN4ux7w/Rd2pdfc0861609c8e7'
+You may want to clean up by 'rm -Rf /var/folders/gv/l5wlstr55gl_g0pgx6k47z9m0000gn/T//Rtmp4Mo485/Rd2pdfe9e210ad9934'
