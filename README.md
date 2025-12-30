@@ -76,14 +76,18 @@ candidate_randomizations <- fastrerandomize::generate_randomizations(
                                             X = X,
                                             randomization_accept_prob = 0.001)
 
-# Check out the candidate randomization dimensions 
-dim( candidate_randomizations )
+# The result is an S3 object with fields:
+# - $randomizations: matrix of acceptable treatment assignments
+# - $balance: corresponding balance statistics for each randomization
+
+# Check out the candidate randomization dimensions
+dim( candidate_randomizations$randomizations )
 ```
 We can also use `fastrerandomize` to perform a randomization test using those acceptable randomizations. 
 ```
 # Setup simulated outcome data 
 CoefY <- rnorm(ncol(X))
-Wobs <- candidate_randomizations[1,]
+Wobs <- candidate_randomizations$randomizations[1,]
 tau_true <- 1
 Yobs <- c(X %*% as.matrix(CoefY) + Wobs*tau_true + rnorm(n_units, sd = 0.1))
 
@@ -91,7 +95,7 @@ Yobs <- c(X %*% as.matrix(CoefY) + Wobs*tau_true + rnorm(n_units, sd = 0.1))
 ExactRandomizationTestResults <- fastrerandomize::randomization_test(
   obsW = Wobs,
   obsY = Yobs,
-  candidate_randomizations = candidate_randomizations,
+  candidate_randomizations = candidate_randomizations$randomizations,
   findFI = F # set to T if an exact fiducial interval needed
 )
 ExactRandomizationTestResults$p_value # p-value
