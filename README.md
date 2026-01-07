@@ -113,13 +113,13 @@ data( YOPData )
 We welcome new features or bug fixes (you can raise an issue or submit a pull request in the repository). We will keep the package up-to-date with the latest version of the [JAX backend](https://en.wikipedia.org/wiki/Google_JAX). 
 
 # References<a id="references"></a>
-Connor T. Jerzak, Rebecca Goldstein, Aniket Kamat, Fucheng Warren Zhu. fastrerandomize: An R Package for Fast Rerandomization Using Accelerated Computing. *ArXiv Preprint*, 2025. [[PDF]](https://arxiv.org/pdf/2501.07642)
+Connor T. Jerzak, Rebecca Goldstein, Aniket Kamat, Fucheng Warren Zhu. FastRerandomize: An R Package for Fast Rerandomization Using Accelerated Computing. *SoftwareX*, 2026. ArXiv Preprint[[PDF]](https://arxiv.org/pdf/2501.07642)
 ```
 @article{jerzak2025fastrerandomize,
-  title={fastrerandomize: An R Package for Fast Rerandomization Using Accelerated Computing},
+  title={FastRerandomize: An R Package for Fast Rerandomization Using Accelerated Computing},
   author={Jerzak, Connor T. and Rebecca Goldstein and Aniket Kamat and Fucheng Warren Zhu},
-  journal={ArXiv Preprint},
-  year={2025}
+  journal={SoftwareX},
+  year={2026}
 }
 ```
 
