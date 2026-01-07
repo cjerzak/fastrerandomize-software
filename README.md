@@ -24,22 +24,24 @@ We employ a [JAX backend](https://en.wikipedia.org/wiki/Google_JAX) to make exac
 
 # Performance: n = 100<a id="performance"></a>
 
+https://connorjerzak.com/wp-content/uploads/2026/01/CPU_v_GPU_FALSE_100_dark.webp
+
 <a href="https://arxiv.org/abs/2501.07642/#gh-light-mode-only">
-  <img src="https://connorjerzak.com/wp-content/uploads/2025/11/figure1.webp#gh-light-mode-only" alt="Figure – light" width="600">
+  <img src="https://connorjerzak.com/wp-content/uploads/2026/01/CPU_v_GPU_FALSE_100_light.webp#gh-light-mode-only" alt="Figure – light" width="600">
 </a>
 
 <a href="https://arxiv.org/abs/2501.07642/#gh-dark-mode-only">
-  <img src="https://connorjerzak.com/wp-content/uploads/2025/11/figure1_dark.webp#gh-dark-mode-only" alt="Figure – dark" width="600">
+  <img src="https://connorjerzak.com/wp-content/uploads/2026/01/CPU_v_GPU_FALSE_100_dark.webp#gh-dark-mode-only" alt="Figure – dark" width="600">
 </a>
 
 # Performance: n = 1000
 
 <a href="https://arxiv.org/abs/2501.07642/#gh-light-mode-only">
-  <img src="https://connorjerzak.com/wp-content/uploads/2025/11/figure2.webp#gh-light-mode-only" alt="Figure – light" width="600">
+  <img src="https://connorjerzak.com/wp-content/uploads/2026/01/CPU_v_GPU_FALSE_1000_light.webp#gh-light-mode-only" alt="Figure – light" width="600">
 </a>
 
 <a href="https://arxiv.org/abs/2501.07642/#gh-dark-mode-only">
-  <img src="https://connorjerzak.com/wp-content/uploads/2025/11/figure2_dark.webp#gh-dark-mode-only" alt="Figure – dark" width="600">
+  <img src="https://connorjerzak.com/wp-content/uploads/2026/01/CPU_v_GPU_FALSE_1000_dark.webp#gh-dark-mode-only" alt="Figure – dark" width="600">
 </a>
 
 # Package Installation and Loading <a id="installation"></a>
@@ -122,16 +124,6 @@ Connor T. Jerzak, Rebecca Goldstein, Aniket Kamat, Fucheng Warren Zhu. FastReran
   year={2026}
 }
 ```
-
-Connor T. Jerzak and Rebecca Goldstein. "Degrees of Randomness in Rerandomization Procedures." *ArXiv Preprint*, 2023. [\[PDF\]](https://arxiv.org/pdf/2310.00861.pdf)
-```
-@article{JerGol2023,
-         title={Degrees of Randomness in Rerandomization Procedures},
-         author={Jerzak, Connor T. and Rebecca Goldstein},
-         journal={ArXiv Preprint},
-         year={2023}}
-```
-
 
 
 <!--
