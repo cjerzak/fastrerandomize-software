@@ -24,8 +24,6 @@ We employ a [JAX backend](https://en.wikipedia.org/wiki/Google_JAX) to make exac
 
 # Performance: n = 100<a id="performance"></a>
 
-https://connorjerzak.com/wp-content/uploads/2026/01/CPU_v_GPU_FALSE_100_dark.webp
-
 <a href="https://arxiv.org/abs/2501.07642/#gh-light-mode-only">
   <img src="https://connorjerzak.com/wp-content/uploads/2026/01/CPU_v_GPU_FALSE_100_light.webp#gh-light-mode-only" alt="Figure – light" width="600">
 </a>
