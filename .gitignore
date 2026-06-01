@@ -3,3 +3,26 @@
 CLAUDE.md
 /reports/
 /temp/
+AGENTS.md
+
+# R session / IDE state
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+.Rapp.history
+
+# R package build/check outputs
+*.Rcheck/
+*.tar.gz
+
+# Local scratch
+/tmp/
+
+# Python/JAX local env/cache
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
