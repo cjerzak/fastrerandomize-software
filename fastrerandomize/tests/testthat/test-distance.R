@@ -64,6 +64,38 @@ test_that("fast_distance mahalanobis diagonal approx works", {
   expect_true(all(D >= 0))
 })
 
+test_that("fast_distance full Mahalanobis inverse works on the active backend", {
+  X <- matrix(
+    c(
+      0, 0, 0,
+      1, 0, 1,
+      0, 2, 1,
+      2, 1, 3,
+      3, 4, 2,
+      4, 2, 5
+    ),
+    ncol = 3,
+    byrow = TRUE
+  )
+
+  observed <- fastrerandomize::fast_distance(
+    X,
+    metric = "mahalanobis",
+    approximate_inv = FALSE
+  )
+  covariance_inverse <- solve(stats::cov(rbind(X, X)))
+  expected_squared <- outer(
+    seq_len(nrow(X)),
+    seq_len(nrow(X)),
+    Vectorize(function(i, j) {
+      difference <- X[i, ] - X[j, ]
+      drop(t(difference) %*% covariance_inverse %*% difference)
+    })
+  )
+
+  expect_equal(observed, sqrt(pmax(expected_squared, 0)), tolerance = 1e-3)
+})
+
 test_that("fast_distance A to B works", {
   A <- matrix(c(0, 0, 1, 1), nrow = 2, byrow = TRUE)
   B <- matrix(c(3, 4, 0, 0), nrow = 2, byrow = TRUE)

@@ -1,5 +1,28 @@
 # fastrerandomize 0.4
 
+## Correctness and Reliability
+
+* Fixed full-inverse Mahalanobis distance calculation on the Metal backend.
+* Corrected two-sided fiducial interval inversion to use `alpha / 2`, return
+  typed missing bounds when no grid point is accepted, and handle negative or
+  near-zero effects symmetrically in both JAX and pure-R implementations.
+* Made `c_initial` a functional fiducial-search step-size control while
+  preserving the existing default scale.
+* Exact enumeration now supports tiny designs and warns before very large
+  allocations; Monte Carlo sampling can draw with replacement beyond the
+  number of unique assignments.
+* Added an optional full-range integer `seed` for Monte Carlo JAX streams.
+* File output now preserves balance measures in a named CSV without row names.
+* JAX tests now skip correctly when the backend availability check returns
+  `NULL`.
+
+## Maintenance
+
+* Core JAX kernels are initialized once, and broken or unused internal kernels
+  have been removed.
+* Improved required-input validation and diagnostic printing when `R2` is
+  supplied without `sigma`.
+
 ## Testing Infrastructure
 
 * Migrated test suite to testthat framework in standard R package location

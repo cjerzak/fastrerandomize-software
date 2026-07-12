@@ -18,7 +18,8 @@ generate_randomizations(
   return_type = "R",
   verbose = TRUE,
   conda_env = "fastrerandomize_env",
-  conda_env_required = TRUE
+  conda_env_required = TRUE,
+  seed = NULL
 )
 }
 \arguments{
@@ -26,7 +27,9 @@ generate_randomizations(
 
 \item{n_treated}{An integer specifying the number of units to be assigned to treatment.}
 
-\item{X}{A numeric matrix of covariates used for balance checking. Cannot be \code{NULL}.}
+\item{X}{A numeric matrix of covariates used for balance checking. For exact
+enumeration, \code{NULL} returns every assignment without balance filtering;
+Monte Carlo sampling requires a matrix.}
 
 \item{randomization_accept_prob}{A numeric value between 0 and 1 specifying the probability threshold for accepting randomizations based on balance.}
 
@@ -43,7 +46,9 @@ generate_randomizations(
 balance metrics. This can speed up computations for high-dimensional covariates.
 Default is \code{TRUE}.}
 
-\item{file}{A string specifying where to save candidate randomizations (if saving, not returning).}
+\item{file}{Optional path for a CSV containing assignment columns \code{W1},
+\code{W2}, ..., and an optional final \code{balance} column. When supplied,
+the CSV is written instead of returning the in-memory S3 object.}
 
 \item{return_type}{A string specifying the format of the returned randomizations and balance
 measures. Allowed values are \code{"R"} for base R objects (e.g., \code{matrix}, \code{numeric})
@@ -57,14 +62,18 @@ via \code{reticulate}. Default is \code{"fastrerandomize_env"}.}
 \item{conda_env_required}{A logical indicating whether the specified conda environment
 must be strictly used. If \code{TRUE}, an error is thrown if the environment is not found.
 Default is \code{TRUE}.}
+
+\item{seed}{Optional whole-number seed for Monte Carlo sampling. If \code{NULL},
+a seed is drawn from R's full positive integer range. Ignored for exact
+enumeration. Default is \code{NULL}.}
 }
 \value{
-Returns an S3 object with slots: \itemize{
-\item \code{assignments} An array where each row represents one possible treatment assignment vector containing the accepted randomizations.
-\item \code{balance_measures} A numeric vector containing the balance measure for each corresponding randomization.
+When \code{file = NULL}, returns an S3 object with slots: \itemize{
+\item \code{randomizations} An array where each row represents one accepted treatment assignment.
+\item \code{balance} A numeric vector containing the corresponding balance measures, or \code{NULL} when balance filtering is not performed.
 \item \code{fastrr_env} The fastrerandomize environment.
-\item \code{file_output} If file is specified, results are saved to the given file path instead of being returned.
-}
+\item \code{call} The matched function call.
+} When \code{file} is supplied, invisibly returns the normalized CSV path.
 }
 \description{
 This function generates randomizations for experimental design using either exact enumeration

@@ -25,7 +25,8 @@ find_fiducial_interval_R(
 
 \item{alpha}{Significance level (default 0.05).}
 
-\item{c_initial}{A numeric step scale (default 2).}
+\item{c_initial}{A finite positive step-size scale (default 2). The default
+preserves the standard update scale.}
 
 \item{n_search_attempts}{Number of bracket search attempts (default 500).}
 }

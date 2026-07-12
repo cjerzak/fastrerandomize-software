@@ -39,6 +39,11 @@
 #' 2. If covariates (X) are provided, filters these combinations based on balance
 #'    criteria using the specified threshold function
 #'
+#' A warning is emitted before enumeration when the number of combinations is
+#' greater than one million. Small exact designs are still enumerated; when
+#' balance filtering nominally retains fewer than ten assignments, the function
+#' warns rather than failing.
+#'
 #' The balance filtering process uses Hotelling's T-squared statistic by default to measure
 #' multivariate balance between treatment and control groups. Randomizations are
 #' accepted if their balance measure is below the specified quantile threshold.
@@ -84,16 +89,48 @@ generate_randomizations_exact <- function(
                                    verbose = TRUE,
                                    conda_env = "fastrerandomize_env", 
                                    conda_env_required = TRUE){
+  if (length(n_units) != 1L || !is.numeric(n_units) || !is.finite(n_units) ||
+      n_units < 2 || n_units != floor(n_units)) {
+    stop("'n_units' must be a whole number of at least 2.", call. = FALSE)
+  }
+  if (length(n_treated) != 1L || !is.numeric(n_treated) || !is.finite(n_treated) ||
+      n_treated < 1 || n_treated >= n_units || n_treated != floor(n_treated)) {
+    stop("'n_treated' must be a whole number between 1 and n_units - 1.", call. = FALSE)
+  }
+  if (length(randomization_accept_prob) != 1L ||
+      !is.numeric(randomization_accept_prob) ||
+      !is.finite(randomization_accept_prob) ||
+      randomization_accept_prob < 0 || randomization_accept_prob > 1) {
+    stop("'randomization_accept_prob' must be between 0 and 1.", call. = FALSE)
+  }
+  n_units <- as.integer(n_units)
+  n_treated <- as.integer(n_treated)
+  if (!is.null(X)) {
+    X <- as.matrix(X)
+    if (!is.numeric(X) || nrow(X) != n_units) {
+      stop("'X' must be a numeric matrix with one row per unit.", call. = FALSE)
+    }
+  }
+
+  max_rand_num <- choose(n_units, n_treated)
+  .warn_if_large_exact(max_rand_num)
+  if (!is.null(X) && randomization_accept_prob < 1 &&
+      max_rand_num * randomization_accept_prob < 10) {
+    warning(
+      paste0(
+        "The requested balance filter nominally retains fewer than 10 randomizations. ",
+        "The exact design will still be generated, but downstream inference may have low resolution."
+      ),
+      call. = FALSE
+    )
+  }
+
   if(is.null(check_jax_availability(conda_env=conda_env))) { return(NULL) }
   
   if (!"VectorizedFastHotel2T2" %in% ls(envir = fastrr_env)) {
     initialize_jax(conda_env = conda_env, conda_env_required = conda_env_required)
   }
   if(is.null(threshold_func)){ threshold_func <- fastrr_env$VectorizedFastHotel2T2 }
-  
-  max_rand_num <- choose(n_units, n_treated)
-  assertthat::assert_that( max_rand_num * randomization_accept_prob > 10,
-              msg = "Value of randomization_accept_prob results in fewer than 10 accepted randomizations. Increase randomization_accept_prob!")
   
   # Get all combinations of positions to set to 1
   combinations <- fastrr_env$jnp$array(  utils::combn(n_units, n_treated) - 1L )
@@ -110,7 +147,7 @@ generate_randomizations_exact <- function(
       SAMP_COV_INV_APPROX <- fastrr_env$jnp$reciprocal( fastrr_env$jnp$var( fastrr_env$jnp$array(as.matrix(X)), axis = 0L) )
       {
         SAMP_COV_INV <-  fastrr_env$jnp$cov( fastrr_env$jnp$array(as.matrix(X)), rowvar = FALSE)
-        IS_METAL_BACKEND <- grepl(reticulate::py_str( fastrr_env$jax$devices()[[1]] ), pattern = "METAL")
+        IS_METAL_BACKEND <- .is_metal_backend()
         if(IS_METAL_BACKEND){
           SAMP_COV_INV <- SAMP_COV_INV$to_device(fastrr_env$jax$devices("cpu")[[1]])
         }

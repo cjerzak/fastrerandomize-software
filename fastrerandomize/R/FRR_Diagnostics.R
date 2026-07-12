@@ -301,7 +301,10 @@ print.fastrerandomize_diagnostic <- function(x, ...) {
   cat("diagnose_rerandomization(): diagnostic map\n")
   cat(sprintf("  n_T = %s, n_C = %s, d = %s\n", x$inputs$n_T, x$inputs$n_C, x$inputs$d))
   cat(sprintf("  M (sum SMD^2) = %.6g\n", x$inputs$M))
-  if (!is.null(x$inputs$R2)) cat(sprintf("  sigma = %s, R^2 = %s\n", x$inputs$sigma, x$inputs$R2))
+  if (!is.null(x$inputs$R2)) {
+    sigma_label <- if (is.null(x$inputs$sigma)) "not supplied" else as.character(x$inputs$sigma)
+    cat(sprintf("  sigma = %s, R^2 = %s\n", sigma_label, x$inputs$R2))
+  }
   cat("\nRealized precision (from observed M):\n")
   cat(sprintf("  RMSE (per sigma): %.6g", x$realized$rmse_factor)); 
   if (!is.na(x$realized$rmse)) cat(sprintf("   =>  RMSE = %.6g", x$realized$rmse))
@@ -365,5 +368,3 @@ if(FALSE){
   plan$recommendation$expected_M_accepted
   plan$recommendation$expected_draws_per_accept
 }
-  
-  

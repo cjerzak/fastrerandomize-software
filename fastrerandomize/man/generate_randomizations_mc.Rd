@@ -15,7 +15,8 @@ generate_randomizations_mc(
   approximate_inv = TRUE,
   verbose = TRUE,
   conda_env = "fastrerandomize_env",
-  conda_env_required = TRUE
+  conda_env_required = TRUE,
+  seed = NULL
 )
 }
 \arguments{
@@ -46,6 +47,10 @@ via \code{reticulate}. Default is \code{"fastrerandomize_env"}.}
 \item{conda_env_required}{A logical indicating whether the specified conda environment
 must be strictly used. If \code{TRUE}, an error is thrown if the environment is not found.
 Default is \code{TRUE}.}
+
+\item{seed}{Optional whole-number seed for the JAX random stream. If \code{NULL},
+a seed is drawn from R's full positive integer range, so \code{set.seed()} can
+still be used to reproduce the draw. Default is \code{NULL}.}
 }
 \value{
 The function returns a \emph{list} with two elements:

@@ -136,7 +136,7 @@ fast_distance <- function(
     } else {
       if (is.null(cov_inv)) {
         S_inv <- fastrr_env$jnp$cov(fastrr_env$jnp$array(rbind(A, B)), rowvar = FALSE)
-        IS_METAL_BACKEND <- grepl(reticulate::py_str(fastrr_env$jax$devices()[[1]]), "METAL")
+        IS_METAL_BACKEND <- .is_metal_backend()
         if (IS_METAL_BACKEND) {
           S_inv <- S_inv$to_device(fastrr_env$jax$devices("cpu")[[1]])
         }

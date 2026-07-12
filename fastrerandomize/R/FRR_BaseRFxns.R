@@ -62,15 +62,7 @@ generate_randomizations_R <- function(n_units, n_treated, X, accept_prob, random
   # Safety checks for exact enumeration size
   if (random_type == "exact") {
     n_comb_total <- choose(n_units, n_treated)
-    if (n_comb_total > 1e6) {
-      warning(
-        sprintf("Exact randomization is requested, but that is %s combinations. 
-                 This may be infeasible in terms of memory/time. 
-                 Consider Monte Carlo instead.", 
-                format(n_comb_total, big.mark=",")), 
-        immediate. = TRUE
-      )
-    }
+    .warn_if_large_exact(n_comb_total)
   }
   
   if (random_type == "exact") {
@@ -175,7 +167,8 @@ compute_diff_at_tau_for_oneW_R <- function(Wprime, obsY, obsW, tau) {
 #' @param allW Matrix of candidate random assignments (rows = assignments).
 #' @param tau_obs Observed difference in means with obsW, obsY.
 #' @param alpha Significance level (default 0.05).
-#' @param c_initial A numeric step scale (default 2).
+#' @param c_initial A finite positive step-size scale (default 2). The default
+#'   preserves the standard update scale.
 #' @param n_search_attempts Number of bracket search attempts (default 500).
 #'
 #' @return 2-element numeric vector [lower, upper] or [NA, NA] if none accepted.
@@ -183,10 +176,16 @@ compute_diff_at_tau_for_oneW_R <- function(Wprime, obsY, obsW, tau) {
 #' @export
 find_fiducial_interval_R <- function(obsW, obsY, allW, tau_obs, alpha = 0.05, 
                                            c_initial = 2, n_search_attempts = 500) {
+  if (length(alpha) != 1L || !is.numeric(alpha) || !is.finite(alpha) ||
+      alpha <= 0 || alpha >= 1) {
+    stop("'alpha' must be a finite number strictly between 0 and 1.", call. = FALSE)
+  }
+  step_multiplier <- .fi_step_multiplier(c_initial)
   
   # Attempt random bracket approach
-  lowerBound_est <- tau_obs - 3 * tau_obs
-  upperBound_est <- tau_obs + 3 * tau_obs
+  initial_bounds <- .fi_initial_bounds(tau_obs)
+  lowerBound_est <- initial_bounds[1]
+  upperBound_est <- initial_bounds[2]
   
   z_alpha <- qnorm(1 - alpha)
   k <- 2 / (z_alpha * (2 * pi)^(-1/2) * exp(-z_alpha^2 / 2))
@@ -206,9 +205,9 @@ find_fiducial_interval_R <- function(obsW, obsY, allW, tau_obs, alpha = 0.05,
     delta <- tau_obs - tau_at_step_lower
     
     if (tau_at_step_lower < tau_obs) {
-      lowerBound_est <- lowerBound_est + k * delta * (alpha / 2) / step_t
+      lowerBound_est <- lowerBound_est + step_multiplier * k * delta * (alpha / 2) / step_t
     } else {
-      lowerBound_est <- lowerBound_est - k * (-delta) * (1 - alpha / 2) / step_t
+      lowerBound_est <- lowerBound_est - step_multiplier * k * (-delta) * (1 - alpha / 2) / step_t
     }
     
     # ~~~~~ update upperBound ~~~~~
@@ -220,18 +219,17 @@ find_fiducial_interval_R <- function(obsW, obsY, allW, tau_obs, alpha = 0.05,
     delta2 <- tau_at_step_upper - tau_obs
     
     if (tau_at_step_upper > tau_obs) {
-      upperBound_est <- upperBound_est - k * delta2 * (alpha / 2) / step_t
+      upperBound_est <- upperBound_est - step_multiplier * k * delta2 * (alpha / 2) / step_t
     } else {
-      upperBound_est <- upperBound_est + k * (-delta2) * (1 - alpha / 2) / step_t
+      upperBound_est <- upperBound_est + step_multiplier * k * (-delta2) * (1 - alpha / 2) / step_t
     }
   }
   
-  # Now do a grid search from (lowerBound_est - 1) to (upperBound_est * 2)
-  grid_lower <- lowerBound_est - 1
-  grid_upper <- upperBound_est * 2
-  tau_seq <- seq(grid_lower, grid_upper, length.out = 100)
+  # Use the same symmetric grid construction as the JAX implementation.
+  tau_seq <- .fi_search_grid(c(lowerBound_est, upperBound_est), tau_obs,
+                             length.out = 100L)
   
-  accepted <- logical(length(tau_seq))
+  tail_probabilities <- numeric(length(tau_seq))
   for (i in seq_along(tau_seq)) {
     tau_pseudo <- tau_seq[i]
     diffs_pseudo <- apply(allW, 1, function(wp) {
@@ -240,14 +238,10 @@ find_fiducial_interval_R <- function(obsW, obsY, allW, tau_obs, alpha = 0.05,
     frac_ge <- mean(diffs_pseudo >= tau_obs)
     frac_le <- mean(diffs_pseudo <= tau_obs)
     
-    accepted[i] <- (min(frac_ge, frac_le) > alpha / 2)
+    tail_probabilities[i] <- min(frac_ge, frac_le)
   }
   
-  if (!any(accepted)) {
-    return(c(NA, NA))
-  }
-  
-  c(min(tau_seq[accepted]), max(tau_seq[accepted]))
+  .fi_accepted_range(tau_seq, tail_probabilities, alpha)
 }
 
 

@@ -21,7 +21,8 @@ randomization_test(
 \arguments{
 \item{obsW}{A numeric vector where \code{0}'s correspond to control units and \code{1}'s to treated units.}
 
-\item{obsY}{An optional numeric vector of observed outcomes. If not provided, the function assumes a NULL value.}
+\item{obsY}{A required numeric vector of observed outcomes with the same length as
+\code{obsW}.}
 
 \item{alpha}{The significance level for the test. Default is \code{0.05}.}
 
@@ -35,8 +36,9 @@ randomization_test(
 
 \item{findFI}{A logical value indicating whether to find the fiducial interval. Default is FALSE.}
 
-\item{c_initial}{A numeric value representing the initial criterion for the fiducial interval
-search. Default is \code{2}.}
+\item{c_initial}{A finite positive step-size scale for the fiducial interval
+search. The default of \code{2} preserves the standard update scale; smaller
+or larger values decrease or increase the stochastic update size.}
 
 \item{conda_env}{A character string specifying the name of the conda environment to use
 via \code{reticulate}. Default is \code{"fastrerandomize_env"}.}

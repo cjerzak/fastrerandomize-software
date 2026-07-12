@@ -21,6 +21,9 @@
 #' @param conda_env_required A logical indicating whether the specified conda environment 
 #'   must be strictly used. If \code{TRUE}, an error is thrown if the environment is not found. 
 #'   Default is \code{TRUE}.
+#' @param seed Optional whole-number seed for the JAX random stream. If \code{NULL},
+#'   a seed is drawn from R's full positive integer range, so \code{set.seed()} can
+#'   still be used to reproduce the draw. Default is \code{NULL}.
 #' @details
 #' The function works by:
 #' 1. Generating batches of random permutations.
@@ -64,7 +67,6 @@
 #' \code{\link{generate_randomizations_exact}} for the exact version. 
 #' 
 #' @import reticulate
-#' @importFrom assertthat assert_that
 #' @export
 #' @md
 generate_randomizations_mc <- function(n_units, 
@@ -77,21 +79,47 @@ generate_randomizations_mc <- function(n_units,
                                        approximate_inv = TRUE,
                                        verbose = TRUE,
                                        conda_env = "fastrerandomize_env", 
-                                       conda_env_required = TRUE
+                                       conda_env_required = TRUE,
+                                       seed = NULL
                                       ){
+  if (length(n_units) != 1L || !is.numeric(n_units) || !is.finite(n_units) ||
+      n_units < 2 || n_units != floor(n_units)) {
+    stop("'n_units' must be a whole number of at least 2.", call. = FALSE)
+  }
+  if (length(n_treated) != 1L || !is.numeric(n_treated) || !is.finite(n_treated) ||
+      n_treated < 1 || n_treated >= n_units || n_treated != floor(n_treated)) {
+    stop("'n_treated' must be a whole number between 1 and n_units - 1.", call. = FALSE)
+  }
+  if (length(randomization_accept_prob) != 1L ||
+      !is.numeric(randomization_accept_prob) ||
+      !is.finite(randomization_accept_prob) ||
+      randomization_accept_prob < 0 || randomization_accept_prob > 1) {
+    stop("'randomization_accept_prob' must be between 0 and 1.", call. = FALSE)
+  }
+  if (length(max_draws) != 1L || !is.numeric(max_draws) || !is.finite(max_draws) ||
+      max_draws < 1 || max_draws > .Machine$integer.max || max_draws != floor(max_draws)) {
+    stop("'max_draws' must be a positive whole number in R's integer range.", call. = FALSE)
+  }
+  if (length(batch_size) != 1L || !is.numeric(batch_size) || !is.finite(batch_size) ||
+      batch_size < 1 || batch_size > .Machine$integer.max || batch_size != floor(batch_size)) {
+    stop("'batch_size' must be a positive whole number in R's integer range.", call. = FALSE)
+  }
+  n_units <- as.integer(n_units)
+  n_treated <- as.integer(n_treated)
+  max_draws <- as.integer(max_draws)
+  batch_size <- as.integer(batch_size)
+  X <- as.matrix(X)
+  if (!is.numeric(X) || nrow(X) != n_units) {
+    stop("'X' must be a numeric matrix with one row per unit.", call. = FALSE)
+  }
+  seed <- .resolve_jax_seed(seed)
+
   if (is.null(check_jax_availability(conda_env=conda_env))) { return(NULL) }
   
   if (!"VectorizedFastHotel2T2" %in% ls(envir = fastrr_env)) {
     initialize_jax(conda_env = conda_env, conda_env_required = conda_env_required) 
   }
   if(is.null(threshold_func)){ threshold_func <- fastrr_env$VectorizedFastHotel2T2 }
-  
-  # Calculate the maximum number of possible randomizations
-  max_rand_num <- choose(n_units, n_treated)
-  assertthat::assert_that(max_draws <= max_rand_num, 
-              msg = paste0("max_draws must be less than or equal to the total number of possible randomizations (", max_rand_num, ")."))
-  assertthat::assert_that(max_draws >= 2*batch_size, 
-              msg = "max_draws must be at least 2*batch_size")
   
   # Define the base vector: 1s for treated, 0s for control
   base_vector <- c(rep(1L, n_treated), rep(0L, n_units - n_treated))
@@ -100,8 +128,8 @@ generate_randomizations_mc <- function(n_units,
   base_vector_jax <- fastrr_env$jnp$array(as.integer(base_vector), 
                                           dtype = fastrr_env$jnp$int8)
   
-  # Initialize base JAX random key with the provided seed
-  key <- fastrr_env$jax$random$PRNGKey( as.integer(stats::runif(1,1,100000)) )
+  # Initialize the base JAX random key.
+  key <- fastrr_env$jax$random$PRNGKey(seed)
   
   # Convert X to JAX array (float16 can cause issues with matrix inverse)
   X_jax <- fastrr_env$jnp$array(as.matrix(X), dtype = fastrr_env$jnp$float32)
@@ -111,7 +139,7 @@ generate_randomizations_mc <- function(n_units,
     SAMP_COV_INV_APPROX <- fastrr_env$jnp$reciprocal( fastrr_env$jnp$var( fastrr_env$jnp$array(as.matrix(X)), axis = 0L) )
     {
       SAMP_COV_INV <-  fastrr_env$jnp$cov( fastrr_env$jnp$array(as.matrix(X)), rowvar = FALSE)
-      IS_METAL_BACKEND <- grepl(reticulate::py_str( fastrr_env$jax$devices()[[1]] ), pattern = "METAL")
+      IS_METAL_BACKEND <- .is_metal_backend()
       if(IS_METAL_BACKEND){
         SAMP_COV_INV <- SAMP_COV_INV$to_device(fastrr_env$jax$devices("cpu")[[1]])
       }
@@ -140,7 +168,10 @@ generate_randomizations_mc <- function(n_units,
   # Determine the number of permutations to accept based on the acceptance probability
   float_num_to_accept <- max_draws * randomization_accept_prob
   if (float_num_to_accept < 1){
-    warning("randomization_accept_prob is less than 1, so we will accept at least one randomization.")
+    warning(
+      "max_draws * randomization_accept_prob is below 1; returning the single best sampled randomization.",
+      call. = FALSE
+    )
   }
   num_to_accept <- ceiling(float_num_to_accept)
   num_to_accept <- max(num_to_accept, 1) # Ensure at least one

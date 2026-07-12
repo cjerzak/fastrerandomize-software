@@ -4,15 +4,17 @@
 #'
 #'
 #' @param obsW A numeric vector where `0`'s correspond to control units and `1`'s to treated units.
-#' @param obsY An optional numeric vector of observed outcomes. If not provided, the function assumes a NULL value.
+#' @param obsY A required numeric vector of observed outcomes with the same length as
+#'   \code{obsW}.
 #' @param alpha The significance level for the test. Default is `0.05`.
 #' @param candidate_randomizations A numeric matrix of candidate randomizations.
 #' @param candidate_randomizations_array An optional 'JAX' array of candidate randomizations. If not provided, the function coerces `candidate_randomizations` into a 'JAX' array.
 #' @param n0_array An optional array specifying the number of control units.
 #' @param n1_array An optional array specifying the number of treated units.
 #' @param findFI A logical value indicating whether to find the fiducial interval. Default is FALSE.
-#' @param c_initial A numeric value representing the initial criterion for the fiducial interval
-#'   search. Default is `2`.
+#' @param c_initial A finite positive step-size scale for the fiducial interval
+#'   search. The default of \code{2} preserves the standard update scale; smaller
+#'   or larger values decrease or increase the stochastic update size.
 #' @param conda_env A character string specifying the name of the conda environment to use 
 #'   via \code{reticulate}. Default is \code{"fastrerandomize_env"}.
 #' @param conda_env_required A logical indicating whether the specified conda environment 
@@ -89,6 +91,54 @@ randomization_test <- function(obsW = NULL,
                                conda_env = "fastrerandomize_env",
                                conda_env_required = TRUE
                                ){
+  if (is.null(obsW)) {
+    stop("'obsW' is required.", call. = FALSE)
+  }
+  if (is.null(obsY)) {
+    stop("'obsY' is required.", call. = FALSE)
+  }
+  if (length(alpha) != 1L || !is.numeric(alpha) || !is.finite(alpha) ||
+      alpha <= 0 || alpha >= 1) {
+    stop("'alpha' must be a finite number strictly between 0 and 1.", call. = FALSE)
+  }
+  if (length(findFI) != 1L || !is.logical(findFI) || is.na(findFI)) {
+    stop("'findFI' must be TRUE or FALSE.", call. = FALSE)
+  }
+  if(is.null(candidate_randomizations) && is.null(candidate_randomizations_array)){
+    stop("Either 'candidate_randomizations' or 'candidate_randomizations_array' must be provided.",
+         call. = FALSE)
+  }
+
+  obsW <- c(unlist(obsW))
+  obsY <- c(unlist(obsY))
+  if (!is.numeric(obsW) && !is.logical(obsW)) {
+    stop("'obsW' must be a numeric or logical 0/1 vector.", call. = FALSE)
+  }
+  if (!is.numeric(obsY)) {
+    stop("'obsY' must be numeric.", call. = FALSE)
+  }
+  if (length(obsW) == 0L || length(obsW) != length(obsY)) {
+    stop("'obsW' and 'obsY' must be non-empty vectors of equal length.", call. = FALSE)
+  }
+  if (anyNA(obsW) || any(!is.finite(obsW)) || !all(obsW %in% c(0, 1))) {
+    stop("'obsW' must contain only finite 0 and 1 values.", call. = FALSE)
+  }
+  if (!all(c(0, 1) %in% obsW)) {
+    stop("'obsW' must contain at least one treated and one control unit.", call. = FALSE)
+  }
+  if (anyNA(obsY) || any(!is.finite(obsY))) {
+    stop("'obsY' must contain only finite values.", call. = FALSE)
+  }
+  if (!is.null(candidate_randomizations)) {
+    candidate_randomizations <- as.matrix(candidate_randomizations)
+    if (nrow(candidate_randomizations) == 0L ||
+        ncol(candidate_randomizations) != length(obsW)) {
+      stop("'candidate_randomizations' must have one column per observed unit and at least one row.",
+           call. = FALSE)
+    }
+  }
+  step_multiplier <- if (findFI) .fi_step_multiplier(c_initial) else 1
+
   if( is.null(check_jax_availability(conda_env=conda_env)) ) { return(NULL) }
 
   tau_obs <- FI <- NULL
@@ -96,25 +146,22 @@ randomization_test <- function(obsW = NULL,
     initialize_jax(conda_env = conda_env, conda_env_required = conda_env_required)
   }
 
-  if(is.null(n0_array)){ n0_array <- fastrr_env$jnp$array(sum(obsW == 0)) }
-  if(is.null(n1_array)){ n1_array <- fastrr_env$jnp$array(sum(obsW == 1)) }
-
-  if(!is.null(obsW)){obsW <- c(unlist(obsW))}
-  if(!is.null(obsY)){obsY <- c(unlist(obsY))}
-
-  # Validate that at least one of candidate_randomizations or candidate_randomizations_array is provided
-  if(is.null(candidate_randomizations) && is.null(candidate_randomizations_array)){
-      stop("Either 'candidate_randomizations' or 'candidate_randomizations_array' must be provided.")
-  }
-
   # Convert between formats as needed
   if(is.null(candidate_randomizations)){
-      candidate_randomizations <- fastrr_env$np$array( candidate_randomizations_array )
+      candidate_randomizations <- as.matrix(fastrr_env$np$array(candidate_randomizations_array))
+      if (nrow(candidate_randomizations) == 0L ||
+          ncol(candidate_randomizations) != length(obsW)) {
+        stop("'candidate_randomizations_array' must have one column per observed unit and at least one row.",
+             call. = FALSE)
+      }
   }
   if(is.null(candidate_randomizations_array)){
       candidate_randomizations_array <- fastrr_env$jnp$array(candidate_randomizations,
                                                              dtype = fastrr_env$jnp$float32)
   }
+
+  if(is.null(n0_array)){ n0_array <- fastrr_env$jnp$array(sum(obsW == 0)) }
+  if(is.null(n1_array)){ n1_array <- fastrr_env$jnp$array(sum(obsW == 1)) }
 
   # perform randomization inference using input data
   {
@@ -138,18 +185,13 @@ randomization_test <- function(obsW = NULL,
       obsW_array <- fastrr_env$jnp$array( obsW )
 
       n_search_attempts <- 500
-      bound_counter <- 0
       upperBound_storage_vec <- lowerBound_storage_vec <- rep(NA, n_search_attempts)
       {
-        bound_counter <- bound_counter + 1
-        # Use absolute value to ensure proper bracket regardless of tau_obs sign
-        # Ensure minimum range of 1 to handle tau_obs near zero
-        bound_range <- max(abs(tau_obs) * 3, 1)
-        lowerBound_estimate_step_t <- tau_obs - bound_range
-        upperBound_estimate_step_t <- tau_obs + bound_range
+        initial_bounds <- .fi_initial_bounds(tau_obs)
+        lowerBound_estimate_step_t <- initial_bounds[1]
+        upperBound_estimate_step_t <- initial_bounds[2]
 
         #setting optimal c
-        c_step_t <- c_initial
         z_alpha <- stats::qnorm( p = (1-alpha) )
         k <- 2 / (  z_alpha *   (2 * pi)^(-1/2) * exp( -z_alpha^2 / 2)  )
         NAHolder <- rep(NA, length(obsW))
@@ -170,7 +212,7 @@ randomization_test <- function(obsW = NULL,
                                                              fastrr_env$jnp$array(permutation_treatment_vec),
                                                              n0_array, n1_array) )
 
-            c_step_t <-  k * (tau_obs  - lowerBound_estimate_step_t)
+            c_step_t <- step_multiplier * k * (tau_obs - lowerBound_estimate_step_t)
             if(lower_tau_at_step_t < tau_obs) {  lowerBound_estimate_step_t <- lowerBound_estimate_step_t + c_step_t * (alpha/2) / step_t  }
             if(lower_tau_at_step_t >= tau_obs) { lowerBound_estimate_step_t <- lowerBound_estimate_step_t - c_step_t * (1-alpha/2) / step_t }
           }
@@ -185,7 +227,7 @@ randomization_test <- function(obsW = NULL,
                                                                                    fastrr_env$jnp$array(permutation_treatment_vec), 
                                                                                    n0_array, n1_array) )
 
-            c_step_t <- k * (upperBound_estimate_step_t  -  tau_obs)
+            c_step_t <- step_multiplier * k * (upperBound_estimate_step_t - tau_obs)
             if(upper_tau_at_step_t > tau_obs) {  upperBound_estimate_step_t <- upperBound_estimate_step_t - c_step_t * (alpha/2) / step_t  }
             if(upper_tau_at_step_t <= tau_obs) { upperBound_estimate_step_t <- upperBound_estimate_step_t + c_step_t * (1-alpha/2) / step_t }
           }
@@ -200,10 +242,7 @@ randomization_test <- function(obsW = NULL,
 
       # stage 2
       {
-        # Use symmetric expansion around the initial bounds to handle negative values correctly
-        fi_range <- abs(FI[2] - FI[1])
-        expansion <- max(fi_range * 0.5, abs(tau_obs) * 0.5, 1)
-        tau_pseudo_seq <- seq(FI[1] - expansion, FI[2] + expansion, length.out = 100)
+        tau_pseudo_seq <- .fi_search_grid(FI, tau_obs, length.out = 100L)
         pvals_vec <- sapply(tau_pseudo_seq, function(tau_pseudo){
           stat_vec_at_tau_pseudo <- fastrr_env$np$array(     fastrr_env$vec1_get_stat_vec_at_tau_pseudo(
                                                                                   candidate_randomizations_array,# treatment_pseudo
@@ -218,9 +257,7 @@ randomization_test <- function(obsW = NULL,
                       mean( tau_obs <= stat_vec_at_tau_pseudo))
           return( ret_ )
         } )
-        tau_pseudo_seq_AcceptNull <- tau_pseudo_seq[pvals_vec>0.05]
-        FI <- c(min(tau_pseudo_seq_AcceptNull),
-                max(tau_pseudo_seq_AcceptNull))
+        FI <- .fi_accepted_range(tau_pseudo_seq, pvals_vec, alpha)
       }
     }
   }

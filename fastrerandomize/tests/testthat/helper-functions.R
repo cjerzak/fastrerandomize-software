@@ -14,13 +14,12 @@ approx_equal <- function(x, y, tol = 1e-6) {
 #' Check if JAX backend is available
 #' @return TRUE if JAX is available, FALSE otherwise
 jax_is_available <- function() {
-  result <- tryCatch({
-    fastrerandomize::check_jax_availability(conda_env = "fastrerandomize_env")
-    TRUE
-  }, error = function(e) {
-    FALSE
-  })
-  result
+  tryCatch(
+    isTRUE(fastrerandomize::check_jax_availability(
+      conda_env = "fastrerandomize_env"
+    )),
+    error = function(e) FALSE
+  )
 }
 
 #' Skip test if JAX is not available

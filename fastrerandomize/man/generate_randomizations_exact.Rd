@@ -65,6 +65,11 @@ The function works in two main steps:
 2. If covariates (X) are provided, filters these combinations based on balance
    criteria using the specified threshold function
 
+A warning is emitted before enumeration when the number of combinations is
+greater than one million. Small exact designs are still enumerated; when
+balance filtering nominally retains fewer than ten assignments, the function
+warns rather than failing.
+
 The balance filtering process uses Hotelling's T-squared statistic by default to measure
 multivariate balance between treatment and control groups. Randomizations are
 accepted if their balance measure is below the specified quantile threshold.

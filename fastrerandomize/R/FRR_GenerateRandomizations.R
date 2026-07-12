@@ -6,7 +6,9 @@
 #'
 #' @param n_units An integer specifying the total number of experimental units.
 #' @param n_treated An integer specifying the number of units to be assigned to treatment.
-#' @param X A numeric matrix of covariates used for balance checking. Cannot be \code{NULL}. 
+#' @param X A numeric matrix of covariates used for balance checking. For exact
+#'   enumeration, \code{NULL} returns every assignment without balance filtering;
+#'   Monte Carlo sampling requires a matrix.
 #' @param randomization_accept_prob A numeric value between 0 and 1 specifying the probability threshold for accepting randomizations based on balance.
 #' @param threshold_func A 'JAX' function that computes a balance measure for each randomization. Only used for Monte Carlo sampling.
 #' @param max_draws An integer specifying the maximum number of randomizations to draw in Monte Carlo sampling.
@@ -16,7 +18,9 @@
 #'   (diagonal of the covariance matrix) instead of the full matrix inverse when computing 
 #'   balance metrics. This can speed up computations for high-dimensional covariates.
 #'   Default is `TRUE`.
-#' @param file A string specifying where to save candidate randomizations (if saving, not returning).
+#' @param file Optional path for a CSV containing assignment columns \code{W1},
+#'   \code{W2}, ..., and an optional final \code{balance} column. When supplied,
+#'   the CSV is written instead of returning the in-memory S3 object.
 #' @param return_type A string specifying the format of the returned randomizations and balance 
 #'   measures. Allowed values are \code{"R"} for base R objects (e.g., \code{matrix}, \code{numeric}) 
 #'   or \code{"jax"} for 'JAX' arrays. Default is \code{"R"}.
@@ -26,6 +30,9 @@
 #' @param conda_env_required A logical indicating whether the specified conda environment 
 #'   must be strictly used. If \code{TRUE}, an error is thrown if the environment is not found. 
 #'   Default is \code{TRUE}.
+#' @param seed Optional whole-number seed for Monte Carlo sampling. If \code{NULL},
+#'   a seed is drawn from R's full positive integer range. Ignored for exact
+#'   enumeration. Default is \code{NULL}.
 #'
 #' @details
 #' The function supports two methods of generating randomizations:
@@ -34,12 +41,12 @@
 #'
 #' For large problems (e.g., X with >20 rows), Monte Carlo sampling is recommended.
 #'
-#' @return Returns an S3 object with slots: \itemize{
-#'   \item `assignments` An array where each row represents one possible treatment assignment vector containing the accepted randomizations.
-#'   \item `balance_measures` A numeric vector containing the balance measure for each corresponding randomization.
+#' @return When \code{file = NULL}, returns an S3 object with slots: \itemize{
+#'   \item `randomizations` An array where each row represents one accepted treatment assignment.
+#'   \item `balance` A numeric vector containing the corresponding balance measures, or \code{NULL} when balance filtering is not performed.
 #'   \item `fastrr_env` The fastrerandomize environment. 
-#'   \item `file_output` If file is specified, results are saved to the given file path instead of being returned.
-#' }
+#'   \item `call` The matched function call.
+#' } When \code{file} is supplied, invisibly returns the normalized CSV path.
 #'
 #' @examples
 #' 
@@ -85,7 +92,8 @@ generate_randomizations <- function(n_units,
                                    return_type = "R", 
                                    verbose = TRUE,
                                    conda_env = "fastrerandomize_env", 
-                                   conda_env_required = TRUE
+                                   conda_env_required = TRUE,
+                                   seed = NULL
                                    ){
   if (is.null(check_jax_availability(conda_env=conda_env))) { return() }
   
@@ -121,6 +129,7 @@ generate_randomizations <- function(n_units,
                                                                     approximate_inv = approximate_inv,
                                                                     conda_env = conda_env,
                                                                     conda_env_required = conda_env_required,
+                                                                    seed = seed,
                                                                     verbose = verbose)
     } else {
         stop("Invalid randomization type")
@@ -137,9 +146,24 @@ generate_randomizations <- function(n_units,
         )
       )
     } else {
-      # existing file-writing logic
-      utils::write.csv( fastrr_env$np$array(candidate_randomizations$candidate_randomizations), file = file)
-      return(sprintf("File saved at %s", file))
+      assignments <- as.matrix(
+        output2output(candidate_randomizations$candidate_randomizations, "R")
+      )
+      colnames(assignments) <- paste0("W", seq_len(ncol(assignments)))
+      file_data <- as.data.frame(assignments, check.names = FALSE)
+
+      balance <- output2output(candidate_randomizations$M_candidate_randomizations, "R")
+      if (!is.null(balance)) {
+        balance <- as.numeric(balance)
+        if (length(balance) != nrow(file_data)) {
+          stop("Balance measures do not align with the generated randomizations.",
+               call. = FALSE)
+        }
+        file_data$balance <- balance
+      }
+
+      utils::write.csv(file_data, file = file, row.names = FALSE)
+      return(invisible(normalizePath(file, mustWork = TRUE)))
     }
       
 }
