@@ -1,6 +1,7 @@
 # `fastrerandomize`: An R Package for Ultra-Fast Rerandomization Using Accelerated Computing 
 
 [**What is `fastrerandomize`?**](#description)
+| [**News**](#news)
 | [**Performance**](#performance)
 | [**Installation**](#installation)
 | [**Tutorial**](#tutorial)
@@ -21,6 +22,15 @@
 `fastrerandomize` contains functions such as `randomization_test`, which offers a streamlined approach for performing randomization tests after using rerandomization in the research design. 
 
 We employ a [JAX backend](https://en.wikipedia.org/wiki/Google_JAX) to make exact rerandomization inference possible even for larger experiments where the number of randomizations is in the hundreds of millions or where experimenters seek to maintain balanced randomizations across thousands of features.
+
+# News<a id="news"></a>
+**October 2026 (development version):** We profiled the package's accelerator kernels and found that most of each call's time went to overhead rather than computation. Every call ran a ~0.7 s conda check, Monte Carlo kernels were recompiled on every call, and the fiducial-interval search made about 1,000 small device round trips. We also found that int8 permutations could produce invalid treatment assignments on some GPU backends (observed on ROCm). The fixes:
+- Monte Carlo generation now runs in a single compiled program, with random keys derived per draw. It returns the same randomizations as before for a given seed.
+- Fiducial intervals use a closed form computed in one pass over the candidate randomizations.
+- Balance statistics and distances use matrix-product formulations on covariates centered in double precision, which also improves float32 accuracy.
+- Every generated assignment is now checked for validity.
+
+On an AMD Radeon RX 7600M XT GPU, repeated calls became 10–110× faster for Monte Carlo generation, 6–180× for `randomization_test()`, 14× for exact enumeration, and 8–80× for `fast_distance()`. First calls also became faster. On CPU, `randomization_test()` with fiducial intervals went from 40 s to 0.35 s. See [NEWS.md](fastrerandomize/NEWS.md) for details.
 
 # Performance: n = 100<a id="performance"></a>
 
