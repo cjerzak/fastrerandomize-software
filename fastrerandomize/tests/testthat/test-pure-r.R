@@ -311,6 +311,8 @@ test_that("closed-form fiducial statistic matches direct construction", {
 test_that("row-count invariant and batch sizing helpers behave", {
   expect_error(fastrerandomize:::.assert_valid_rows(3, 10L), "without exactly 10 treated units")
   expect_true(fastrerandomize:::.assert_valid_rows(0, 10L))
+  expect_error(fastrerandomize:::.assert_reproducible(2, 40L), "different assignments for the same random key")
+  expect_true(fastrerandomize:::.assert_reproducible(0, 40L))
   expect_equal(fastrerandomize:::.resolve_batch_size(NULL, 100L, 1e6), 32768L)
   expect_equal(fastrerandomize:::.resolve_batch_size(NULL, 1000L, 1e6), 4096L)
   expect_equal(fastrerandomize:::.resolve_batch_size(NULL, 1e6, 1e6), 1024L)

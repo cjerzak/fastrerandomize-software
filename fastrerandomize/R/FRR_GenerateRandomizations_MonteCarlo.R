@@ -136,14 +136,17 @@ generate_randomizations_mc <- function(n_units,
   design <- .balance_design(X, approximate_inv)
   if (.is_default_threshold(threshold_func)) {
     scorers <- fastrr_env$MCScorers
+    balance_jit <- fastrr_env$WhitenedT2Jit
     design_jax <- list(jnp$array(design$Xw, dtype = jnp$float32))
   } else {
-    scorers <- .mc_scorers(function(W_, design_, n0, n1) {
+    balance_fn <- function(W_, design_, n0, n1) {
       jnp$reshape(threshold_func(
         design_[[1]], design_[[2]], design_[[3]], W_$astype(jnp$int8),
         n0$astype(jnp$int32), n1$astype(jnp$int32), approximate_inv
       ), -1L)$astype(jnp$float32)
-    })
+    }
+    scorers <- .mc_scorers(balance_fn)
+    balance_jit <- fastrr_env$jax$jit(function(design_, W_, n0, n1) balance_fn(W_, design_, n0, n1))
     design_jax <- list(jnp$array(X, dtype = jnp$float32),
                        jnp$array(design$S_inv, dtype = jnp$float32),
                        jnp$array(design$S_inv_approx, dtype = jnp$float32))
@@ -202,15 +205,21 @@ generate_randomizations_mc <- function(n_units,
   indices_to_keep <- jnp$take(order_all, keep_range)
   top_M_results <- jnp$take(M_sorted, keep_range)
 
-  # (Re-)generate the accepted permutations from their keys, one batch at a time
+  # (Re-)generate the accepted permutations from their keys, one batch at a
+  # time, and check that they reproduce their balance scores
+  balance_design_arg <- if (.is_default_threshold(threshold_func)) design_jax[[1]] else design_jax
   regenerated <- lapply(seq(0L, num_to_accept - 1L, by = batch_size), function(s_) {
-    idx <- jnp$take(indices_to_keep,
-                    jnp$arange(as.integer(s_), as.integer(min(s_ + batch_size, num_to_accept))))
+    chunk <- jnp$arange(as.integer(s_), as.integer(min(s_ + batch_size, num_to_accept)))
+    idx <- jnp$take(indices_to_keep, chunk)
     keys <- if (is.null(all_keys)) fastrr_env$CounterKeysJit(key, idx) else jnp$take(all_keys, idx, axis = 0L)
-    c(list(keys), fastrr_env$MCRegenerate(keys, base_vector_jax, n1_int))
+    regen <- fastrr_env$MCRegenerate(keys, base_vector_jax, n1_int)
+    M_regen <- as.numeric(.to_r(balance_jit(balance_design_arg, regen[[1]], n0_jax, n1_jax)))
+    M_chunk <- as.numeric(.to_r(jnp$take(top_M_results, chunk)))
+    list(keys, regen[[1]], as.numeric(.to_r(regen[[2]])),
+         sum(abs(M_regen - M_chunk) > 1e-4 * abs(M_chunk) + 1e-6))
   })
-  .assert_valid_rows(sum(vapply(regenerated, function(r_) as.numeric(.to_r(r_[[3]])), numeric(1))),
-                     n_treated)
+  .assert_valid_rows(sum(vapply(regenerated, `[[`, numeric(1), 3L)), n_treated)
+  .assert_reproducible(sum(vapply(regenerated, `[[`, numeric(1), 4L)), num_to_accept)
   top_keys <- jnp$concatenate(lapply(regenerated, `[[`, 1L), 0L)
   top_perms <- jnp$concatenate(lapply(regenerated, `[[`, 2L), 0L)
 

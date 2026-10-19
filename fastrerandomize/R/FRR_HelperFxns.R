@@ -171,15 +171,32 @@ check_jax_availability <- function(conda_env = "fastrerandomize_env",
   as.integer(min(batch_size, max_draws))
 }
 
+.backend_device <- function() {
+  tryCatch(reticulate::py_str(fastrr_env$jax$devices()[[1]]),
+           error = function(e) "unknown device")
+}
+
 .assert_valid_rows <- function(n_bad, n_treated) {
   n_bad <- as.numeric(n_bad)
   if (n_bad > 0) {
-    device <- tryCatch(reticulate::py_str(fastrr_env$jax$devices()[[1]]),
-                       error = function(e) "unknown device")
     stop(sprintf(paste0(
       "The JAX backend (%s) produced %s assignment(s) without exactly %d treated units. ",
       "This is a backend bug; please report it and use JAX_PLATFORMS=cpu meanwhile."),
-      device, format(n_bad), n_treated),
+      .backend_device(), format(n_bad), n_treated),
+      call. = FALSE)
+  }
+  invisible(TRUE)
+}
+
+# Accepted draws are regenerated from their keys; a different balance score
+# means the backend returned a different permutation for the same key.
+.assert_reproducible <- function(n_mismatch, n_total) {
+  if (n_mismatch > 0) {
+    stop(sprintf(paste0(
+      "The JAX backend (%s) returned different assignments for the same random key ",
+      "in %s of %d accepted draws (nondeterministic sort). Results on this device are ",
+      "unreliable; please report it and use JAX_PLATFORMS=cpu meanwhile."),
+      .backend_device(), format(n_mismatch), n_total),
       call. = FALSE)
   }
   invisible(TRUE)
