@@ -1,5 +1,21 @@
 # fastrerandomize (development version)
 
+## Installation
+
+* `build_backend()` installs 'JAX' for AMD GPUs (ROCm) on Linux. It detects the
+  GPU from the amdgpu driver and installs the ROCm runtime from AMD's wheel
+  index, so no system ROCm installation is needed. Settings that some GPUs need
+  (`HSA_OVERRIDE_GFX_VERSION_<node>` for the RX 7600 series, and
+  `ROCR_VISIBLE_DEVICES` to hide an integrated GPU) are stored in the conda
+  environment and applied when the package loads 'JAX'. Previously, AMD
+  machines got CPU-only 'JAX'.
+* New `backend` argument of `build_backend()` (`"auto"`, `"cpu"`, `"cuda"`,
+  `"rocm"`, `"metal"`) to override detection, for example to install CPU-only
+  'JAX' on a GPU machine. `build_backend()` now ends by reporting the device
+  'JAX' uses.
+* Variables set with `conda env config vars` in the environment are now applied
+  when the package loads 'JAX', as `conda activate` would.
+
 ## Correctness and Reliability
 
 * Monte Carlo permutations now use an int32 payload. The previous int8 payload

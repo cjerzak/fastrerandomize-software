@@ -4,12 +4,21 @@
 \alias{build_backend}
 \title{A function to build the environment for fastrerandomize. Builds a conda environment in which 'JAX' and 'np' are installed. Users can also create a conda environment where 'JAX' and 'np' are installed themselves.}
 \usage{
-build_backend(conda_env = "fastrerandomize_env", conda = "auto")
+build_backend(
+  conda_env = "fastrerandomize_env",
+  conda = "auto",
+  backend = c("auto", "cpu", "cuda", "rocm", "metal")
+)
 }
 \arguments{
 \item{conda_env}{(default = \code{"fastrerandomize_env"}) Name of the conda environment in which to place the backends.}
 
 \item{conda}{(default = \code{auto}) The path to a conda executable. Using \code{"auto"} allows reticulate to attempt to automatically find an appropriate conda binary.}
+
+\item{backend}{(default = \code{"auto"}) The accelerator backend to install. \code{"auto"} picks
+\code{"metal"} on Apple Silicon, \code{"cuda"} on Linux with an NVIDIA driver, \code{"rocm"} on Linux
+with an AMD GPU, and \code{"cpu"} otherwise. Set it explicitly to override detection, for
+example \code{backend = "cpu"} on a GPU machine.}
 }
 \value{
 Invisibly returns NULL; this function is used for its side effects
@@ -20,6 +29,18 @@ You can find out a list of conda Python paths via: \code{Sys.which("python")}
 \description{
 A function to build the environment for fastrerandomize. Builds a conda environment in which 'JAX' and 'np' are installed. Users can also create a conda environment where 'JAX' and 'np' are installed themselves.
 }
+\details{
+On AMD GPUs (\code{"rocm"}), the ROCm runtime is installed into the environment from AMD's
+Python wheel index (about 3 GB), so only the amdgpu kernel driver is needed. GPUs that
+'JAX' does not compile for, but that run the code of a supported GPU (the RX 7600 series,
+gfx1102), are mapped to it with \verb{HSA_OVERRIDE_GFX_VERSION_<node>}, and other AMD GPUs
+(such as an integrated GPU) are hidden with \code{ROCR_VISIBLE_DEVICES}. These variables are
+stored in the environment (\verb{conda env config vars}) and applied when the package loads
+'JAX'. Sorting on some ROCm GPUs is not reproducible, which \code{generate_randomizations()}
+reports as an error; use \code{backend = "cpu"} (or set \code{JAX_PLATFORMS=cpu}) if this occurs.
+
+The function ends by reporting the device 'JAX' uses in the new environment.
+}
 \examples{
 \dontrun{
 # Create a conda environment named "fastrerandomize_env"
@@ -28,6 +49,9 @@ build_backend(conda_env = "fastrerandomize_env", conda = "auto")
 
 # If you want to specify a particular conda path:
 # build_backend(conda_env = "fastrerandomize_env", conda = "/usr/local/bin/conda")
+
+# Install CPU-only JAX on a machine with a GPU:
+# build_backend(backend = "cpu")
 }
 
 }

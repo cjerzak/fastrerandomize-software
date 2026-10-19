@@ -79,7 +79,8 @@ check_jax_availability <- function(conda_env = "fastrerandomize_env",
             "fastrerandomize::build_backend(conda_env = '", conda_env, "', conda = '", conda, "').")
     return(NULL)
   }
-  
+  .apply_conda_env_vars()
+
   # Check if 'JAX' is installed
   if(!reticulate::py_module_available("jax")){
     message("JAX is not installed. Please build the backend using ",
@@ -90,6 +91,25 @@ check_jax_availability <- function(conda_env = "fastrerandomize_env",
   # If we reach this point, both Python and JAX are accessible
   fastrr_env$jax_checked_env <- conda_env
   invisible(TRUE)
+}
+
+# reticulate does not apply variables set with `conda env config vars set` (as
+# `conda activate` does), such as the ROCm settings from build_backend(). Set
+# those not already in the environment; they must be in place before JAX
+# initializes a backend.
+.apply_conda_env_vars <- function() {
+  tryCatch({
+    state <- file.path(reticulate::import("sys")$prefix, "conda-meta", "state")
+    if (file.exists(state)) {
+      env_vars <- reticulate::import("json")$loads(
+        paste(readLines(state, warn = FALSE), collapse = "\n"))$env_vars
+      environ <- reticulate::import("os")$environ
+      for (name in names(env_vars)) {
+        environ$setdefault(name, as.character(env_vars[[name]]))
+      }
+    }
+  }, error = function(e) NULL)
+  invisible(NULL)
 }
 
 .ensure_backend <- function(conda_env, conda_env_required) {

@@ -64,6 +64,7 @@ On an AMD Radeon RX 7600M XT GPU, repeated calls became 10–110× faster for Mo
 library(  fastrerandomize  ) 
 
 # Running code the first time, you'll want to create the computational environment 
+# (detects Apple Silicon, NVIDIA, or AMD GPUs; use backend = "cpu" to skip the GPU)
 fastrerandomize::build_backend()
 ```
 
