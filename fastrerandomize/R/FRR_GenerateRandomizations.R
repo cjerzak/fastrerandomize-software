@@ -10,9 +10,9 @@
 #'   enumeration, \code{NULL} returns every assignment without balance filtering;
 #'   Monte Carlo sampling requires a matrix.
 #' @param randomization_accept_prob A numeric value between 0 and 1 specifying the probability threshold for accepting randomizations based on balance.
-#' @param threshold_func A 'JAX' function that computes a balance measure for each randomization. Only used for Monte Carlo sampling.
+#' @param threshold_func A 'JAX' function that computes a balance measure for each randomization (see \code{\link{generate_randomizations_mc}} for its signature). Default (\code{NULL}) uses Hotelling's T-squared statistic.
 #' @param max_draws An integer specifying the maximum number of randomizations to draw in Monte Carlo sampling.
-#' @param batch_size An integer specifying batch size for Monte Carlo processing.
+#' @param batch_size An integer specifying batch size for Monte Carlo processing, or \code{NULL} (default) to size batches automatically. Results do not depend on the batch size.
 #' @param randomization_type A string specifying the type of randomization: either \code{"exact"} or \code{"monte_carlo"}.
 #' @param approximate_inv A logical value indicating whether to use an approximate inverse 
 #'   (diagonal of the covariance matrix) instead of the full matrix inverse when computing 
@@ -85,7 +85,7 @@ generate_randomizations <- function(n_units,
                                    randomization_accept_prob, 
                                    threshold_func = NULL, 
                                    max_draws = 10^6, 
-                                   batch_size = 1000, 
+                                   batch_size = NULL, 
                                    randomization_type = "monte_carlo", 
                                    approximate_inv = TRUE, 
                                    file = NULL, 
@@ -95,12 +95,7 @@ generate_randomizations <- function(n_units,
                                    conda_env_required = TRUE,
                                    seed = NULL
                                    ){
-  if (is.null(check_jax_availability(conda_env=conda_env))) { return() }
-  
-  if (!"VectorizedFastHotel2T2" %in% ls(envir = fastrr_env)) {
-      initialize_jax(conda_env = conda_env, conda_env_required = conda_env_required) 
-  }
-  if(is.null(threshold_func)){ threshold_func <- fastrr_env$VectorizedFastHotel2T2 }
+  if (is.null(.ensure_backend(conda_env, conda_env_required))) { return() }
   
   if (randomization_type == "exact"){
         if (verbose){ message("Using exact randomization") }

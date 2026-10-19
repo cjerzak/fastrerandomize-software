@@ -106,10 +106,7 @@ generate_randomizations_exact <- function(
   n_units <- as.integer(n_units)
   n_treated <- as.integer(n_treated)
   if (!is.null(X)) {
-    X <- as.matrix(X)
-    if (!is.numeric(X) || nrow(X) != n_units) {
-      stop("'X' must be a numeric matrix with one row per unit.", call. = FALSE)
-    }
+    X <- .prepare_X(X, n_units)
   }
 
   max_rand_num <- choose(n_units, n_treated)
@@ -125,67 +122,56 @@ generate_randomizations_exact <- function(
     )
   }
 
-  if(is.null(check_jax_availability(conda_env=conda_env))) { return(NULL) }
-  
-  if (!"VectorizedFastHotel2T2" %in% ls(envir = fastrr_env)) {
-    initialize_jax(conda_env = conda_env, conda_env_required = conda_env_required)
-  }
-  if(is.null(threshold_func)){ threshold_func <- fastrr_env$VectorizedFastHotel2T2 }
-  
-  # Get all combinations of positions to set to 1
-  combinations <- fastrr_env$jnp$array(  utils::combn(n_units, n_treated) - 1L )
-  ZerosHolder <- fastrr_env$jnp$zeros(as.integer(n_units), dtype=fastrr_env$jnp$uint16)
+  if (is.null(.ensure_backend(conda_env, conda_env_required))) { return(NULL) }
+  jnp <- fastrr_env$jnp
+
+  # Get all combinations of positions to set to 1 (int32 rows, checked below)
+  combinations <- jnp$array(  utils::combn(n_units, n_treated) - 1L )
+  ZerosHolder <- jnp$zeros(as.integer(n_units), dtype = jnp$int32)
   candidate_randomizations <- fastrr_env$InsertOnesVectorized(combinations, ZerosHolder)
+  .assert_valid_rows(
+    .to_r(jnp$sum(jnp$not_equal(jnp$sum(candidate_randomizations, 1L), n_treated))),
+    n_treated
+  )
+  candidate_randomizations <- candidate_randomizations$astype(jnp$uint16)
 
   M_results <- NULL; if(!is.null(X)){
-    # Set up sample sizes for treatment/control
-    n0_array <- fastrr_env$jnp$array(  (n_units - n_treated) )
-    n1_array <- fastrr_env$jnp$array(  n_treated )
+    # Balance inputs are built in double precision on the host
+    design <- .balance_design(X, approximate_inv)
 
-    # pre-compute matrix inverse
-    {
-      SAMP_COV_INV_APPROX <- fastrr_env$jnp$reciprocal( fastrr_env$jnp$var( fastrr_env$jnp$array(as.matrix(X)), axis = 0L) )
-      {
-        SAMP_COV_INV <-  fastrr_env$jnp$cov( fastrr_env$jnp$array(as.matrix(X)), rowvar = FALSE)
-        IS_METAL_BACKEND <- .is_metal_backend()
-        if(IS_METAL_BACKEND){
-          SAMP_COV_INV <- SAMP_COV_INV$to_device(fastrr_env$jax$devices("cpu")[[1]])
-        }
-        # Handle single covariate case: cov returns scalar, inv needs 2D
-        if(ncol(X) == 1L) {
-          SAMP_COV_INV <- fastrr_env$jnp$reshape(SAMP_COV_INV, c(1L, 1L))
-        }
-        SAMP_COV_INV <- fastrr_env$jnp$linalg$inv(SAMP_COV_INV)
-        if(IS_METAL_BACKEND){
-          SAMP_COV_INV <- SAMP_COV_INV$to_device(fastrr_env$jax$devices("METAL")[[1]])
-        }
-      }
+    # Calculate balance measure (Hotelling T-squared) for each candidate randomization
+    if (.is_default_threshold(threshold_func)) {
+      M_results <- fastrr_env$WhitenedT2Jit(
+        jnp$array(design$Xw, dtype = jnp$float32),
+        candidate_randomizations,
+        jnp$float32(n_units - n_treated),
+        jnp$float32(n_treated)
+      )
+    } else {
+      M_results <- jnp$reshape(threshold_func(
+        jnp$array(X, dtype = jnp$float32),                        # Covariates
+        jnp$array(design$S_inv, dtype = jnp$float32),             # matrix inverse
+        jnp$array(design$S_inv_approx, dtype = jnp$float32),      # diagonal inverse
+        jnp$array(candidate_randomizations, dtype = jnp$float32), # Possible assignments
+        jnp$array(n_units - n_treated),
+        jnp$array(n_treated),                                     # Sample sizes
+        approximate_inv
+      ), -1L)
     }
     
-    # Calculate balance measure (Hotelling T-squared) for each candidate randomization
-    M_results <-  threshold_func(
-      fastrr_env$jnp$array( X ),                    # Covariates
-      SAMP_COV_INV,  # matrix inverse 
-      SAMP_COV_INV_APPROX,  # matrix inverse 
-      fastrr_env$jnp$array(candidate_randomizations, dtype = fastrr_env$jnp$float32),  # Possible assignments
-      n0_array, 
-      n1_array,                # Sample sizes
-      approximate_inv
-    )
-    
     # Find acceptance threshold based on specified quantile
-    a_threshold <- fastrr_env$jnp$quantile( 
+    a_threshold <- jnp$quantile( 
       M_results,  
-      fastrr_env$jnp$array(randomization_accept_prob)
+      jnp$array(randomization_accept_prob)
     )
 
     # Keep only randomizations with balance measure at or below threshold (use less_equal to include ties)
-    candidate_randomizations <- fastrr_env$jnp$take(
+    candidate_randomizations <- jnp$take(
       candidate_randomizations,
-      indices = (takeM_ <- fastrr_env$jnp$where(fastrr_env$jnp$less_equal(M_results, a_threshold))[[1]] ),
+      indices = (takeM_ <- jnp$where(jnp$less_equal(M_results, a_threshold))[[1]] ),
       axis = 0L
     )
-    M_results <- fastrr_env$jnp$take( M_results, indices = takeM_, axis = 0L )
+    M_results <- jnp$take( M_results, indices = takeM_, axis = 0L )
   }
   
   return(list("candidate_randomizations"=candidate_randomizations,

@@ -26,7 +26,20 @@
 #'   \item `FI` A numeric vector representing the fiducial interval if \code{findFI=TRUE}.
 #'   \item `tau_obs` A numeric value or vector representing the estimated treatment effect(s).
 #'   \item `fastrr_env` The fastrerandomize environment. 
+#'   \item `candidate_randomizations` The candidate matrix, when supplied as an R matrix;
+#'     otherwise \code{NULL}, and the 'JAX' array is kept in `candidate_randomizations_array`
+#'     (it is not copied back to R).
 #' }
+#'
+#' @details
+#' All statistics are computed from one pass over the candidates: for a binary
+#' candidate \code{w}, the difference in means under the sharp null of effect
+#' \code{tau} equals \code{a_w + tau * (c_w - b_w)}, where \code{a_w} is the
+#' difference in means of \code{obsY} under \code{w}, \code{b_w} that of
+#' \code{obsW}, and \code{c_w = sum(w) / n1}. The fiducial search then runs on
+#' these per-candidate values. \code{tau_obs} is computed in double precision,
+#' and candidates whose statistic ties \code{tau_obs} up to float32 error are
+#' re-evaluated in double precision, so exact ties are counted consistently.
 #'
 #' @section References:
 #' \itemize{
@@ -139,50 +152,64 @@ randomization_test <- function(obsW = NULL,
   }
   step_multiplier <- if (findFI) .fi_step_multiplier(c_initial) else 1
 
-  if( is.null(check_jax_availability(conda_env=conda_env)) ) { return(NULL) }
+  if( is.null(.ensure_backend(conda_env, conda_env_required)) ) { return(NULL) }
+  jnp <- fastrr_env$jnp
 
   tau_obs <- FI <- NULL
-  if (!"VectorizedFastHotel2T2" %in% ls(envir = fastrr_env)) {
-    initialize_jax(conda_env = conda_env, conda_env_required = conda_env_required)
-  }
 
-  # Convert between formats as needed
-  if(is.null(candidate_randomizations)){
-      candidate_randomizations <- as.matrix(fastrr_env$np$array(candidate_randomizations_array))
-      if (nrow(candidate_randomizations) == 0L ||
-          ncol(candidate_randomizations) != length(obsW)) {
-        stop("'candidate_randomizations_array' must have one column per observed unit and at least one row.",
-             call. = FALSE)
-      }
-  }
+  # Use a supplied device array as is; only an R matrix is copied to the device
   if(is.null(candidate_randomizations_array)){
-      candidate_randomizations_array <- fastrr_env$jnp$array(candidate_randomizations,
-                                                             dtype = fastrr_env$jnp$float32)
+      candidate_randomizations_array <- jnp$array(candidate_randomizations,
+                                                  dtype = jnp$float32)
+  }
+  candidate_shape <- as.integer(unlist(reticulate::py_to_r(
+    reticulate::py_get_attr(candidate_randomizations_array, "shape"))))
+  if (length(candidate_shape) != 2L || candidate_shape[1] == 0L ||
+      candidate_shape[2] != length(obsW)) {
+    stop("'candidate_randomizations_array' must have one column per observed unit and at least one row.",
+         call. = FALSE)
+  }
+  if (!isTRUE(.to_r(fastrr_env$IsBinary(candidate_randomizations_array)))) {
+    stop("Candidate randomizations must contain only 0 and 1 values.", call. = FALSE)
   }
 
-  if(is.null(n0_array)){ n0_array <- fastrr_env$jnp$array(sum(obsW == 0)) }
-  if(is.null(n1_array)){ n1_array <- fastrr_env$jnp$array(sum(obsW == 1)) }
+  n0 <- if (is.null(n0_array)) sum(obsW == 0) else as.numeric(.to_r(n0_array))
+  n1 <- if (is.null(n1_array)) sum(obsW == 1) else as.numeric(.to_r(n1_array))
 
   # perform randomization inference using input data
   {
-    tau_obs <- c(fastrr_env$np$array( fastrr_env$FastDiffInMeans(
-                                          fastrr_env$jnp$array(obsY), # 
-                                          fastrr_env$jnp$array(obsW), # 
-                                           n0_array, #
-                                           n1_array # 
-                                           ) ))
-    tau_perm_null_0 <- fastrr_env$np$array(
-      fastrr_env$W_VectorizedFastDiffInMeans(
-          fastrr_env$jnp$array(obsY),  # y_ =
-          candidate_randomizations_array, # t_ =
-          n0_array, # n0 =
-          n1_array # n1 =
-    ))
-    p_value <- mean( abs(tau_perm_null_0) >= abs(tau_obs) )
+    # One pass over the candidates; every statistic below is linear in these sums
+    G <- matrix(.to_r(fastrr_env$CandidateMoments(
+      candidate_randomizations_array,
+      jnp$array(obsY - mean(obsY), dtype = jnp$float32),
+      jnp$array(obsW, dtype = jnp$float32)
+    )), ncol = 3L)
+    fi <- .fi_components(G, obsY, obsW, n0, n1)
+    if (any(fi$r != n1)) {
+      warning("Some candidate randomizations do not have the observed number of treated units.",
+              call. = FALSE)
+    }
+    tau_obs <- .dim64(obsY, obsW, n0, n1)
+
+    # Re-evaluate in double precision the candidates whose |statistic| is within
+    # float32 error of |tau_obs|, so that exact ties (e.g. obsW itself) stay ties
+    tol <- 4 * length(obsY) * 2^-24 * sum(abs(obsY - mean(obsY))) * (1 / n1 + 1 / n0)
+    near <- which(abs(abs(fi$a) - abs(tau_obs)) <= tol)
+    if (length(near) > 0L) {
+      near_rows <- if (!is.null(candidate_randomizations)) {
+        candidate_randomizations[near, , drop = FALSE]
+      } else {
+        matrix(.to_r(jnp$take(candidate_randomizations_array, jnp$array(near - 1L), axis = 0L)),
+               ncol = length(obsW))
+      }
+      fi$a[near] <- apply(near_rows, 1L, function(w) .dim64(obsY, w, n0, n1))
+    }
+    p_value <- mean( abs(fi$a) >= abs(tau_obs) )
 
     if( findFI ){
-      obsY_array <- fastrr_env$jnp$array( obsY )
-      obsW_array <- fastrr_env$jnp$array( obsW )
+      # Statistic of candidate i at hypothesized effect tau: a[i] + tau * slope[i]
+      a <- fi$a
+      slope <- fi$slope
 
       n_search_attempts <- 500
       upperBound_storage_vec <- lowerBound_storage_vec <- rep(NA, n_search_attempts)
@@ -194,23 +221,13 @@ randomization_test <- function(obsW = NULL,
         #setting optimal c
         z_alpha <- stats::qnorm( p = (1-alpha) )
         k <- 2 / (  z_alpha *   (2 * pi)^(-1/2) * exp( -z_alpha^2 / 2)  )
-        NAHolder <- rep(NA, length(obsW))
         for(step_t in 1:n_search_attempts){
           #initialize for next step
-          permutation_treatment_vec <- candidate_randomizations[sample(1:nrow(candidate_randomizations), size=1),]
-          lower_Y_0_under_null <- lower_Y_obs_perm <- NAHolder
-          upper_Y_0_under_null <- upper_Y_obs_perm <- lower_Y_obs_perm
+          perm_index <- sample(1:nrow(G), size=1)
 
           #update lower
           {
-            lower_Y_0_under_null[obsW == 0] <- obsY[obsW == 0]
-            lower_Y_0_under_null[obsW == 1] <- obsY[obsW == 1] - lowerBound_estimate_step_t
-            lower_Y_obs_perm[permutation_treatment_vec==0] <- lower_Y_0_under_null[permutation_treatment_vec==0]
-            lower_Y_obs_perm[permutation_treatment_vec==1] <- lower_Y_0_under_null[permutation_treatment_vec==1] + lowerBound_estimate_step_t
-            lower_tau_at_step_t <- fastrr_env$np$array( fastrr_env$FastDiffInMeans(
-                                                             fastrr_env$jnp$array(lower_Y_obs_perm), 
-                                                             fastrr_env$jnp$array(permutation_treatment_vec),
-                                                             n0_array, n1_array) )
+            lower_tau_at_step_t <- a[perm_index] + lowerBound_estimate_step_t * slope[perm_index]
 
             c_step_t <- step_multiplier * k * (tau_obs - lowerBound_estimate_step_t)
             if(lower_tau_at_step_t < tau_obs) {  lowerBound_estimate_step_t <- lowerBound_estimate_step_t + c_step_t * (alpha/2) / step_t  }
@@ -219,13 +236,7 @@ randomization_test <- function(obsW = NULL,
 
           #update upper
           {
-            upper_Y_0_under_null[obsW == 0] <- obsY[obsW == 0]
-            upper_Y_0_under_null[obsW == 1] <- obsY[obsW == 1] - upperBound_estimate_step_t
-            upper_Y_obs_perm[permutation_treatment_vec==0] <- upper_Y_0_under_null[permutation_treatment_vec==0]
-            upper_Y_obs_perm[permutation_treatment_vec==1] <- upper_Y_0_under_null[permutation_treatment_vec==1] + upperBound_estimate_step_t
-            upper_tau_at_step_t <- fastrr_env$np$array( fastrr_env$FastDiffInMeans(fastrr_env$jnp$array(upper_Y_obs_perm), 
-                                                                                   fastrr_env$jnp$array(permutation_treatment_vec), 
-                                                                                   n0_array, n1_array) )
+            upper_tau_at_step_t <- a[perm_index] + upperBound_estimate_step_t * slope[perm_index]
 
             c_step_t <- step_multiplier * k * (upperBound_estimate_step_t - tau_obs)
             if(upper_tau_at_step_t > tau_obs) {  upperBound_estimate_step_t <- upperBound_estimate_step_t - c_step_t * (alpha/2) / step_t  }
@@ -234,7 +245,7 @@ randomization_test <- function(obsW = NULL,
           lowerBound_storage_vec[step_t] <- lowerBound_estimate_step_t
           upperBound_storage_vec[step_t] <- upperBound_estimate_step_t
         }
-      }#for(bound_side in c("lower", "upper"))
+      }
 
       # save results
       FI <- c(lowerBound_storage_vec[length(lowerBound_storage_vec)],
@@ -243,20 +254,11 @@ randomization_test <- function(obsW = NULL,
       # stage 2
       {
         tau_pseudo_seq <- .fi_search_grid(FI, tau_obs, length.out = 100L)
-        pvals_vec <- sapply(tau_pseudo_seq, function(tau_pseudo){
-          stat_vec_at_tau_pseudo <- fastrr_env$np$array(     fastrr_env$vec1_get_stat_vec_at_tau_pseudo(
-                                                                                  candidate_randomizations_array,# treatment_pseudo
-                                                                                  obsY_array,# obsY_array
-                                                                                  obsW_array, # obsW_array
-                                                                                  tau_pseudo, # tau_pseudo
-                                                                                  n0_array, # n0_array
-                                                                                  n1_array #
-                                                                                  )  )
-
-          ret_ <- min(mean( tau_obs >= stat_vec_at_tau_pseudo),
-                      mean( tau_obs <= stat_vec_at_tau_pseudo))
-          return( ret_ )
-        } )
+        pvals_vec <- vapply(tau_pseudo_seq, function(tau_pseudo){
+          stat_vec_at_tau_pseudo <- a + tau_pseudo * slope
+          min(mean( tau_obs >= stat_vec_at_tau_pseudo),
+              mean( tau_obs <= stat_vec_at_tau_pseudo))
+        }, numeric(1))
         FI <- .fi_accepted_range(tau_pseudo_seq, pvals_vec, alpha)
       }
     }
@@ -270,6 +272,9 @@ randomization_test <- function(obsW = NULL,
       FI      = FI,
       tau_obs = tau_obs,
       candidate_randomizations = candidate_randomizations, 
+      candidate_randomizations_array = if (is.null(candidate_randomizations)) {
+        candidate_randomizations_array
+      },
       fastrr_env = fastrr_env, 
       call    = match.call()  
     )

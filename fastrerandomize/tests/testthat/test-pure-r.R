@@ -239,3 +239,98 @@ test_that("randomization_test validates required R inputs before JAX", {
     "strictly between 0 and 1"
   )
 })
+
+# ---------------------------------------------------------------------------
+# Host-side helpers for the GEMM-form kernels
+# ---------------------------------------------------------------------------
+whitened_t2 <- function(Xw, W) {
+  n1 <- sum(W)
+  n0 <- length(W) - n1
+  d <- colSums(Xw[W == 1, , drop = FALSE]) * (1 / n1 + 1 / n0) - colSums(Xw) / n0
+  n0 * n1 / (n0 + n1) * sum(d^2)
+}
+
+test_that("whitened balance design reproduces Hotelling T^2 in double precision", {
+  set.seed(11)
+  for (X in list(matrix(rnorm(40 * 3), 40) + 100, matrix(rnorm(40), 40))) {
+    W <- sample(rep(c(1, 0), each = 20))
+    full <- fastrerandomize:::.balance_design(X, approximate_inv = FALSE)
+    expect_equal(whitened_t2(full$Xw, W), hotellingT2_R(X, W), tolerance = 1e-10)
+
+    d <- colMeans(X[W == 1, , drop = FALSE]) - colMeans(X[W == 0, , drop = FALSE])
+    diag_ref <- 10 * sum(d^2 / colMeans(sweep(X, 2, colMeans(X))^2))
+    approx <- fastrerandomize:::.balance_design(X, approximate_inv = TRUE)
+    expect_equal(whitened_t2(approx$Xw, W), diag_ref, tolerance = 1e-10)
+  }
+})
+
+test_that("full balance design uses a pseudo-inverse for collinear covariates", {
+  set.seed(13)
+  X2 <- matrix(rnorm(30 * 2), 30)
+  X3 <- cbind(X2, X2[, 1] + X2[, 2])
+  W <- sample(rep(c(1, 0), each = 15))
+  expect_equal(
+    whitened_t2(fastrerandomize:::.balance_design(X3, FALSE)$Xw, W),
+    whitened_t2(fastrerandomize:::.balance_design(X2, FALSE)$Xw, W),
+    tolerance = 1e-8
+  )
+})
+
+test_that("covariate preparation drops constant columns and rejects non-finite values", {
+  X <- cbind(1:6, 5, c(2, 4, 1, 3, 6, 5))
+  expect_warning(prepared <- fastrerandomize:::.prepare_X(X, 6L), "Dropping 1 constant")
+  expect_equal(prepared, X[, c(1, 3)])
+  expect_warning(all_constant <- fastrerandomize:::.prepare_X(matrix(2, 6, 2), 6L),
+                 "All covariates")
+  expect_equal(all_constant, matrix(0, 6, 1))
+  expect_error(fastrerandomize:::.prepare_X(replace(X, 2, NA), 6L), "finite")
+  expect_error(fastrerandomize:::.prepare_X(X, 5L), "one row per unit")
+})
+
+test_that("closed-form fiducial statistic matches direct construction", {
+  set.seed(12)
+  obsW <- sample(rep(c(1, 0), c(12, 18)))
+  Y <- rnorm(30) + 2 * obsW
+  cand <- rbind(t(replicate(25, sample(obsW))), c(rep(1, 11), rep(0, 19)))  # last row: 11 treated
+  G <- cbind(cand %*% (Y - mean(Y)), cand %*% obsW, rowSums(cand))
+  fi <- fastrerandomize:::.fi_components(G, Y, obsW, n0 = 18, n1 = 12)
+  for (tau in c(-1.5, 0, 0.7)) {
+    direct <- apply(cand, 1, function(w) {
+      Y0 <- Y - obsW * tau
+      Yo <- (Y0 + w * tau) * w + Y0 * (1 - w)
+      sum(Yo * w) / 12 - sum(Yo * (1 - w)) / 18
+    })
+    expect_equal(fi$a + tau * fi$slope, direct, tolerance = 1e-12)
+  }
+  expect_equal(fi$r, rowSums(cand))
+  # The complement (18 treated) gives the exactly negated statistic
+  expect_identical(fastrerandomize:::.dim64(Y, 1 - obsW, 12, 18),
+                   -fastrerandomize:::.dim64(Y, obsW, 18, 12))
+})
+
+test_that("row-count invariant and batch sizing helpers behave", {
+  expect_error(fastrerandomize:::.assert_valid_rows(3, 10L), "without exactly 10 treated units")
+  expect_true(fastrerandomize:::.assert_valid_rows(0, 10L))
+  expect_equal(fastrerandomize:::.resolve_batch_size(NULL, 100L, 1e6), 32768L)
+  expect_equal(fastrerandomize:::.resolve_batch_size(NULL, 1000L, 1e6), 4096L)
+  expect_equal(fastrerandomize:::.resolve_batch_size(NULL, 1e6, 1e6), 1024L)
+  expect_equal(fastrerandomize:::.resolve_batch_size(NULL, 100L, 50L), 50L)
+  expect_equal(fastrerandomize:::.resolve_batch_size(777, 100L, 1e6), 777L)
+})
+
+test_that("JAX availability check is cached per conda environment", {
+  env <- fastrerandomize:::fastrr_env
+  old <- env$jax_checked_env
+  on.exit(assign("jax_checked_env", old, envir = env), add = TRUE)
+  env$jax_checked_env <- "cached_env_for_test"
+  testthat::local_mocked_bindings(
+    py_available = function(...) TRUE,
+    use_condaenv = function(...) stop("conda should not be consulted"),
+    .package = "reticulate"
+  )
+  expect_true(fastrerandomize::check_jax_availability("cached_env_for_test"))
+  expect_message(
+    expect_null(fastrerandomize::check_jax_availability("other_env")),
+    "conda environment is not available"
+  )
+})

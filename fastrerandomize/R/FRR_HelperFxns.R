@@ -53,9 +53,16 @@ print2 <- function(text,
 #' }
 #'
 #' @export
-check_jax_availability <- function(conda_env = "fastrerandomize_env", 
+check_jax_availability <- function(conda_env = "fastrerandomize_env",
                                    conda = "auto"){
-  
+
+  # Reuse a successful check: Python cannot switch environments once bound in
+  # this session, and use_condaenv() shells out to conda (~1 s per call)
+  if (identical(fastrr_env$jax_checked_env, conda_env) &&
+      reticulate::py_available(initialize = FALSE)) {
+    return(invisible(TRUE))
+  }
+
   # Try to use the specified conda environment
   try_condaenv <- try(reticulate::use_condaenv(conda_env, 
                                                required = TRUE, 
@@ -81,7 +88,126 @@ check_jax_availability <- function(conda_env = "fastrerandomize_env",
   }
   
   # If we reach this point, both Python and JAX are accessible
+  fastrr_env$jax_checked_env <- conda_env
   invisible(TRUE)
+}
+
+.ensure_backend <- function(conda_env, conda_env_required) {
+  if (is.null(check_jax_availability(conda_env = conda_env))) { return(NULL) }
+  if (!"WhitenedT2" %in% ls(envir = fastrr_env)) {
+    initialize_jax(conda_env = conda_env, conda_env_required = conda_env_required)
+  }
+  invisible(TRUE)
+}
+
+.to_r <- function(x) {
+  reticulate::py_to_r(fastrr_env$np$asarray(x))
+}
+
+# Validate covariates and drop exactly-constant columns, which carry no balance
+# information (their Hotelling contribution is 0/0).
+.prepare_X <- function(X, n_units) {
+  X <- as.matrix(X)
+  if (!is.numeric(X) || nrow(X) != n_units) {
+    stop("'X' must be a numeric matrix with one row per unit.", call. = FALSE)
+  }
+  if (any(!is.finite(X))) {
+    stop("'X' must contain only finite values.", call. = FALSE)
+  }
+  storage.mode(X) <- "double"
+  constant <- apply(X, 2L, function(x) all(x == x[1L]))
+  if (all(constant)) {
+    warning("All covariates in 'X' are constant; every randomization has balance 0.",
+            call. = FALSE)
+    return(matrix(0, nrow(X), 1L))
+  }
+  if (any(constant)) {
+    warning(sprintf("Dropping %d constant covariate column(s) from 'X'.", sum(constant)),
+            call. = FALSE)
+    X <- X[, !constant, drop = FALSE]
+  }
+  X
+}
+
+# L with L %*% t(L) equal to the (pseudo-)inverse of symmetric PSD S.
+.psd_inv_sqrt <- function(S) {
+  S <- (S + t(S)) / 2
+  eig <- eigen(S, symmetric = TRUE)
+  tol <- max(abs(eig$values)) * max(dim(S)) * .Machine$double.eps
+  keep <- eig$values > tol
+  if (!any(keep)) { return(matrix(0, nrow(S), 1L)) }
+  eig$vectors[, keep, drop = FALSE] %*%
+    diag(1 / sqrt(eig$values[keep]), nrow = sum(keep))
+}
+
+# Float64 host-side design for Hotelling's T^2: center X, then scale (diagonal
+# approximation, population variance as jnp.var) or whiten (sample covariance as
+# jnp.cov) so that T^2 is a plain squared norm of whitened mean differences.
+# Centering removes the float32 cancellation between treated and control means.
+.balance_design <- function(X, approximate_inv) {
+  Xc <- sweep(X, 2L, colMeans(X))
+  var_pop <- colMeans(Xc^2)
+  S_inv_approx <- ifelse(var_pop > 0, 1 / var_pop, 0)
+  S <- stats::cov(X)
+  L <- .psd_inv_sqrt(S)
+  Xw <- if (approximate_inv) sweep(Xc, 2L, sqrt(S_inv_approx), "*") else Xc %*% L
+  list(Xw = Xw, S_inv = L %*% t(L), S_inv_approx = S_inv_approx)
+}
+
+.is_default_threshold <- function(threshold_func) {
+  if (is.null(threshold_func)) { return(TRUE) }
+  default <- fastrr_env$VectorizedFastHotel2T2
+  inherits(threshold_func, "python.builtin.object") && !is.null(default) &&
+    identical(reticulate::py_id(threshold_func), reticulate::py_id(default))
+}
+
+# Draws per batch. Results do not depend on it (keys are derived per draw
+# index), so NULL picks a power of two filling roughly 2^22 assignment entries.
+.resolve_batch_size <- function(batch_size, n_units, max_draws) {
+  if (is.null(batch_size)) {
+    batch_size <- 2^floor(log2(max(1, 2^22 / n_units)))
+    batch_size <- min(max(batch_size, 1024), 65536)
+  }
+  as.integer(min(batch_size, max_draws))
+}
+
+.assert_valid_rows <- function(n_bad, n_treated) {
+  n_bad <- as.numeric(n_bad)
+  if (n_bad > 0) {
+    device <- tryCatch(reticulate::py_str(fastrr_env$jax$devices()[[1]]),
+                       error = function(e) "unknown device")
+    stop(sprintf(paste0(
+      "The JAX backend (%s) produced %s assignment(s) without exactly %d treated units. ",
+      "This is a backend bug; please report it and use JAX_PLATFORMS=cpu meanwhile."),
+      device, format(n_bad), n_treated),
+      call. = FALSE)
+  }
+  invisible(TRUE)
+}
+
+# Float64 difference in means, using means when the counts match so that an
+# assignment and its complement give exactly negated values.
+.dim64 <- function(Y, w, n0, n1) {
+  if (sum(w == 1) == n1 && sum(w == 0) == n0) {
+    return(mean(Y[w == 1]) - mean(Y[w == 0]))
+  }
+  sum(Y[w == 1]) / n1 - sum(Y[w == 0]) / n0
+}
+
+# Closed form of the fiducial-search statistic. For binary w, the difference in
+# means of Y0 + w * tau (Y0 = Y - obsW * tau) is a_w + tau * (c_w - b_w) with
+# a_w = D(Y, w), b_w = D(obsW, w), c_w = sum(w) / n1. G holds the per-row sums
+# w . (Y - mean(Y)), w . obsW, and sum(w).
+.fi_components <- function(G, Y, obsW, n0, n1) {
+  r <- G[, 3L]
+  s <- G[, 1L] + mean(Y) * r
+  m <- round(G[, 2L])
+  r <- round(r)
+  list(
+    a = s / n1 - (sum(Y) - s) / n0,
+    slope = r / n1 - (m / n1 - (sum(obsW) - m) / n0),
+    r = r
+  )
 }
 
 .is_metal_backend <- function(device_string = NULL) {

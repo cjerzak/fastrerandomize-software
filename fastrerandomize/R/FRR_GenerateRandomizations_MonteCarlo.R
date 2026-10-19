@@ -8,9 +8,9 @@
 #' @param n_treated An integer specifying the number of units to be assigned to treatment. 
 #' @param X A numeric matrix of covariates used for balance checking. Cannot be NULL.
 #' @param randomization_accept_prob A numeric value between 0 and 1 specifying the probability threshold for accepting randomizations based on balance. Default is 1
-#' @param threshold_func A JAX function that computes a balance measure for each randomization. Must be vectorized using \code{jax$vmap} with \code{in_axes = list(NULL, 0L, NULL, NULL)}, and inputs covariates (matrix of X), treatment_assignment (vector of 0s and 1s), n0 (scalar), n1 (scalar). Default is \code{VectorizedFastHotel2T2} which uses Hotelling's T-squared statistic.
+#' @param threshold_func A traceable JAX function that computes a balance measure for each randomization in a batch. It is called as \code{threshold_func(X, S_inv, S_inv_approx, W, n0, n1, approximate_inv)}, where \code{X} is the covariate matrix, \code{S_inv} the inverse sample covariance, \code{S_inv_approx} the reciprocal covariate variances, \code{W} a batch of 0/1 assignments (one per row), \code{n0}/\code{n1} the group sizes, and \code{approximate_inv} the logical argument below; it must return one value per row of \code{W}. Default (\code{NULL}) uses Hotelling's T-squared statistic.
 #' @param max_draws An integer specifying the maximum number of randomizations to draw.
-#' @param batch_size An integer specifying how many randomizations to process at once. Lower values use less memory but may be slower. 
+#' @param batch_size An integer specifying how many randomizations to process at once, or \code{NULL} (default) to size batches automatically from \code{n_units}. Lower values use less memory but may be slower. Results do not depend on the batch size.
 #' @param approximate_inv A logical value indicating whether to use an approximate inverse 
 #'   (diagonal of the covariance matrix) instead of the full matrix inverse when computing 
 #'   balance metrics. This can speed up computations for high-dimensional covariates.
@@ -26,16 +26,21 @@
 #'   still be used to reproduce the draw. Default is \code{NULL}.
 #' @details
 #' The function works by:
-#' 1. Generating batches of random permutations.
-#' 2. Computing balance measures for each permutation using the provided threshold function.
-#' 3. Keeping only the top permutations that meet the acceptance probability threshold.
-#' 4. Managing memory by clearing unused objects and caches between batches.
+#' 1. Deriving the key of draw \code{i} as \code{jax.random.split(key, max_draws)[i]}
+#'    inside each batch, without materializing all keys.
+#' 2. Permuting the base assignment for each key and computing its balance measure.
+#' 3. Keeping the \code{ceiling(max_draws * randomization_accept_prob)} most balanced draws
+#'    and regenerating their assignments from their keys.
 #'
-#' The function uses smaller data types (int8, float16) where possible to reduce memory usage.
-#' It also includes assertions to verify array shapes and dimensions throughout.
+#' All batches run inside one compiled JAX program (on Metal, or when
+#' \code{options(fastrerandomize.mc_fused = FALSE)} is set, batches are dispatched from R).
+#' Covariates are centered and scaled or whitened in double precision before
+#' they are sent to the device; constant covariates are dropped with a warning.
+#' Every generated assignment is checked to contain exactly \code{n_treated} treated units.
 #'
-#' @return The function returns a \emph{list} with two elements:
-#' \code{candidate_randomizations}: an array of randomization vectors
+#' @return The function returns a \emph{list} with three elements:
+#' \code{candidate_randomizations}: an int8 array of randomization vectors;
+#' \code{keys_candidate_randomizations}: their JAX random keys;
 #' \code{M_candidate_randomizations}: an array of their balance measures. 
 #' @examples
 #' 
@@ -75,7 +80,7 @@ generate_randomizations_mc <- function(n_units,
                                        randomization_accept_prob = 1,
                                        threshold_func = NULL, 
                                        max_draws = 100000, 
-                                       batch_size = 1000, 
+                                       batch_size = NULL, 
                                        approximate_inv = TRUE,
                                        verbose = TRUE,
                                        conda_env = "fastrerandomize_env", 
@@ -100,71 +105,23 @@ generate_randomizations_mc <- function(n_units,
       max_draws < 1 || max_draws > .Machine$integer.max || max_draws != floor(max_draws)) {
     stop("'max_draws' must be a positive whole number in R's integer range.", call. = FALSE)
   }
-  if (length(batch_size) != 1L || !is.numeric(batch_size) || !is.finite(batch_size) ||
-      batch_size < 1 || batch_size > .Machine$integer.max || batch_size != floor(batch_size)) {
+  if (!is.null(batch_size) &&
+      (length(batch_size) != 1L || !is.numeric(batch_size) || !is.finite(batch_size) ||
+       batch_size < 1 || batch_size > .Machine$integer.max || batch_size != floor(batch_size))) {
     stop("'batch_size' must be a positive whole number in R's integer range.", call. = FALSE)
   }
   n_units <- as.integer(n_units)
   n_treated <- as.integer(n_treated)
   max_draws <- as.integer(max_draws)
-  batch_size <- as.integer(batch_size)
-  X <- as.matrix(X)
-  if (!is.numeric(X) || nrow(X) != n_units) {
-    stop("'X' must be a numeric matrix with one row per unit.", call. = FALSE)
-  }
+  X <- .prepare_X(X, n_units)
   seed <- .resolve_jax_seed(seed)
 
-  if (is.null(check_jax_availability(conda_env=conda_env))) { return(NULL) }
-  
-  if (!"VectorizedFastHotel2T2" %in% ls(envir = fastrr_env)) {
-    initialize_jax(conda_env = conda_env, conda_env_required = conda_env_required) 
-  }
-  if(is.null(threshold_func)){ threshold_func <- fastrr_env$VectorizedFastHotel2T2 }
-  
-  # Define the base vector: 1s for treated, 0s for control
-  base_vector <- c(rep(1L, n_treated), rep(0L, n_units - n_treated))
-  
-  # Convert base_vector to a JAX array with a smaller data type to save memory
-  base_vector_jax <- fastrr_env$jnp$array(as.integer(base_vector), 
-                                          dtype = fastrr_env$jnp$int8)
-  
-  # Initialize the base JAX random key.
-  key <- fastrr_env$jax$random$PRNGKey(seed)
-  
-  # Convert X to JAX array (float16 can cause issues with matrix inverse)
-  X_jax <- fastrr_env$jnp$array(as.matrix(X), dtype = fastrr_env$jnp$float32)
-  
-  # pre-compute matrix inverse
-  {
-    SAMP_COV_INV_APPROX <- fastrr_env$jnp$reciprocal( fastrr_env$jnp$var( fastrr_env$jnp$array(as.matrix(X)), axis = 0L) )
-    {
-      SAMP_COV_INV <-  fastrr_env$jnp$cov( fastrr_env$jnp$array(as.matrix(X)), rowvar = FALSE)
-      IS_METAL_BACKEND <- .is_metal_backend()
-      if(IS_METAL_BACKEND){
-        SAMP_COV_INV <- SAMP_COV_INV$to_device(fastrr_env$jax$devices("cpu")[[1]])
-      }
-      # Handle single covariate case: cov returns scalar, inv needs 2D
-      if(ncol(X) == 1L) {
-        SAMP_COV_INV <- fastrr_env$jnp$reshape(SAMP_COV_INV, c(1L, 1L))
-      }
-      SAMP_COV_INV <- fastrr_env$jnp$linalg$inv(SAMP_COV_INV)
-      if(IS_METAL_BACKEND){
-        SAMP_COV_INV <- SAMP_COV_INV$to_device(fastrr_env$jax$devices("METAL")[[1]])
-      }
-    }
-  }
+  if (is.null(.ensure_backend(conda_env, conda_env_required))) { return(NULL) }
+  jnp <- fastrr_env$jnp
 
-  # Set up sample sizes for treatment/control
-  n0_array <- fastrr_env$jnp$array(as.integer(n_units - n_treated))
-  n1_array <- fastrr_env$jnp$array(as.integer(n_treated))
-    
-  # Calculate the number of batches
-  num_batches <- ceiling(max_draws / batch_size)
-    
-  # Initialize variables to store top permutations and their balance measures
-  top_perms <- NULL
-  top_M_results <- NULL
-    
+  batch_size <- .resolve_batch_size(batch_size, n_units, max_draws)
+  num_batches <- as.integer(ceiling(max_draws / batch_size))
+
   # Determine the number of permutations to accept based on the acceptance probability
   float_num_to_accept <- max_draws * randomization_accept_prob
   if (float_num_to_accept < 1){
@@ -173,83 +130,92 @@ generate_randomizations_mc <- function(n_units,
       call. = FALSE
     )
   }
-  num_to_accept <- ceiling(float_num_to_accept)
-  num_to_accept <- max(num_to_accept, 1) # Ensure at least one
-  
-  # Batch processing to prevent memory issues
+  num_to_accept <- as.integer(max(ceiling(float_num_to_accept), 1)) # Ensure at least one
+
+  # Balance inputs are built in double precision on the host
+  design <- .balance_design(X, approximate_inv)
+  if (.is_default_threshold(threshold_func)) {
+    scorers <- fastrr_env$MCScorers
+    design_jax <- list(jnp$array(design$Xw, dtype = jnp$float32))
+  } else {
+    scorers <- .mc_scorers(function(W_, design_, n0, n1) {
+      jnp$reshape(threshold_func(
+        design_[[1]], design_[[2]], design_[[3]], W_$astype(jnp$int8),
+        n0$astype(jnp$int32), n1$astype(jnp$int32), approximate_inv
+      ), -1L)$astype(jnp$float32)
+    })
+    design_jax <- list(jnp$array(X, dtype = jnp$float32),
+                       jnp$array(design$S_inv, dtype = jnp$float32),
+                       jnp$array(design$S_inv_approx, dtype = jnp$float32))
+  }
+
+  # Base vector: 1s for treated, 0s for control (int32 sort payload)
+  base_vector_jax <- jnp$array(c(rep(1L, n_treated), rep(0L, n_units - n_treated)),
+                               dtype = jnp$int32)
+  key <- fastrr_env$jax$random$PRNGKey(seed)
+  n0_jax <- jnp$float32(n_units - n_treated)
+  n1_jax <- jnp$float32(n_treated)
+  n1_int <- jnp$int32(n_treated)
+  lane <- jnp$arange(batch_size, dtype = jnp$uint32)
+  max_draws_jax <- jnp$uint32(max_draws)
+  fused <- fastrr_env$counter_keys_ok &&
+    isTRUE(getOption("fastrerandomize.mc_fused", !.is_metal_backend()))
+  # Older PRNG schemes: materialize jax.random.split(key, max_draws) instead
+  all_keys <- if (fastrr_env$counter_keys_ok) NULL else fastrr_env$jax$random$split(key, max_draws)
+
   if (verbose){
-    message(paste0("Starting batch processing with ", num_batches, " batches."))
+    message(sprintf("Scoring %d draws in %d batch(es) of %d (%s).", max_draws, num_batches,
+                    batch_size, if (fused) "one compiled program" else "dispatched from R"))
   }
   t0 <- Sys.time()
 
-  batch_permutation <- fastrr_env$jax$jit( fastrr_env$jax$vmap( function(key_, base_vector_){
-      perm_ = fastrr_env$jax$random$permutation(key = key_, 
-                                                x = base_vector_, 
-                                                axis = 0L, # axis to shuffle along 
-                                                independent = TRUE)
-      return(perm_)
-  }, list(0L, NULL)) )
-  
-  top_M_fxn <- fastrr_env$jax$jit(function(key){
-    perms_batch <- batch_permutation(key, base_vector_jax)
-    
-    # Calculate balance measures (e.g., Hotelling T-squared) for each permutation in the batch
-    M_results_batch_ <- fastrr_env$jnp$squeeze( threshold_func(
-      X_jax,
-      SAMP_COV_INV,
-      SAMP_COV_INV_APPROX, 
-      perms_batch,
-      n0_array, 
-      n1_array, 
-      approximate_inv
-    ) )$astype(fastrr_env$jnp$float32)
-    
-    return(list("top_M_results" = M_results_batch_))
-  })
-  
-  AllKeys <- fastrr_env$jax$random$split(key, as.integer(max_draws))
-  batch_ids <- ceiling(seq_len(max_draws) / batch_size)
-  AllKeySelectionIndices <- split(as.integer((1L:max_draws) - 1L), batch_ids)
-  top_M_results <- sapply(1L:num_batches, function(b_){ # note: vmapping this causes unacceptable memory overhead 
-    if(verbose){ message(paste0("On batch ", b_, " of ", num_batches)) }
-    top_M_results_ <- top_M_fxn( fastrr_env$jnp$take(AllKeys,
-                                          fastrr_env$jnp$array(AllKeySelectionIndices[[b_]]), 
-                                          axis = 0L) )
-    
-    return(list( top_M_results_$top_M_results ) ) 
-  })
-  
-  # Concatenate results 
-  top_M_results <- fastrr_env$jnp$concatenate( top_M_results, 0L )
-  
-  # Main analysis 
-  {
-    # Keep only top num_to_accept permutations
-    indices_to_keep <- fastrr_env$jnp$take(fastrr_env$jnp$argsort( top_M_results ), 
-                                           indices = fastrr_env$jnp$arange(as.integer(num_to_accept)) )
-    
-    # select top 
-    top_M_results <- fastrr_env$jnp$take(top_M_results, indices_to_keep, axis=0L)
-    top_keys <- fastrr_env$jnp$take(AllKeys, indices_to_keep, axis=0L)
-    
-    # (re-) generate permutations
-    top_perms <- batch_permutation(top_keys, 
-                                   base_vector_jax)
-    
-    # check work 
-    #M_results_batch_ <- fastrr_env$jnp$squeeze( threshold_func(
-      #X_jax,
-      #SAMP_COV_INV,
-      #SAMP_COV_INV_APPROX, 
-      #top_perms,
-      #n0_array, 
-      #n1_array, 
-      #approximate_inv ) )
+  if (fused) {
+    scored <- scorers$all(key, lane,
+                          jnp$arange(0, as.numeric(num_batches) * batch_size, batch_size,
+                                     dtype = jnp$uint32),
+                          design_jax, base_vector_jax, n0_jax, n1_jax, n1_int, max_draws_jax)
+    order_all <- scored[[1]]
+    M_sorted <- scored[[2]]
+    n_bad <- .to_r(scored[[3]])
+  } else {
+    batches <- lapply(seq_len(num_batches) - 1L, function(b_) {
+      if (verbose) { message(paste0("On batch ", b_ + 1L, " of ", num_batches)) }
+      start <- jnp$uint32(as.numeric(b_) * batch_size)
+      if (is.null(all_keys)) {
+        return(scorers$batch(key, lane, start, design_jax, base_vector_jax,
+                             n0_jax, n1_jax, n1_int, max_draws_jax))
+      }
+      idx <- jnp$add(lane, start)
+      scorers$batch_from_keys(jnp$take(all_keys, idx, axis = 0L, mode = "clip"), idx,
+                              design_jax, base_vector_jax, n0_jax, n1_jax, n1_int,
+                              max_draws_jax)
+    })
+    sorted <- fastrr_env$SortBalance(jnp$concatenate(lapply(batches, `[[`, 1L), 0L))
+    order_all <- sorted[[1]]
+    M_sorted <- sorted[[2]]
+    n_bad <- sum(vapply(batches, function(b_) as.numeric(.to_r(b_[[2]])), numeric(1)))
   }
+  .assert_valid_rows(n_bad, n_treated)
+
+  # Keep the num_to_accept most balanced draws (ties broken by draw index)
+  keep_range <- jnp$arange(num_to_accept)
+  indices_to_keep <- jnp$take(order_all, keep_range)
+  top_M_results <- jnp$take(M_sorted, keep_range)
+
+  # (Re-)generate the accepted permutations from their keys, one batch at a time
+  regenerated <- lapply(seq(0L, num_to_accept - 1L, by = batch_size), function(s_) {
+    idx <- jnp$take(indices_to_keep,
+                    jnp$arange(as.integer(s_), as.integer(min(s_ + batch_size, num_to_accept))))
+    keys <- if (is.null(all_keys)) fastrr_env$CounterKeysJit(key, idx) else jnp$take(all_keys, idx, axis = 0L)
+    c(list(keys), fastrr_env$MCRegenerate(keys, base_vector_jax, n1_int))
+  })
+  .assert_valid_rows(sum(vapply(regenerated, function(r_) as.numeric(.to_r(r_[[3]])), numeric(1))),
+                     n_treated)
+  top_keys <- jnp$concatenate(lapply(regenerated, `[[`, 1L), 0L)
+  top_perms <- jnp$concatenate(lapply(regenerated, `[[`, 2L), 0L)
 
   if(verbose){ message(sprintf("MC Loop Time (s): %.4f", as.numeric(difftime(Sys.time(), t0, units = "secs"))))}
-    
-  # After processing all batches, the candidate_randomizations are the top_perms
+
   return(list(
               "candidate_randomizations" = top_perms,
               "keys_candidate_randomizations" = top_keys,

@@ -141,10 +141,15 @@ test_that("initialize_jax reuses retained kernels and omits dead kernels", {
   fastrerandomize:::initialize_jax()
   env <- fastrerandomize:::fastrr_env
   core_kernel <- env$FastDiffInMeans
+  gemm_kernel <- env$WhitenedT2Jit
   fastrerandomize:::initialize_jax()
 
+  expect_false(is.null(gemm_kernel))
   expect_identical(core_kernel, env$FastDiffInMeans)
+  expect_identical(gemm_kernel, env$WhitenedT2Jit)
   expect_false(any(c(
+    "get_stat_vec_at_tau_pseudo",
+    "vec1_get_stat_vec_at_tau_pseudo",
     "BatchedVectorizedFastHotel2T2",
     "VectorizedTakeAxis0",
     "Potential2Obs",
