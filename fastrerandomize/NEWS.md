@@ -1,3 +1,55 @@
+# fastrerandomize (development version)
+
+## Correctness and Reliability
+
+* Monte Carlo permutations now use an int32 payload. The previous int8 payload
+  produced assignments with the wrong number of treated units on some GPU
+  backends (observed on ROCm for `n_units >= 256`). Every generated assignment,
+  Monte Carlo and exact, is now checked to contain exactly `n_treated` treated
+  units, with an informative error otherwise.
+* Balance inputs are built in double precision on the host: covariates are
+  centered, then scaled (diagonal approximation) or whitened (full inverse,
+  using a pseudo-inverse for singular covariance). This removes float32
+  cancellation for uncentered covariates (relative error about 1e-3 down to
+  about 1e-6) and the CPU round trip for matrix inversion on Metal. Balance
+  values can differ from earlier versions in the last digits, so draws at the
+  acceptance cutoff may change.
+* Constant covariates are dropped with a warning (they previously produced
+  `NaN` balance), and non-finite covariates are rejected.
+* `randomization_test()` computes `tau_obs` in double precision and
+  re-evaluates candidates that tie it up to float32 error, so exact ties (such
+  as the observed assignment and, with equal group sizes, its complement) are
+  counted consistently. Candidates must be 0/1.
+* Matrix products in the new kernels use full float32 precision, so TF32 on
+  NVIDIA GPUs does not reduce accuracy.
+* Fixed the cosine distance kernel for JAX versions without the `a_min`/`a_max`
+  arguments of `jnp.clip`.
+
+## Performance
+
+* Monte Carlo generation runs every batch in one compiled program. Keys are
+  derived per draw index rather than materialized, and the compiled kernels are
+  reused across calls. Results, including the returned keys, are unchanged for
+  a given seed and do not depend on `batch_size`, which now defaults to `NULL`
+  (sized automatically). Set `options(fastrerandomize.mc_fused = FALSE)` to
+  dispatch batches from R (the default on Metal).
+* The fiducial-interval search in `randomization_test()` uses the closed form
+  `a_w + tau * (c_w - b_w)` of each candidate's statistic, computed in one pass
+  over the candidates. It runs the same stochastic search and grid as before,
+  10 to 1000 times faster.
+* Euclidean, squared Euclidean and Mahalanobis `fast_distance()` metrics use a
+  matrix-product formulation on centered (and scaled or whitened) inputs:
+  about 5x faster for Euclidean and 20-60x for full Mahalanobis on GPU.
+* `check_jax_availability()` caches a successful check for the session, removing
+  about 0.7 s of conda overhead from every call.
+
+## Interface
+
+* When `randomization_test()` receives only `candidate_randomizations_array`,
+  the array is no longer copied back to R; the result stores it in
+  `candidate_randomizations_array` and sets `candidate_randomizations` to `NULL`.
+* Documented the `threshold_func` call signature.
+
 # fastrerandomize 0.4
 
 ## Correctness and Reliability

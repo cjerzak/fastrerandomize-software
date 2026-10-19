@@ -11,7 +11,7 @@ generate_randomizations_mc(
   randomization_accept_prob = 1,
   threshold_func = NULL,
   max_draws = 1e+05,
-  batch_size = 1000,
+  batch_size = NULL,
   approximate_inv = TRUE,
   verbose = TRUE,
   conda_env = "fastrerandomize_env",
@@ -28,11 +28,11 @@ generate_randomizations_mc(
 
 \item{randomization_accept_prob}{A numeric value between 0 and 1 specifying the probability threshold for accepting randomizations based on balance. Default is 1}
 
-\item{threshold_func}{A JAX function that computes a balance measure for each randomization. Must be vectorized using \code{jax$vmap} with \code{in_axes = list(NULL, 0L, NULL, NULL)}, and inputs covariates (matrix of X), treatment_assignment (vector of 0s and 1s), n0 (scalar), n1 (scalar). Default is \code{VectorizedFastHotel2T2} which uses Hotelling's T-squared statistic.}
+\item{threshold_func}{A traceable JAX function that computes a balance measure for each randomization in a batch. It is called as \code{threshold_func(X, S_inv, S_inv_approx, W, n0, n1, approximate_inv)}, where \code{X} is the covariate matrix, \code{S_inv} the inverse sample covariance, \code{S_inv_approx} the reciprocal covariate variances, \code{W} a batch of 0/1 assignments (one per row), \code{n0}/\code{n1} the group sizes, and \code{approximate_inv} the logical argument below; it must return one value per row of \code{W}. Default (\code{NULL}) uses Hotelling's T-squared statistic.}
 
 \item{max_draws}{An integer specifying the maximum number of randomizations to draw.}
 
-\item{batch_size}{An integer specifying how many randomizations to process at once. Lower values use less memory but may be slower.}
+\item{batch_size}{An integer specifying how many randomizations to process at once, or \code{NULL} (default) to size batches automatically from \code{n_units}. Lower values use less memory but may be slower. Results do not depend on the batch size.}
 
 \item{approximate_inv}{A logical value indicating whether to use an approximate inverse
 (diagonal of the covariance matrix) instead of the full matrix inverse when computing
@@ -53,8 +53,9 @@ a seed is drawn from R's full positive integer range, so \code{set.seed()} can
 still be used to reproduce the draw. Default is \code{NULL}.}
 }
 \value{
-The function returns a \emph{list} with two elements:
-\code{candidate_randomizations}: an array of randomization vectors
+The function returns a \emph{list} with three elements:
+\code{candidate_randomizations}: an int8 array of randomization vectors;
+\code{keys_candidate_randomizations}: their JAX random keys;
 \code{M_candidate_randomizations}: an array of their balance measures.
 }
 \description{
@@ -65,14 +66,18 @@ The function uses JAX for fast computation and memory management.
 \details{
 The function works by:
 \enumerate{
-\item Generating batches of random permutations.
-\item Computing balance measures for each permutation using the provided threshold function.
-\item Keeping only the top permutations that meet the acceptance probability threshold.
-\item Managing memory by clearing unused objects and caches between batches.
+\item Deriving the key of draw \code{i} as \code{jax.random.split(key, max_draws)[i]}
+inside each batch, without materializing all keys.
+\item Permuting the base assignment for each key and computing its balance measure.
+\item Keeping the \code{ceiling(max_draws * randomization_accept_prob)} most balanced draws
+and regenerating their assignments from their keys.
 }
 
-The function uses smaller data types (int8, float16) where possible to reduce memory usage.
-It also includes assertions to verify array shapes and dimensions throughout.
+All batches run inside one compiled JAX program (on Metal, or when
+\code{options(fastrerandomize.mc_fused = FALSE)} is set, batches are dispatched from R).
+Covariates are centered and scaled or whitened in double precision before
+they are sent to the device; constant covariates are dropped with a warning.
+Every generated assignment is checked to contain exactly \code{n_treated} treated units.
 }
 \examples{
 

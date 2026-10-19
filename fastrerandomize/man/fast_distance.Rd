@@ -41,7 +41,8 @@ equivalent to Minkowski with \code{p = 1}).}
 
 \item{cov_inv}{Optional inverse covariance matrix (p x p) for Mahalanobis (ignored
 if \code{approximate_inv = TRUE}). If not supplied and \code{approximate_inv = FALSE},
-it is estimated from \code{rbind(A, B)} and inverted in JAX.}
+the covariance of \code{rbind(A, B)} is estimated and (pseudo-)inverted in double
+precision.}
 
 \item{approximate_inv}{Logical; if \code{TRUE} and \code{metric = "mahalanobis"},
 uses a diagonal inverse (reciprocal variances) for speed and robustness.
@@ -86,6 +87,9 @@ The function automatically batches computations to avoid excessive device memory
   covariance is used (variance stabilizer); otherwise a full inverse covariance is used.
 - **Weighted distances**: supply \code{weights} (length \code{p}) for
   \code{"minkowski"} and \code{"manhattan"} (the latter uses \code{p = 1}).
+- Euclidean, squared Euclidean and Mahalanobis distances are computed as
+  \eqn{\|a\|^2 + \|b\|^2 - 2 a^\top b} (a matrix product) on inputs that are
+  centered, and scaled or whitened for Mahalanobis, in double precision first.
 - Computations run in float32 and are JIT-compiled with JAX; where applicable,
   GPU/Metal/CPU device selection follows your existing backend.
 }

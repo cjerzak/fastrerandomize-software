@@ -53,10 +53,23 @@ Returns an S3 object with slots: \itemize{
 \item \code{FI} A numeric vector representing the fiducial interval if \code{findFI=TRUE}.
 \item \code{tau_obs} A numeric value or vector representing the estimated treatment effect(s).
 \item \code{fastrr_env} The fastrerandomize environment.
+\item \code{candidate_randomizations} The candidate matrix, when supplied as an R matrix;
+otherwise \code{NULL}, and the 'JAX' array is kept in \code{candidate_randomizations_array}
+(it is not copied back to R).
 }
 }
 \description{
 Fast randomization test
+}
+\details{
+All statistics are computed from one pass over the candidates: for a binary
+candidate \code{w}, the difference in means under the sharp null of effect
+\code{tau} equals \code{a_w + tau * (c_w - b_w)}, where \code{a_w} is the
+difference in means of \code{obsY} under \code{w}, \code{b_w} that of
+\code{obsW}, and \code{c_w = sum(w) / n1}. The fiducial search then runs on
+these per-candidate values. \code{tau_obs} is computed in double precision,
+and candidates whose statistic ties \code{tau_obs} up to float32 error are
+re-evaluated in double precision, so exact ties are counted consistently.
 }
 \section{References}{
 
