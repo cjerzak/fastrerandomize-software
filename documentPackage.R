@@ -3,9 +3,9 @@
   # set path and specify package name
   setwd(sprintf("~/Documents/%s-software",
                 package_name <- "fastrerandomize"))
-  versionNumber <- "0.3"
-  
   package_path <- sprintf("~/Documents/%s-software/%s",package_name,package_name)
+  versionNumber <- read.dcf(file.path(package_path, "DESCRIPTION"),
+                            fields = "Version")[[1L]]
   tools::add_datalist(package_path, force = TRUE, small.size = 1L)
   devtools::build_vignettes(package_path)
   devtools::document(package_path)
@@ -23,8 +23,11 @@
   devtools::check( package_path )
   
   # build tar
-  system( paste(shQuote(file.path(R.home("bin"), "R")),
-                "R CMD build --resave-data", shQuote(package_path)) )
+  build_status <- system( paste(shQuote(file.path(R.home("bin"), "R")),
+                                "R CMD build --resave-data", shQuote(package_path)) )
+  if (build_status != 0L) {
+    stop("Package build failed; no archive was checked.")
+  }
   
   # check as cran
   system( paste(shQuote(file.path(R.home("bin"), "R")),
