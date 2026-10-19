@@ -106,7 +106,7 @@ initialize_jax <- function(conda_env = "fastrerandomize_env",
 
   # ------------------------------------------------------------------
   # GEMM-form kernels. Balance is a squared norm of whitened mean
-  # differences (one matmul per batch), Monte Carlo keys are derived per
+  # differences (one product per batch), Monte Carlo keys are derived per
   # draw index, and matmuls use HIGHEST precision so TF32 (NVIDIA Ampere+)
   # does not undo float32 accuracy.
   # ------------------------------------------------------------------
@@ -144,8 +144,19 @@ initialize_jax <- function(conda_env = "fastrerandomize_env",
                                         independent = TRUE)
     }, in_axes = list(0L, NULL))
 
+    # W %*% X. For narrow X this is one reduction per column: every new GEMM
+    # shape costs ~5 s of compilation on ROCm (Triton), versus < 0.4 s here,
+    # at a similar run time (measured on an RX 7600M XT).
+    fastrr_env$NarrowProduct <- function(W_, X_) {
+      k_ <- X_$shape[[2]]
+      if (k_ > 64L) { return(jnp$matmul(W_, X_, precision = HIGHEST)) }
+      jnp$stack(lapply(seq_len(k_) - 1L, function(j_) {
+        jnp$sum(jnp$multiply(W_, jnp$take(X_, j_, axis = 1L)), 1L)
+      }), axis = 1L)
+    }
+
     fastrr_env$WhitenedT2 <- function(Xw_, W_, n0, n1) {
-      s_ <- jnp$matmul(W_$astype(jnp$float32), Xw_, precision = HIGHEST)
+      s_ <- fastrr_env$NarrowProduct(W_$astype(jnp$float32), Xw_)
       diff_ <- jnp$subtract(jnp$multiply(s_, 1 / n1 + 1 / n0),
                             jnp$divide(jnp$sum(Xw_, 0L), n0))
       jnp$multiply(n0 * n1 / (n0 + n1), jnp$sum(jnp$square(diff_), 1L))
@@ -170,8 +181,10 @@ initialize_jax <- function(conda_env = "fastrerandomize_env",
     # Per-candidate sums w . (Y - mean(Y)), w . obsW and sum(w) for the
     # closed-form fiducial search.
     fastrr_env$CandidateMoments <- fastrr_env$jax$jit(function(cand_, Yc_, obsW_) {
-      rhs_ <- jnp$stack(list(Yc_, obsW_, jnp$ones_like(Yc_)), axis = 1L)
-      jnp$matmul(cand_$astype(jnp$float32), rhs_, precision = HIGHEST)
+      cand_ <- cand_$astype(jnp$float32)
+      jnp$stack(list(jnp$sum(jnp$multiply(cand_, Yc_), 1L),
+                     jnp$sum(jnp$multiply(cand_, obsW_), 1L),
+                     jnp$sum(cand_, 1L)), axis = 1L)
     })
     fastrr_env$IsBinary <- fastrr_env$jax$jit(function(cand_) {
       jnp$all(jnp$logical_or(jnp$equal(cand_, 0L), jnp$equal(cand_, 1L)))
