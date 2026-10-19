@@ -35,13 +35,19 @@
   dispatch batches from R (the default on Metal).
 * The fiducial-interval search in `randomization_test()` uses the closed form
   `a_w + tau * (c_w - b_w)` of each candidate's statistic, computed in one pass
-  over the candidates. It runs the same stochastic search and grid as before,
-  10 to 1000 times faster.
+  over the candidates. It runs the same stochastic search and grid as before.
 * Euclidean, squared Euclidean and Mahalanobis `fast_distance()` metrics use a
-  matrix-product formulation on centered (and scaled or whitened) inputs:
-  about 5x faster for Euclidean and 20-60x for full Mahalanobis on GPU.
+  matrix-product formulation on centered (and scaled or whitened) inputs.
 * `check_jax_availability()` caches a successful check for the session, removing
   about 0.7 s of conda overhead from every call.
+* Narrow matrix products (the fiducial-search sums, and balance with up to 64
+  covariates) are computed as per-column reductions, which avoids multi-second
+  GEMM compilation for each new shape on some GPU backends.
+* In benchmarks on an AMD Radeon RX 7600M XT (ROCm), repeated calls were 10-110x
+  faster for Monte Carlo generation, 6-180x for `randomization_test()`, 14x for
+  exact enumeration, and 8-80x for `fast_distance()`; first calls were also
+  faster. On CPU, `randomization_test()` with fiducial intervals was up to
+  110x faster.
 
 ## Interface
 
