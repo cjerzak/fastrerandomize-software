@@ -26,12 +26,13 @@ peak = s["reference_fp32_flops_per_second"] / 1e12
 bw = s["reference_dram_bytes_per_second"] / 1e12
 ax.loglog(x, np.minimum(x*bw, peak), color="#374151", linewidth=2)
 ax.scatter([s["gemm_arithmetic_intensity"]], [gemm_tflops], s=65, color=palette["gemm"], zorder=4)
-ax.annotate(f"Observed GEMM\n{gemm_tflops:.1f} TFLOP/s", (512, gemm_tflops),
-            xytext=(105, 3.7), arrowprops={"arrowstyle": "-", "color": palette["gemm"]})
+ax.annotate(f"Measured GEMM\n{gemm_tflops:.1f} TFLOP/s\n{100 * gemm_tflops / peak:.1f}% of FP32 reference",
+            (s["gemm_arithmetic_intensity"], gemm_tflops), xytext=(50, 2.2),
+            fontsize=9, arrowprops={"arrowstyle": "-", "color": palette["gemm"]})
 ax.text(1.1, 56, f"FP32 reference: {peak:.1f} TFLOP/s", fontsize=9)
 ax.text(.42, .32, "DRAM reference: 896 GB/s", rotation=37, fontsize=8)
 ax.set(xlim=(.2, 2048), ylim=(.15, 100), xlabel="GEMM arithmetic intensity (FLOP/byte)",
-       ylabel="Throughput (TFLOP/s)", title="Balance matrix multiplication")
+       ylabel="Throughput (TFLOP/s)", title="Balance GEMM roofline estimate")
 ax.grid(alpha=.15, which="major")
 
 ax = axes[1]
@@ -50,10 +51,10 @@ for (name, value), color in zip(groups.items(), [palette["sort"], palette["gemm"
 ax.set(yticks=[], ylim=(-.65, .65), xlim=(0, max(12.5, left * 1.06)), xlabel="GPU kernel time per 4,096 draws (ms)",
        title="Where GPU time goes")
 ax.legend(frameon=False, loc="lower left", bbox_to_anchor=(-.02, -.02), fontsize=9)
-ax.text(0, .45, f"1.05 million draws: {measured['pipeline_median_seconds']:.2f} s unprofiled", fontsize=9)
+ax.text(0, .45, f"GPU stage: {measured['pipeline_median_seconds']:.2f} s for 1,048,576 draws", fontsize=9)
 
 ax = axes[2]
-names = ["Complete R call", "Covariate preparation", "GPU stage"]
+names = ["Complete call\n(R + JAX)", "Covariate\npreparation", "JAX GPU stage"]
 values = [measured["api_median_seconds"], measured["preparation_median_seconds"],
           measured["pipeline_median_seconds"]]
 colors = ["#374151", palette["host"], palette["gemm"]]
@@ -62,13 +63,14 @@ for i, (name, value, color) in enumerate(zip(names, values, colors)):
     label = f"{value:.3f} s" if value < 1 else f"{value:.2f} s"
     ax.text(value+.05, i, label, va="center", fontsize=9)
 ax.set(yticks=range(len(names)), yticklabels=names, xlim=(0, max(values) * 1.2), xlabel="Elapsed time (s)",
-       title="Warmed execution time")
+       title="Warmed timings by scope")
 ax.invert_yaxis()
 ax.tick_params(axis="y", length=0, labelsize=9)
 fig.suptitle("Speed of Light analysis of Monte Carlo rerandomization", y=1.02, fontsize=15, weight="bold")
-fig.text(.02, -.035,
-         "RTX 5080 Laptop GPU · 4,096 units · 2,048 covariates · FP32 HIGHEST · reference roofline uses 2,287 MHz, not locked clocks.\n"
-         "Preparation and GPU-stage times were measured separately from the complete R call. R uses the system reference BLAS.",
+fig.text(.02, -.10,
+         "RTX 5080 Laptop GPU · 4,096 units · 2,048 covariates · batch 4,096 · 0.1% accepted · FP32 HIGHEST.\n"
+         "Roofline estimate uses the listed 2,287 MHz upper boost clock; hardware counters were unavailable.\n"
+         "Timings were measured separately. The complete R call includes the JAX GPU stage; R uses the system reference BLAS.",
          fontsize=9, color="#4b5563")
 fig.tight_layout(w_pad=2.5)
 for ext in ("png", "pdf", "svg"):

@@ -4,7 +4,9 @@ The complete warmed Monte Carlo R call takes **3.410 seconds** in the selected h
 
 The GPU pipeline takes **2.951 seconds**. Its balance matrix multiplication sustains **18.55 TFLOP/s**, or **52.8% of an analytical FP32 reference at NVIDIA's listed upper laptop boost clock**. This is a scoped GEMM roofline comparison, not a counter-measured Nsight Compute SOL percentage or an end-to-end utilization estimate. Permutation sorting remains the largest GPU cost.
 
-![GEMM roofline estimate, GPU time breakdown, and measured R API timings](speed_of_light.png)
+![Measured GEMM throughput against the analytical roofline, GPU kernel-time breakdown, and execution times by scope](speed_of_light.png)
+
+All panels describe the same implementation. The complete R call includes the JAX GPU stage; each timing scope was measured separately. The roofline percentage applies to the balance GEMM.
 
 [PDF figure](speed_of_light.pdf) · [SVG figure](speed_of_light.svg) · [Performance and correctness results](results/metrics.json) · [Reproduction instructions](REPRODUCE.md)
 
