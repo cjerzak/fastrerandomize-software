@@ -1,14 +1,11 @@
-"""Rebuild the two-revision timing comparison and verify saved R outputs."""
-import hashlib
+"""Derive report metrics from the recorded summary and GPU telemetry."""
+import argparse
 import json
 import csv
 import datetime
 from pathlib import Path
 import statistics
-import subprocess
 from zoneinfo import ZoneInfo
-
-import analyze
 
 ROOT = Path(__file__).resolve().parent
 RESULTS = ROOT / "results"
@@ -39,7 +36,7 @@ def metrics(summary):
     gemms = [v for trace in traces for v in trace["gemm_samples_ms"]]
     gemm_ms = statistics.median(gemms)
     groups = {name: statistics.mean(t["groups_ms"].get(name, 0) for t in traces)
-              for name in {k for t in traces for k in t["groups_ms"]}}
+              for name in sorted({k for t in traces for k in t["groups_ms"]})}
     total = sum(groups.values())
     tflops = summary["balance_gemm_flops"] / (gemm_ms * 1e9)
     return {
@@ -58,45 +55,23 @@ def metrics(summary):
         "kernel_busy_fraction": statistics.mean(t["kernel_union_ms"] / t["wall_ms"] for t in traces),
         "max_relative_error_float64": api["max_relative_error_float64"],
         "accepted": api["accepted"],
+        "repeat_identical": api["repeat_identical"],
+        "diagonal_reference_identical": {
+            "Xw": prep["identical_Xw"],
+            "inverse_variance": prep["identical_inverse_variance"],
+        },
     }
 
 
-def main():
-    comparison = {}
-    outputs = []
-    for revision in ("baseline", "optimized"):
-        summary = analyze.main(RESULTS / revision)
-        comparison[revision] = metrics(summary)
-        comparison[revision]["profile_telemetry"] = profile_clocks(RESULTS / revision / "profile_all")
-        outputs.append(next((RESULTS / revision / "api").glob("*_outputs.rds")))
-    # Compare decoded R values, not serialization alone. Keys are included.
-    check = subprocess.run([
-        "Rscript", "-e",
-        'a <- commandArgs(TRUE); x <- readRDS(a[1]); y <- readRDS(a[2]); '
-        'checks <- vapply(names(x), function(n) identical(x[[n]], y[[n]]), logical(1)); '
-        'stopifnot(identical(names(x), names(y)), all(checks)); '
-        'cat(jsonlite::toJSON(as.list(checks), auto_unbox=TRUE))',
-        *map(str, outputs),
-    ], check=True, capture_output=True, text=True)
-    comparison["outputs_identical"] = json.loads(check.stdout)
-    comparison["output_rds_sha256"] = {revision: hashlib.sha256(path.read_bytes()).hexdigest()
-                                        for revision, path in zip(("baseline", "optimized"), outputs)}
-    normalized_hlo = []
-    for revision in ("baseline", "optimized"):
-        manifest = json.loads((RESULTS / revision / "manifest.json").read_text())
-        hlo = next((RESULTS / revision / "pipeline").glob("*_all.hlo.txt")).read_text()
-        normalized_hlo.append(hlo.replace(manifest["remote_root"], "<study>"))
-    comparison["compiled_pipeline_hlo_identical_except_study_path"] = normalized_hlo[0] == normalized_hlo[1]
-    comparison["normalized_pipeline_hlo_sha256"] = {
-        revision: hashlib.sha256(hlo.encode()).hexdigest()
-        for revision, hlo in zip(("baseline", "optimized"), normalized_hlo)
-    }
-    before, after = comparison["baseline"], comparison["optimized"]
-    comparison["api_speedup"] = before["api_median_seconds"] / after["api_median_seconds"]
-    comparison["preparation_speedup"] = before["preparation_median_seconds"] / after["preparation_median_seconds"]
-    (RESULTS / "comparison.json").write_text(json.dumps(comparison, indent=2) + "\n")
-    print(json.dumps(comparison, indent=2))
+def main(results=RESULTS):
+    summary = json.loads((results / "summary.json").read_text())
+    measured = metrics(summary)
+    measured["profile_telemetry"] = profile_clocks(results / "profile_all")
+    (results / "metrics.json").write_text(json.dumps(measured, indent=2) + "\n")
+    print(json.dumps(measured, indent=2))
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--results-dir", type=Path, default=RESULTS)
+    main(parser.parse_args().results_dir)

@@ -2,7 +2,7 @@
 None
 Capture range started in the application.
 Capture range ended in the application.
-Generating '/tmp/nsys-cjerzak/nsys-report-01a6.qdstrm'
+Generating '/tmp/nsys-cjerzak/nsys-report-b7fe.qdstrm'
 
 [1/1] [0%                          ] profile_batch.nsys-repProcessing events...
 
@@ -13,12 +13,11 @@ Generating '/tmp/nsys-cjerzak/nsys-report-01a6.qdstrm'
 [1/1] [==19%                       ] profile_batch.nsys-rep
 [1/1] [==20%                       ] profile_batch.nsys-rep
 [1/1] [===23%                      ] profile_batch.nsys-rep
-[1/1] [===24%                      ] profile_batch.nsys-rep
-[1/1] [====28%                     ] profile_batch.nsys-rep
+[1/1] [=====29%                    ] profile_batch.nsys-rep
 [1/1] [=======================96%  ] profile_batch.nsys-rep
 [1/1] [========================98% ] profile_batch.nsys-rep
 [1/1] [========================100%] profile_batch.nsys-rep
 [1/1] [========================100%] profile_batch.nsys-rep
 None
 Generated:
-	/home/cjerzak/Documents/fastrerandomize-sol-20261022/results/profile_batch.nsys-rep
+	/home/cjerzak/Documents/fastrerandomize-diagonal-prep-20261022/optimized/results/profile_batch.nsys-rep

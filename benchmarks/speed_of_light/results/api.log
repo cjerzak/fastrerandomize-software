@@ -13,16 +13,13 @@ $draws
 [1] 1048576
 
 $first_api_call_after_backend_setup_seconds
-[1] 34.869
+[1] 11.956
 
 $samples_seconds
-[1] 25.740 27.664 25.913 27.799 26.148 25.349 26.459
+[1] 3.569 3.555 3.501 3.385 3.391 3.410 3.397
 
 $median_seconds
-[1] 26.148
-
-$design_seconds
-[1] 23.212 23.322 23.088
+[1] 3.41
 
 $accepted
 [1] 1049

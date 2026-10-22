@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
-# Separate diagnostic for a pre-existing CUDA custom-threshold tail failure.
-# Run from either revision root with the same environment as validate.R.
+# Separate diagnostic for a CUDA custom-threshold tail failure.
+# Run from the study root with the same environment as validate.R.
 .libPaths(c(file.path(getwd(), "rlib"), .libPaths()))
 library(fastrerandomize)
 fastrerandomize:::.ensure_backend("fastrerandomize_env", TRUE)

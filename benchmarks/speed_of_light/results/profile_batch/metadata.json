@@ -18,5 +18,5 @@
     "OPENBLAS_NUM_THREADS": "1",
     "OMP_NUM_THREADS": "1"
   },
-  "gpu": "NVIDIA GeForce RTX 5080 Laptop GPU, 615.71.10, 1507 MHz, 14001 MHz, 40, 30.47 W"
+  "gpu": "NVIDIA GeForce RTX 5080 Laptop GPU, 615.71.10, 1492 MHz, 11001 MHz, 57, 30.33 W"
 }

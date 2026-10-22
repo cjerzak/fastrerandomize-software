@@ -9,14 +9,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 root = Path(__file__).resolve().parent
-s = json.loads((root / "results/optimized/summary.json").read_text())
-comparison = json.loads((root / "results/comparison.json").read_text())
-before, after = comparison["baseline"], comparison["optimized"]
+s = json.loads((root / "results/summary.json").read_text())
+measured = json.loads((root / "results/metrics.json").read_text())
 traces = s["profiles"]["profile_all"]
 gemms = [ms for t in traces for ms in t["gemm_samples_ms"]]
 gemm_tflops = s["balance_gemm_flops"] / (statistics.median(gemms) * 1e9)
-api = next(iter(s["api"].values()))
-pipeline = next(iter(s["pipeline"].values()))
 palette = {"gemm": "#167d9a", "sort": "#d88828", "other": "#9ba8b5", "host": "#536aa2"}
 plt.rcParams.update({"font.family": "DejaVu Sans", "font.size": 10,
                      "axes.spines.top": False, "axes.spines.right": False,
@@ -53,26 +50,25 @@ for (name, value), color in zip(groups.items(), [palette["sort"], palette["gemm"
 ax.set(yticks=[], ylim=(-.65, .65), xlim=(0, max(12.5, left * 1.06)), xlabel="GPU kernel time per 4,096 draws (ms)",
        title="Where GPU time goes")
 ax.legend(frameon=False, loc="lower left", bbox_to_anchor=(-.02, -.02), fontsize=9)
-ax.text(0, .45, f"1.05 million draws: {after['pipeline_median_seconds']:.2f} s unprofiled", fontsize=9)
+ax.text(0, .45, f"1.05 million draws: {measured['pipeline_median_seconds']:.2f} s unprofiled", fontsize=9)
 
 ax = axes[2]
-names = ["Baseline R API", "Patched R API", "Baseline preparation", "Patched preparation", "Patched GPU stage"]
-values = [before["api_median_seconds"], after["api_median_seconds"],
-          before["preparation_median_seconds"], after["preparation_median_seconds"],
-          after["pipeline_median_seconds"]]
-colors = ["#9ba8b5", "#374151", "#aab4cf", palette["host"], palette["gemm"]]
+names = ["Complete R call", "Covariate preparation", "GPU stage"]
+values = [measured["api_median_seconds"], measured["preparation_median_seconds"],
+          measured["pipeline_median_seconds"]]
+colors = ["#374151", palette["host"], palette["gemm"]]
 for i, (name, value, color) in enumerate(zip(names, values, colors)):
     ax.barh(i, value, color=color, height=.5)
     label = f"{value:.3f} s" if value < 1 else f"{value:.2f} s"
-    ax.text(value+.25, i, label, va="center", fontsize=9)
-ax.set(yticks=range(5), yticklabels=names, xlim=(0, max(values) * 1.2), xlabel="Elapsed time (s)",
-       title=f"Complete R call: {comparison['api_speedup']:.2f}× faster")
+    ax.text(value+.05, i, label, va="center", fontsize=9)
+ax.set(yticks=range(len(names)), yticklabels=names, xlim=(0, max(values) * 1.2), xlabel="Elapsed time (s)",
+       title="Warmed execution time")
 ax.invert_yaxis()
 ax.tick_params(axis="y", length=0, labelsize=9)
 fig.suptitle("Speed of Light analysis of Monte Carlo rerandomization", y=1.02, fontsize=15, weight="bold")
 fig.text(.02, -.035,
          "RTX 5080 Laptop GPU · 4,096 units · 2,048 covariates · FP32 HIGHEST · reference roofline uses 2,287 MHz, not locked clocks.\n"
-         "Baseline and patched outputs are identical. Preparation and GPU-stage times were measured separately from the complete R call.",
+         "Preparation and GPU-stage times were measured separately from the complete R call. R uses the system reference BLAS.",
          fontsize=9, color="#4b5563")
 fig.tight_layout(w_pad=2.5)
 for ext in ("png", "pdf", "svg"):

@@ -5,6 +5,10 @@
   "devices": [
     "cuda:0"
   ],
+  "timezone": [
+    "CST",
+    "CDT"
+  ],
   "x64": false,
   "default_matmul_precision": "None",
   "environment": {
@@ -14,5 +18,5 @@
     "OPENBLAS_NUM_THREADS": "1",
     "OMP_NUM_THREADS": "1"
   },
-  "gpu": "NVIDIA GeForce RTX 5080 Laptop GPU, 615.71.10, 1530 MHz, 11001 MHz, 59, 20.93 W"
+  "gpu": "NVIDIA GeForce RTX 5080 Laptop GPU, 615.71.10, 1500 MHz, 14001 MHz, 60, 26.25 W"
 }

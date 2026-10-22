@@ -16,14 +16,9 @@ h <- reticulate::import_from_path("timing", path = file.path(root, "benchmarks",
 h$save_metadata(out)
 jnp <- e$jnp
 
-# Match the default production caller on both the baseline and patched package.
+# Match the default production caller's diagonal-only preparation.
 production_design <- function(X) {
-  fn <- fastrerandomize:::.balance_design
-  if ("need_full_inverse" %in% names(formals(fn))) {
-    fn(X, TRUE, need_full_inverse = FALSE)
-  } else {
-    fn(X, TRUE)
-  }
+  fastrerandomize:::.balance_design(X, TRUE, need_full_inverse = FALSE)
 }
 
 inputs <- function(n, p, batch, draws = batch) {
@@ -94,7 +89,7 @@ if (mode == "sweep") {
   if (mode == "hostprep") {
     Rprof(file.path(out, "preparation.Rprof"), interval = 0.01)
     start <- proc.time()[["elapsed"]]
-    original <- production_design(z$X)
+    design <- production_design(z$X)
     elapsed <- proc.time()[["elapsed"]] - start
     Rprof(NULL)
     diagonal_only <- function(X) {
@@ -104,7 +99,7 @@ if (mode == "sweep") {
       list(Xw = sweep(Xc, 2L, sqrt(inv), "*"), S_inv_approx = inv)
     }
     d <- diagonal_only(z$X)
-    stopifnot(identical(original$Xw, d$Xw), identical(original$S_inv_approx, d$S_inv_approx))
+    stopifnot(identical(design$Xw, d$Xw), identical(design$S_inv_approx, d$S_inv_approx))
     times <- replicate(5L, system.time(production_design(z$X))[["elapsed"]])
     prof <- summaryRprof(file.path(out, "preparation.Rprof"))
     result <- list(profiled_seconds = elapsed, samples_seconds = times,
@@ -148,7 +143,7 @@ if (mode == "sweep") {
                 identical(result$balance, first$balance))
       elapsed
     })
-    # Save values outside the timers for exact cross-revision comparison,
+    # Save values outside the timers for reproducibility,
     # including keys (the high-level S3 wrapper does not expose them).
     mc_args <- call_args[names(call_args) != "return_type"]
     direct <- do.call(fastrerandomize::generate_randomizations_mc, mc_args)

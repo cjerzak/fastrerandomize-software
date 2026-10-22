@@ -8,7 +8,7 @@ import shlex
 import subprocess
 
 parser = argparse.ArgumentParser()
-parser.add_argument("revision", choices=("baseline", "optimized"))
+parser.add_argument("--results-dir", type=Path, default=Path(__file__).resolve().parent / "results")
 parser.add_argument("--source-root", type=Path, required=True)
 parser.add_argument("--commit", required=True)
 parser.add_argument("--remote-root", required=True)
@@ -39,9 +39,9 @@ manifest = {
     "host": args.host, "remote_root": args.remote_root,
     "measurement_harness_hashes": harness, "remote_harness_hashes_match": True,
     "analysis_script_hashes": {name: hashlib.sha256((root / name).read_bytes()).hexdigest()
-                               for name in ("analyze.py", "compare.py", "plot.py")},
+                               for name in ("analyze.py", "metrics.py", "plot.py")},
 }
-out = root / "results" / args.revision
+out = args.results_dir
 out.mkdir(parents=True, exist_ok=True)
 (out / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
-print(f"{args.revision}: {len(hashes)} source files verified against {args.host}")
+print(f"{len(hashes)} source files verified against {args.host}")

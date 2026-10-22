@@ -1,7 +1,0 @@
-/usr/bin/bash: /home/cjerzak/miniconda3/envs/preference_fm_cuda_20261009/lib/libtinfo.so.6: no version information available (required by /usr/bin/bash)
-==WARNING== Note: Running with unmodified GPU clocks. If not controlled otherwise, profiling results may be inconsistent.
-==PROF== Connected to process 70432 (/usr/lib/R/bin/exec/R)
-None
-==ERROR== ERR_NVGPUCTRPERM - The user does not have permission to access NVIDIA GPU Performance Counters on the target device 0. For instructions on enabling permissions and to get more information see https://developer.nvidia.com/ERR_NVGPUCTRPERM
-None
-==PROF== Disconnected from process 70432
