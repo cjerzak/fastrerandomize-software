@@ -3,6 +3,7 @@
 [**What is `fastrerandomize`?**](#description)
 | [**News**](#news)
 | [**Performance**](#performance)
+| [**Speed of Light Analysis**](#speed-of-light-analysis)
 | [**Installation**](#installation)
 | [**Tutorial**](#tutorial)
 | [**Data**](#data)
@@ -52,7 +53,11 @@ On an AMD Radeon RX 7600M XT GPU, repeated calls became 10–110× faster for Mo
   <img src="https://connorjerzak.com/wp-content/uploads/2026/01/CPU_v_GPU_FALSE_1000_dark.webp#gh-dark-mode-only" alt="Figure – dark" width="600">
 </a>
 
-[Speed of Light Analysis](benchmarks/speed_of_light/REPORT.md). Skipping unused covariance preparation reduced the warmed complete R call from **26.42 s to 3.41 s (7.75× faster)** on an NVIDIA RTX 5080 Laptop GPU system using R’s reference BLAS. The benchmark used default diagonal scoring for 1,048,576 Monte Carlo draws with 4,096 units and 2,048 covariates (batch 4,096; 0.1% accepted), with identical assignments, random keys, and balance scores before and after. The GPU stage took 2.95 s, and its balance matrix multiplication sustained 18.6 TFLOP/s—about 53% of an analytical FP32 reference at NVIDIA’s listed upper boost clock. Permutation sorting remains the largest GPU cost. Hardware counters were unavailable, so the roofline percentage is an estimate.
+# Speed of Light Analysis<a id="speed-of-light-analysis"></a>
+
+Skipping unused covariance preparation reduced the warmed complete R call from **26.42 s to 3.41 s (7.75× faster)** on an NVIDIA RTX 5080 Laptop GPU system using R’s reference BLAS. The benchmark used default diagonal scoring for 1,048,576 Monte Carlo draws with 4,096 units and 2,048 covariates (batch 4,096; 0.1% accepted), with identical assignments, random keys, and balance scores before and after. The GPU stage took 2.95 s, and its balance matrix multiplication sustained 18.6 TFLOP/s—about 53% of an analytical FP32 reference at NVIDIA’s listed upper boost clock. Permutation sorting remains the largest GPU cost. Hardware counters were unavailable, so the roofline percentage is an estimate.
+
+[Read the full analysis](benchmarks/speed_of_light/REPORT.md).
 
 # Package Installation and Loading <a id="installation"></a>
 ```
