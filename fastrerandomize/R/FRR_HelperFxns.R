@@ -164,10 +164,16 @@ check_jax_availability <- function(conda_env = "fastrerandomize_env",
 # approximation, population variance as jnp.var) or whiten (sample covariance as
 # jnp.cov) so that T^2 is a plain squared norm of whitened mean differences.
 # Centering removes the float32 cancellation between treated and control means.
-.balance_design <- function(X, approximate_inv) {
+.balance_design <- function(X, approximate_inv, need_full_inverse = TRUE) {
   Xc <- sweep(X, 2L, colMeans(X))
   var_pop <- colMeans(Xc^2)
   S_inv_approx <- ifelse(var_pop > 0, 1 / var_pop, 0)
+  # Default diagonal scoring consumes only Xw. Custom thresholds still receive
+  # both inverse forms, even when approximate_inv is TRUE.
+  if (approximate_inv && !need_full_inverse) {
+    return(list(Xw = sweep(Xc, 2L, sqrt(S_inv_approx), "*"),
+                S_inv = NULL, S_inv_approx = S_inv_approx))
+  }
   S <- stats::cov(X)
   L <- .psd_inv_sqrt(S)
   Xw <- if (approximate_inv) sweep(Xc, 2L, sqrt(S_inv_approx), "*") else Xc %*% L

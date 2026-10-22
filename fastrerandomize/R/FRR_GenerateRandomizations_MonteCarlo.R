@@ -133,8 +133,9 @@ generate_randomizations_mc <- function(n_units,
   num_to_accept <- as.integer(max(ceiling(float_num_to_accept), 1)) # Ensure at least one
 
   # Balance inputs are built in double precision on the host
-  design <- .balance_design(X, approximate_inv)
-  if (.is_default_threshold(threshold_func)) {
+  default_threshold <- .is_default_threshold(threshold_func)
+  design <- .balance_design(X, approximate_inv, need_full_inverse = !default_threshold)
+  if (default_threshold) {
     scorers <- fastrr_env$MCScorers
     balance_jit <- fastrr_env$WhitenedT2Jit
     design_jax <- list(jnp$array(design$Xw, dtype = jnp$float32))
@@ -207,7 +208,7 @@ generate_randomizations_mc <- function(n_units,
 
   # (Re-)generate the accepted permutations from their keys, one batch at a
   # time, and check that they reproduce their balance scores
-  balance_design_arg <- if (.is_default_threshold(threshold_func)) design_jax[[1]] else design_jax
+  balance_design_arg <- if (default_threshold) design_jax[[1]] else design_jax
   regenerated <- lapply(seq(0L, num_to_accept - 1L, by = batch_size), function(s_) {
     chunk <- jnp$arange(as.integer(s_), as.integer(min(s_ + batch_size, num_to_accept)))
     idx <- jnp$take(indices_to_keep, chunk)

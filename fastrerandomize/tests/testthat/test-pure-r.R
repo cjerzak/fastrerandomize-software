@@ -264,6 +264,39 @@ test_that("whitened balance design reproduces Hotelling T^2 in double precision"
   }
 })
 
+test_that("diagonal-only preparation preserves the existing design exactly", {
+  set.seed(14)
+  X <- matrix(rnorm(40 * 3), 40)
+  cases <- list(X, X + 1e9, X[, 1, drop = FALSE],
+                cbind(X, X[, 1] + X[, 2]), matrix(rnorm(6 * 10), 6),
+                suppressWarnings(fastrerandomize:::.prepare_X(cbind(X, 7), 40L)),
+                suppressWarnings(fastrerandomize:::.prepare_X(matrix(7, 8, 2), 8L)))
+  for (x in cases) {
+    legacy <- fastrerandomize:::.balance_design(x, TRUE)
+    fast <- fastrerandomize:::.balance_design(x, TRUE, need_full_inverse = FALSE)
+    expect_identical(fast$Xw, legacy$Xw)
+    expect_identical(fast$S_inv_approx, legacy$S_inv_approx)
+    expect_null(fast$S_inv)
+    expect_true(is.matrix(legacy$S_inv))
+    expect_identical(fastrerandomize:::.balance_design(x, FALSE, need_full_inverse = FALSE),
+                     fastrerandomize:::.balance_design(x, FALSE))
+  }
+})
+
+test_that("diagonal-only preparation does not construct or decompose covariance", {
+  testthat::local_mocked_bindings(
+    cov = function(...) stop("unexpected covariance computation"), .package = "stats"
+  )
+  testthat::local_mocked_bindings(
+    .psd_inv_sqrt = function(...) stop("unexpected covariance decomposition"),
+    .package = "fastrerandomize"
+  )
+  X <- matrix(seq_len(24), 8)
+  result <- fastrerandomize:::.balance_design(X, TRUE, need_full_inverse = FALSE)
+  expect_equal(colMeans(result$Xw), rep(0, 3), tolerance = 1e-15)
+  expect_equal(colMeans(result$Xw^2), rep(1, 3), tolerance = 1e-15)
+})
+
 test_that("full balance design uses a pseudo-inverse for collinear covariates", {
   set.seed(13)
   X2 <- matrix(rnorm(30 * 2), 30)

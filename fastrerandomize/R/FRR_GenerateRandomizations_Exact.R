@@ -137,10 +137,11 @@ generate_randomizations_exact <- function(
 
   M_results <- NULL; if(!is.null(X)){
     # Balance inputs are built in double precision on the host
-    design <- .balance_design(X, approximate_inv)
+    default_threshold <- .is_default_threshold(threshold_func)
+    design <- .balance_design(X, approximate_inv, need_full_inverse = !default_threshold)
 
     # Calculate balance measure (Hotelling T-squared) for each candidate randomization
-    if (.is_default_threshold(threshold_func)) {
+    if (default_threshold) {
       M_results <- fastrr_env$WhitenedT2Jit(
         jnp$array(design$Xw, dtype = jnp$float32),
         candidate_randomizations,

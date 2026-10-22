@@ -43,6 +43,10 @@
 
 ## Performance
 
+* Default diagonal balance scoring skips full covariance construction and
+  eigendecomposition during preparation, for both Monte Carlo and exact
+  generation. Custom thresholds still receive both inverse forms, and
+  full-covariance scoring is unchanged.
 * Monte Carlo generation runs every batch in one compiled program. Keys are
   derived per draw index rather than materialized, and the compiled kernels are
   reused across calls. Results, including the returned keys, are unchanged for

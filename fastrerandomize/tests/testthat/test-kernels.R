@@ -137,6 +137,82 @@ test_that("a custom threshold_func uses the legacy signature", {
   expect_gte(mean(key_id(custom$randomizations) %in% key_id(default$randomizations)), 0.95)
 })
 
+test_that("default generation skips full preparation without changing results", {
+  invisible(fastrerandomize:::.ensure_backend("fastrerandomize_env", TRUE))
+  set.seed(308)
+  X <- matrix(rnorm(10 * 3), 10) + 100
+  run <- function(method, threshold = NULL) {
+    args <- list(n_units = 10, n_treated = 4, X = X, randomization_accept_prob = 0.25,
+                 threshold_func = threshold, verbose = FALSE)
+    if (method == "mc") {
+      args <- c(args, list(max_draws = 257L, batch_size = 64L, seed = 18L))
+    }
+    fn <- get(paste0("generate_randomizations_", method), asNamespace("fastrerandomize"))
+    lapply(do.call(fn, args), to_r)
+  }
+  prepare <- fastrerandomize:::.balance_design
+  baseline <- testthat::with_mocked_bindings(
+    list(mc = run("mc"), exact = run("exact")),
+    .balance_design = function(X, approximate_inv, need_full_inverse = TRUE) {
+      prepare(X, approximate_inv)
+    }, .package = "fastrerandomize"
+  )
+  testthat::local_mocked_bindings(
+    cov = function(...) stop("unexpected covariance computation"), .package = "stats"
+  )
+  testthat::local_mocked_bindings(
+    .psd_inv_sqrt = function(...) stop("unexpected covariance decomposition"),
+    .package = "fastrerandomize"
+  )
+  for (method in c("mc", "exact")) {
+    expect_identical(run(method), baseline[[method]])
+    expect_identical(run(method, env()$VectorizedFastHotel2T2), baseline[[method]])
+  }
+  unfiltered <- fastrerandomize::generate_randomizations_exact(
+    6L, 3L, X = NULL, verbose = FALSE
+  )
+  expect_null(unfiltered$M_candidate_randomizations)
+  expect_equal(nrow(to_r(unfiltered$candidate_randomizations)), choose(6, 3))
+})
+
+test_that("custom thresholds retain the full inverse with approximate_inv TRUE", {
+  invisible(fastrerandomize:::.ensure_backend("fastrerandomize_env", TRUE))
+  set.seed(309)
+  X <- matrix(rnorm(10 * 3), 10)
+  # This callback deliberately uses both supplied inverse forms, irrespective
+  # of the requested approximation. Compare its scores with an R reference.
+  custom <- function(X_, S_inv_, S_inv_approx_, W_, n0, n1, approximate_inv_) {
+    expect_true(approximate_inv_)
+    e <- env()
+    jnp <- e$jnp
+    precision <- e$jax$lax$Precision$HIGHEST
+    Wf <- W_$astype(jnp$float32)
+    d <- jnp$subtract(
+      jnp$divide(jnp$matmul(Wf, X_, precision = precision), n1),
+      jnp$divide(jnp$matmul(jnp$subtract(1., Wf), X_, precision = precision), n0)
+    )
+    full <- jnp$einsum("bi,ij,bj->b", d, S_inv_, d, precision = precision)
+    diag <- jnp$sum(jnp$multiply(jnp$square(d), S_inv_approx_), 1L)
+    jnp$multiply((n0 * n1) / (n0 + n1), jnp$add(full, diag))
+  }
+  for (method in c("mc", "exact")) {
+    args <- list(n_units = 10, n_treated = 4, X = X, randomization_accept_prob = 0.25,
+                 threshold_func = custom, approximate_inv = TRUE, verbose = FALSE)
+    if (method == "mc") {
+      args <- c(args, list(max_draws = 257L, batch_size = 64L, seed = 19L))
+    }
+    fn <- get(paste0("generate_randomizations_", method), asNamespace("fastrerandomize"))
+    result <- do.call(fn, args)
+    W <- to_r(result$candidate_randomizations)
+    variances <- colMeans(sweep(X, 2L, colMeans(X))^2)
+    ref <- apply(W, 1L, function(w) {
+      d <- colMeans(X[w == 1, , drop = FALSE]) - colMeans(X[w == 0, , drop = FALSE])
+      hotellingT2_R(X, w) + 2.4 * sum(d^2 / variances)
+    })
+    expect_equal(as.numeric(to_r(result$M_candidate_randomizations)), ref, tolerance = 1e-4)
+  }
+})
+
 test_that("exact enumeration matches double-precision Hotelling T^2", {
   set.seed(305)
   X <- matrix(rnorm(10 * 3), 10) + 20
