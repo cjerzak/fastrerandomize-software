@@ -1,0 +1,61 @@
+Generating SQLite file results/profile_all.sqlite from results/profile_all.nsys-rep
+Processing [results/profile_all.sqlite] with [/opt/nvidia/nsight-systems/2026.3.2/target-linux-x64/reports/cuda_gpu_kern_sum.py]...
+Time (%),Total Time (ns),Instances,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Name
+31.8,2807175992,768,3655177.1,3651047.0,3283572,4685501,239177.1,void cutlass::Kernel2<cutlass_80_simt_sgemm_256x128_8x4_nn_align1>(T1::Params)
+30.6,2699871267,6144,439432.2,438403.0,360834,688901,24960.8,"void cub::_V_300200_SM_750_800_900_1000_1100_1200::detail::radix_sort::DeviceSegmentedRadixSortKernel<cub::_V_300200_SM_750_800_900_1000_1100_1200::detail::radix::policy_hub<unsigned int, unsigned int, int>::Policy1000, (bool)1, (cub::_V_300200_SM_750_800_900_1000_1100_1200::SortOrder)0, unsigned int, unsigned int, int *, int *, int, cub::_V_300200_SM_750_800_900_1000_1100_1200::detail::identity_decomposer_t>(const T4 *, T4 *, const T5 *, T5 *, T6, T7, int, int, T9)"
+30.3,2671190399,3072,869528.1,868869.0,663396,1383881,49456.0,"void cub::_V_300200_SM_750_800_900_1000_1100_1200::detail::radix_sort::DeviceSegmentedRadixSortKernel<cub::_V_300200_SM_750_800_900_1000_1100_1200::detail::radix::policy_hub<unsigned int, unsigned int, int>::Policy1000, (bool)0, (cub::_V_300200_SM_750_800_900_1000_1100_1200::SortOrder)0, unsigned int, unsigned int, int *, int *, int, cub::_V_300200_SM_750_800_900_1000_1100_1200::detail::identity_decomposer_t>(const T4 *, T4 *, const T5 *, T5 *, T6, T7, int, int, T9)"
+2.5,223017203,768,290387.0,289649.5,237250,536164,15831.9,loop_xor_fusion
+1.5,134605592,768,175267.7,174721.0,147521,206849,9256.9,wrapped_convert
+0.9,78116309,768,101713.9,101601.0,71201,120961,6545.1,input_reduce_fusion_2
+0.8,73144047,768,95239.6,94977.0,72736,116449,5937.2,wrapped_broadcast
+0.6,51170050,768,66627.7,66416.5,53344,80289,3909.4,gemm_fusion_dot_general_0
+0.6,49334395,768,64237.5,63873.0,48640,296290,9358.4,input_reduce_fusion_3
+0.2,19397007,768,25256.5,24865.0,17280,37441,3004.6,input_reduce_fusion
+0.0,2159060,768,2811.3,2784.0,2240,3648,201.8,loop_and_fusion
+0.0,2053162,768,2673.4,2656.0,2208,3648,201.3,loop_dynamic_update_slice_fusion_1
+0.0,1393224,1536,907.0,896.0,640,1152,51.3,loop_xor_fusion_1
+0.0,1391143,768,1811.4,1792.0,1440,2752,136.0,loop_divide_fusion
+0.0,1376133,768,1791.8,1792.0,1248,2176,90.5,loop_slice_fusion_1
+0.0,1099687,768,1431.9,1408.0,1056,2048,136.2,loop_add_fusion
+0.0,1058859,768,1378.7,1376.0,928,1984,130.5,loop_add_fusion_1
+0.0,1056391,768,1375.5,1376.0,1024,1728,77.0,loop_slice_fusion
+0.0,846245,768,1101.9,1088.0,736,1568,83.8,input_reduce_fusion_1
+0.0,776804,768,1011.5,992.0,800,1216,55.1,fusion_573
+0.0,702563,768,914.8,896.0,640,1184,60.0,memcpy32_post
+0.0,543425,768,707.6,704.0,576,992,48.4,loop_convert_fusion
+0.0,383489,12,31957.4,32800.5,23263,38784,5482.3,"void cub::_V_300200_SM_750_800_900_1000_1100_1200::detail::radix_sort::DeviceRadixSortOnesweepKernel<cub::_V_300200_SM_750_800_900_1000_1100_1200::detail::radix::policy_hub<unsigned int, unsigned long, unsigned long long>::Policy1000, (cub::_V_300200_SM_750_800_900_1000_1100_1200::SortOrder)0, unsigned int, unsigned long, unsigned long long, int, int, cub::_V_300200_SM_750_800_900_1000_1100_1200::detail::identity_decomposer_t>(T7 *, T7 *, T5 *, const T5 *, T3 *, const T3 *, T4 *, const T4 *, T6, int, int, T8)"
+0.0,105376,3,35125.3,35456.0,34240,35680,774.9,loop_convert_select_fusion
+0.0,41664,3,13888.0,13856.0,13312,14496,592.6,loop_or_select_fusion
+0.0,31680,3,10560.0,10688.0,10272,10720,249.9,"void cub::_V_300200_SM_750_800_900_1000_1100_1200::detail::radix_sort::DeviceRadixSortHistogramKernel<cub::_V_300200_SM_750_800_900_1000_1100_1200::detail::radix::policy_hub<unsigned int, unsigned long, unsigned long long>::Policy1000, (cub::_V_300200_SM_750_800_900_1000_1100_1200::SortOrder)0, unsigned int, unsigned long long, cub::_V_300200_SM_750_800_900_1000_1100_1200::detail::identity_decomposer_t>(T4 *, const T3 *, T4, int, int, T5)"
+0.0,13696,3,4565.3,4416.0,4320,4960,345.1,loop_broadcast_fusion_1
+0.0,4096,3,1365.3,1376.0,1312,1408,48.9,"void cub::_V_300200_SM_750_800_900_1000_1100_1200::detail::radix_sort::DeviceRadixSortExclusiveSumKernel<cub::_V_300200_SM_750_800_900_1000_1100_1200::detail::radix::policy_hub<unsigned int, unsigned long, unsigned long long>::Policy1000, unsigned long long>(T2 *)"
+0.0,3616,3,1205.3,1216.0,1152,1248,48.9,input_reduce_fusion_4
+0.0,2304,3,768.0,736.0,704,864,84.7,loop_broadcast_fusion
+
+Processing [results/profile_all.sqlite] with [/opt/nvidia/nsight-systems/2026.3.2/target-linux-x64/reports/cuda_gpu_mem_time_sum.py]...
+Time (%),Total Time (ns),Count,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Operation
+93.6,6302503,1536,4103.2,4192.0,832,76320,2682.9,[CUDA memcpy Host-to-Device]
+6.4,428768,786,545.5,544.0,384,1152,83.1,[CUDA memset]
+0.1,3744,3,1248.0,1216.0,1184,1344,84.7,[CUDA memcpy Device-to-Device]
+
+Processing [results/profile_all.sqlite] with [/opt/nvidia/nsight-systems/2026.3.2/target-linux-x64/reports/nvtx_sum.py]...
+Time (%),Total Time (ns),Instances,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Style,Range
+21.8,7106590108,3,2368863369.3,2357645905.0,2340879978,2408064225,34968620.1,PushPop,"TSL:XlaModule:#hlo_module=jit_python_function,program_id=55#"
+21.7,7083204998,3,2361068332.7,2350167282.0,2332899882,2400137834,34919338.9,PushPop,"TSL:Thunk:#hlo_op=while.6,unique_hlo_op_id=120259084298#"
+9.2,2992930743,1,2992930743.0,2992930743.0,2992930743,2992930743,0.0,PushPop,:n4096_p2048_b4096_d1048576_all_2
+9.0,2933563254,1,2933563254.0,2933563254.0,2933563254,2933563254,0.0,PushPop,:n4096_p2048_b4096_d1048576_all_0
+9.0,2930288751,1,2930288751.0,2930288751.0,2930288751,2930288751,0.0,PushPop,:n4096_p2048_b4096_d1048576_all_1
+7.4,2407636465,1536,1567471.7,421811.0,16168,4307056,1592725.6,PushPop,CCCL:cub::DeviceSegmentedRadixSort
+7.2,2341589534,768,3048944.7,3728452.0,4158,4877871,1556230.7,PushPop,TSL:Thunk:#hlo_op=command_buffer_6#
+7.1,2326382705,768,3029144.1,3714155.0,11226,4612512,1518269.7,PushPop,TSL:Thunk:#hlo_op=command_buffer_16#
+6.6,2155062972,768,2806071.6,3443988.0,19174,4311167,1414209.8,PushPop,"TSL:Thunk:#name=jit(python_function)/while/body/eval_jaxpr/vmap(jit(_shuffle))/sort,hlo_op=custom-call.4,unique_hlo_op_id=85899345924#"
+0.8,259176803,768,337469.8,410850.5,19582,506674,160785.9,PushPop,"TSL:Thunk:#name=jit(python_function)/while/body/eval_jaxpr/vmap(jit(_shuffle))/sort,hlo_op=custom-call.3,unique_hlo_op_id=85899345923#"
+0.1,22819655,3,7606551.7,7755533.0,7272542,7791580,289821.8,PushPop,"TSL:Thunk:#name=jit(python_function)/jit(argsort)/sort,hlo_op=custom-call.5,unique_hlo_op_id=120259084305#"
+0.1,22804945,3,7601648.3,7751770.0,7267342,7785833,290018.3,PushPop,CCCL:cub::DeviceRadixSort
+0.0,6138833,1536,3996.6,3722.0,2569,31244,1896.6,PushPop,"TSL:Thunk:#name=jit(python_function)/while/body,hlo_op=loop_dynamic_update_slice_fusion.2,unique_hlo_op_id=5613522255875#"
+0.0,185430,3,61810.0,61667.0,60519,63244,1368.1,PushPop,"TSL:Thunk:#hlo_op=copy.12,unique_hlo_op_id=120259084316#"
+0.0,71517,3,23839.0,23916.0,21519,26082,2282.5,PushPop,"TSL:Thunk:#name=jit(python_function)/broadcast_in_dim,hlo_op=loop_broadcast_fusion.1,unique_hlo_op_id=120259084310#"
+0.0,66896,3,22298.7,23954.0,15168,27774,6464.0,PushPop,"TSL:Thunk:#name=jit(python_function),hlo_op=loop_or_select_fusion,unique_hlo_op_id=120259084307#"
+0.0,33308,3,11102.7,8987.0,6632,17689,5824.2,PushPop,"TSL:Thunk:#name=jit(python_function),hlo_op=loop_convert_select_fusion,unique_hlo_op_id=120259084306#"
+0.0,20379,3,6793.0,7529.0,5198,7652,1382.7,PushPop,"TSL:Thunk:#hlo_op=input_reduce_fusion.4,unique_hlo_op_id=120259084308#"
+0.0,18974,3,6324.7,6374.0,6101,6499,203.5,PushPop,"TSL:Thunk:#name=jit(python_function)/broadcast_in_dim,hlo_op=loop_broadcast_fusion,unique_hlo_op_id=120259084309#"

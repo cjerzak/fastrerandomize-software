@@ -1,0 +1,10 @@
+/usr/bin/bash: /home/cjerzak/miniconda3/envs/preference_fm_cuda_20261009/lib/libtinfo.so.6: no version information available (required by /usr/bin/bash)
+Device: cpu:0
+kernels: /usr/bin/bash: /home/cjerzak/miniconda3/envs/preference_fm_cuda_20261009/lib/libtinfo.so.6: no version information available (required by /usr/bin/bash)
+/usr/bin/bash: /home/cjerzak/miniconda3/envs/preference_fm_cuda_20261009/lib/libtinfo.so.6: no version information available (required by /usr/bin/bash)
+...................................................................................
+pure-r: ...............................................................................................................
+
+══ DONE ════════════════════════════════════════════════════════════════════════
+ failed skipped   error warning  passed
+      0       0       0       0     194

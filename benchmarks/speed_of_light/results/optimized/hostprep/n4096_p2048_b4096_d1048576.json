@@ -1,0 +1,38 @@
+{
+  "profiled_seconds": 0.42499999999999982,
+  "samples_seconds": [0.37000000000000011, 0.34499999999999975, 0.32099999999999973, 0.36599999999999966, 0.31700000000000017],
+  "median_seconds": 0.34499999999999975,
+  "shortcut_available": true,
+  "identical_Xw": true,
+  "identical_inverse_variance": true,
+  "profile_by_self": [
+    {
+      "self.time": 0.32000000000000001,
+      "self.pct": 76.189999999999998,
+      "total.time": 0.32000000000000001,
+      "total.pct": 76.189999999999998,
+      "_row": "\"aperm.default\""
+    },
+    {
+      "self.time": 0.050000000000000003,
+      "self.pct": 11.9,
+      "total.time": 0.050000000000000003,
+      "total.pct": 11.9,
+      "_row": "\"array\""
+    },
+    {
+      "self.time": 0.029999999999999999,
+      "self.pct": 7.1399999999999997,
+      "total.time": 0.029999999999999999,
+      "total.pct": 7.1399999999999997,
+      "_row": "\"is.data.frame\""
+    },
+    {
+      "self.time": 0.02,
+      "self.pct": 4.7599999999999998,
+      "total.time": 0.39000000000000001,
+      "total.pct": 92.859999999999999,
+      "_row": "\"sweep\""
+    }
+  ]
+}

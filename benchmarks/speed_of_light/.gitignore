@@ -3,6 +3,9 @@ calibrate
 markers.so
 results/*.nsys-rep
 results/*.sqlite
+results/**/*.nsys-rep
+results/**/*.sqlite
+results/**/*.rds
 results/**/*.hlo.txt
 results/**/*.Rprof
 results/analysis.log

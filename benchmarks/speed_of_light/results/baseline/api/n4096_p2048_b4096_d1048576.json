@@ -1,0 +1,14 @@
+{
+  "n": 4096,
+  "p": 2048,
+  "batch": 4096,
+  "draws": 1048576,
+  "first_api_call_after_backend_setup_seconds": 34.502999999999993,
+  "samples_seconds": [26.168000000000006, 26.417000000000002, 26.604000000000013, 25.811000000000007, 26.774000000000001, 26.579999999999984, 26.150000000000006],
+  "median_seconds": 26.417000000000002,
+  "accepted": 1049,
+  "max_relative_error_float64": 9.0689770583363661e-08,
+  "repeat_identical": true,
+  "R": "R version 4.5.2 (2025-10-31)",
+  "blas": "/usr/lib/x86_64-linux-gnu/blas/libblas.so.3.12.1"
+}

@@ -1,0 +1,39 @@
+Generating SQLite file results/profile_batch.sqlite from results/profile_batch.nsys-rep
+Processing [results/profile_batch.sqlite] with [/opt/nvidia/nsight-systems/2026.3.2/target-linux-x64/reports/cuda_gpu_kern_sum.py]...
+Time (%),Total Time (ns),Instances,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Name
+33.2,9938072,3,3312690.7,3333811.0,3254962,3349299,50590.7,void cutlass::Kernel2<cutlass_80_simt_sgemm_256x128_8x4_nn_align1>(T1::Params)
+30.8,9202483,24,383436.8,375554.0,358594,416034,17340.8,"void cub::_V_300200_SM_750_800_900_1000_1100_1200::detail::radix_sort::DeviceSegmentedRadixSortKernel<cub::_V_300200_SM_750_800_900_1000_1100_1200::detail::radix::policy_hub<unsigned int, unsigned int, int>::Policy1000, (bool)1, (cub::_V_300200_SM_750_800_900_1000_1100_1200::SortOrder)0, unsigned int, unsigned int, int *, int *, int, cub::_V_300200_SM_750_800_900_1000_1100_1200::detail::identity_decomposer_t>(const T4 *, T4 *, const T5 *, T5 *, T6, T7, int, int, T9)"
+28.7,8572945,12,714412.1,683332.0,658788,801924,63872.0,"void cub::_V_300200_SM_750_800_900_1000_1100_1200::detail::radix_sort::DeviceSegmentedRadixSortKernel<cub::_V_300200_SM_750_800_900_1000_1100_1200::detail::radix::policy_hub<unsigned int, unsigned int, int>::Policy1000, (bool)0, (cub::_V_300200_SM_750_800_900_1000_1100_1200::SortOrder)0, unsigned int, unsigned int, int *, int *, int, cub::_V_300200_SM_750_800_900_1000_1100_1200::detail::identity_decomposer_t>(const T4 *, T4 *, const T5 *, T5 *, T6, T7, int, int, T9)"
+2.7,796580,3,265526.7,253473.0,250210,292897,23759.5,loop_xor_fusion
+1.6,467810,3,155936.7,152001.0,151585,164224,7180.1,wrapped_convert
+0.8,238242,3,79414.0,75616.0,73601,89025,8384.1,wrapped_broadcast
+0.8,233153,3,77717.7,71072.0,70560,91521,11956.8,input_reduce_fusion_2
+0.6,177696,3,59232.0,60832.0,55552,61312,3196.0,gemm_fusion_dot_general_1
+0.6,164931,3,54977.0,57697.0,48001,59233,6090.0,input_reduce_fusion_3
+0.2,66656,3,22218.7,21472.0,19840,25344,2826.9,input_reduce_fusion
+0.0,7008,3,2336.0,2336.0,2272,2400,64.0,loop_and_select_fusion
+0.0,6080,6,1013.3,992.0,992,1088,38.8,loop_xor_fusion_1
+0.0,6016,3,2005.3,1984.0,1984,2048,37.0,loop_slice_fusion_1
+0.0,5024,3,1674.7,1632.0,1600,1792,102.9,loop_divide_fusion
+0.0,4992,3,1664.0,1632.0,1568,1792,115.4,input_reduce_fusion_1
+0.0,4768,3,1589.3,1568.0,1536,1664,66.6,loop_slice_fusion
+0.0,4128,3,1376.0,1376.0,1344,1408,32.0,loop_add_fusion
+0.0,2656,3,885.3,928.0,800,928,73.9,fusion_546
+0.0,2368,3,789.3,768.0,768,832,37.0,loop_convert_fusion
+
+Processing [results/profile_batch.sqlite] with [/opt/nvidia/nsight-systems/2026.3.2/target-linux-x64/reports/cuda_gpu_mem_time_sum.py]...
+Time (%),Total Time (ns),Count,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Operation
+95.3,24064,6,4010.7,4032.0,736,7392,3485.0,[CUDA memcpy Host-to-Device]
+4.7,1184,3,394.7,352.0,352,480,73.9,[CUDA memset]
+
+Processing [results/profile_batch.sqlite] with [/opt/nvidia/nsight-systems/2026.3.2/target-linux-x64/reports/nvtx_sum.py]...
+Time (%),Total Time (ns),Instances,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Style,Range
+33.1,11632651,1,11632651.0,11632651.0,11632651,11632651,0.0,PushPop,:n4096_p2048_b4096_d1048576_batch_2
+31.6,11104752,1,11104752.0,11104752.0,11104752,11104752,0.0,PushPop,:n4096_p2048_b4096_d1048576_batch_1
+30.6,10760933,1,10760933.0,10760933.0,10760933,10760933,0.0,PushPop,:n4096_p2048_b4096_d1048576_batch_0
+2.1,750118,3,250039.3,249992.0,244317,255809,5746.1,PushPop,"TSL:XlaModule:#hlo_module=jit_python_function,program_id=55#"
+0.9,309369,3,103123.0,103076.0,101931,104362,1216.2,PushPop,"TSL:Thunk:#name=jit(python_function)/vmap(jit(_shuffle))/sort,hlo_op=custom-call.2,unique_hlo_op_id=68719476748#"
+0.7,238982,6,39830.3,43170.0,17400,58665,20112.0,PushPop,CCCL:cub::DeviceSegmentedRadixSort
+0.4,144538,3,48179.3,46734.0,46221,51583,2958.8,PushPop,TSL:Thunk:#hlo_op=command_buffer_1#
+0.3,97940,3,32646.7,32389.0,30651,34900,2136.2,PushPop,TSL:Thunk:#hlo_op=command_buffer_11#
+0.2,82656,3,27552.0,23897.0,22756,36003,7341.0,PushPop,"TSL:Thunk:#name=jit(python_function)/vmap(jit(_shuffle))/sort,hlo_op=custom-call.3,unique_hlo_op_id=68719476749#"

@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 # The production package is installed into a private library from the untouched
-# source snapshot. All measured JIT functions come directly from its namespace.
+# source revision. All measured JIT functions come directly from its namespace.
 args <- commandArgs(trailingOnly = TRUE)
 mode <- if (length(args)) args[[1]] else "sweep"
 root <- normalizePath(Sys.getenv("SOL_ROOT", "."))
@@ -16,13 +16,21 @@ h <- reticulate::import_from_path("timing", path = file.path(root, "benchmarks",
 h$save_metadata(out)
 jnp <- e$jnp
 
+# Match the default production caller on both the baseline and patched package.
+production_design <- function(X) {
+  fn <- fastrerandomize:::.balance_design
+  if ("need_full_inverse" %in% names(formals(fn))) {
+    fn(X, TRUE, need_full_inverse = FALSE)
+  } else {
+    fn(X, TRUE)
+  }
+}
+
 inputs <- function(n, p, batch, draws = batch) {
   set.seed(20261022L)
   X <- matrix(rnorm(n * p), n, p)
-  # Same default diagonal scaling as .balance_design(); kernel-only timing
-  # excludes all preparation. Full API mode uses .balance_design() unchanged.
-  Xc <- sweep(X, 2L, colMeans(X))
-  Xw <- sweep(Xc, 2L, sqrt(1 / colMeans(Xc^2)), "*")
+  # Kernel-only timing excludes preparation and uses the package's actual inputs.
+  Xw <- production_design(X)$Xw
   Xj <- jnp$array(Xw, dtype = jnp$float32)
   base <- jnp$array(c(rep(1L, n %/% 2L), rep(0L, n - n %/% 2L)), dtype = jnp$int32)
   key <- e$jax$random$PRNGKey(77L)
@@ -86,7 +94,7 @@ if (mode == "sweep") {
   if (mode == "hostprep") {
     Rprof(file.path(out, "preparation.Rprof"), interval = 0.01)
     start <- proc.time()[["elapsed"]]
-    original <- fastrerandomize:::.balance_design(z$X, TRUE)
+    original <- production_design(z$X)
     elapsed <- proc.time()[["elapsed"]] - start
     Rprof(NULL)
     diagonal_only <- function(X) {
@@ -97,9 +105,11 @@ if (mode == "sweep") {
     }
     d <- diagonal_only(z$X)
     stopifnot(identical(original$Xw, d$Xw), identical(original$S_inv_approx, d$S_inv_approx))
-    times <- replicate(5L, system.time(diagonal_only(z$X))[["elapsed"]])
+    times <- replicate(5L, system.time(production_design(z$X))[["elapsed"]])
     prof <- summaryRprof(file.path(out, "preparation.Rprof"))
-    result <- list(original_seconds = elapsed, diagonal_only_seconds = times,
+    result <- list(profiled_seconds = elapsed, samples_seconds = times,
+                   median_seconds = median(times),
+                   shortcut_available = "need_full_inverse" %in% names(formals(fastrerandomize:::.balance_design)),
                    identical_Xw = TRUE, identical_inverse_variance = TRUE,
                    profile_by_self = head(prof$by.self, 15L))
     jsonlite::write_json(result, file.path(out, paste0(label, ".json")), auto_unbox = TRUE, pretty = TRUE, digits = 16)
@@ -138,7 +148,14 @@ if (mode == "sweep") {
                 identical(result$balance, first$balance))
       elapsed
     })
-    design_times <- replicate(3L, system.time(fastrerandomize:::.balance_design(z$X, TRUE))[["elapsed"]])
+    # Save values outside the timers for exact cross-revision comparison,
+    # including keys (the high-level S3 wrapper does not expose them).
+    mc_args <- call_args[names(call_args) != "return_type"]
+    direct <- do.call(fastrerandomize::generate_randomizations_mc, mc_args)
+    direct <- lapply(direct, fastrerandomize:::.to_r)
+    stopifnot(identical(direct$candidate_randomizations, first$randomizations),
+              identical(as.numeric(direct$M_candidate_randomizations), as.numeric(first$balance)))
+    saveRDS(direct, file.path(out, paste0(label, "_outputs.rds")), compress = "xz")
     Xc <- sweep(z$X, 2L, colMeans(z$X))
     variances <- colMeans(Xc^2)
     check_ix <- seq_len(min(64L, nrow(first$randomizations)))
@@ -151,7 +168,7 @@ if (mode == "sweep") {
     stopifnot(err < 1e-4, !is.unsorted(first$balance))
     result <- list(n = n, p = p, batch = batch, draws = draws,
                    first_api_call_after_backend_setup_seconds = cold, samples_seconds = times,
-                   median_seconds = median(times), design_seconds = design_times,
+                   median_seconds = median(times),
                    accepted = nrow(first$randomizations),
                    max_relative_error_float64 = err, repeat_identical = TRUE,
                    R = R.version.string, blas = extSoftVersion()[["BLAS"]])

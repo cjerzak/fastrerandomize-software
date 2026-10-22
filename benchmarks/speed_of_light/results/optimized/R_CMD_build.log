@@ -1,0 +1,8 @@
+* checking for file ‘fastrerandomize/DESCRIPTION’ ... OK
+* preparing ‘fastrerandomize’:
+* checking DESCRIPTION meta-information ... OK
+* checking for LF line-endings in source and make files and shell scripts
+* checking for empty or unneeded directories
+Removed empty directory ‘fastrerandomize/tests/testthat/_snaps’
+* looking to see if a ‘data/datalist’ file should be added
+* building ‘fastrerandomize_0.4.tar.gz’

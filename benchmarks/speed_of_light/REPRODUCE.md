@@ -1,83 +1,112 @@
-# Reproduce the Speed of Light analysis
+# Reproduce the Speed of Light comparison
 
-The production snapshot is commit `4489e28e5f2ee1dddc34415afc4de23bfd31796d`. Run experiments in an isolated worktree and copy its package into a private directory on `cjerzak-rog`. The study's remote directory is `/home/cjerzak/Documents/fastrerandomize-sol-20261022`, outside Dropbox. Reusing that directory overwrites benchmark results; use a new directory to preserve the original capture.
+The comparison uses baseline source `4489e28e5f2ee1dddc34415afc4de23bfd31796d` and patched source `171777d1838e7c2a16bca89c6cec6081f3bf23bf`. Both are measured with the same revised harness. The original exploratory study is preserved at commit `8eb9eda` and in the existing top-level `results/` captures; fresh runs live under `results/baseline/` and `results/optimized/`.
 
-The remote host already has R, reticulate, jsonlite, the `preference_fm_cuda_20261009` conda environment, JAX/JAXlib 0.11.1, CUDA 13.4, and Nsight Systems/Compute. The harness installs the package only in a private R library. It does not install or upgrade Python packages. `run.sh` sets CUDA selection, disables JAX preallocation, and sets OMP/OpenBLAS threads to one; it records any inherited `XLA_FLAGS`. The recorded study had no custom XLA flags.
+## Prepare isolated snapshots
 
-## Prepare the remote directory
+Use worktrees under `/Users/cjerzak/Documents`. The recorded implementation worktree is `/Users/cjerzak/Documents/fastrerandomize-diagonal-prep-20261022`; the original analysis worktree contains the baseline package. The recorded remote study root is `/home/cjerzak/Documents/fastrerandomize-diagonal-prep-20261022`. Use a fresh remote directory for another study so the original captures are preserved.
 
-From the analysis worktree on the local machine:
+The remote host already has R, reticulate, testthat, jsonlite, CUDA 13.4, Nsight Systems 2026.3.2, Nsight Compute 2026.3.1, and the `preference_fm_cuda_20261009` Python environment. No Python packages, system R installation, GPU clocks, power policy, or driver permissions were changed.
 
-```bash
-ssh cjerzak-rog 'mkdir -p /home/cjerzak/Documents/fastrerandomize-sol-20261022/source /home/cjerzak/Documents/fastrerandomize-sol-20261022/rlib /home/cjerzak/Documents/fastrerandomize-sol-20261022/results'
-rsync -az fastrerandomize/ cjerzak-rog:/home/cjerzak/Documents/fastrerandomize-sol-20261022/source/fastrerandomize/
-rsync -az --exclude=results --exclude='*.png' --exclude='*.pdf' --exclude='*.svg' benchmarks/ cjerzak-rog:/home/cjerzak/Documents/fastrerandomize-sol-20261022/benchmarks/
-```
-
-On `cjerzak-rog`:
+From the implementation worktree, create the remote layout and copy the two source snapshots:
 
 ```bash
-cd /home/cjerzak/Documents/fastrerandomize-sol-20261022
-R CMD INSTALL --library="$PWD/rlib" source/fastrerandomize
-/usr/local/cuda/bin/nvcc -O3 -arch=sm_120 benchmarks/speed_of_light/calibrate.cu -lcublas -o benchmarks/speed_of_light/calibrate
-/usr/local/cuda/bin/nvcc -O2 -shared -Xcompiler=-fPIC benchmarks/speed_of_light/markers.cu -o benchmarks/speed_of_light/markers.so
+ssh cjerzak-rog 'mkdir -p /home/cjerzak/Documents/fastrerandomize-diagonal-prep-20261022/{baseline,optimized}/{source,rlib,results,benchmarks}'
+rsync -az /Users/cjerzak/Documents/fastrerandomize-sol-20261022/fastrerandomize/ cjerzak-rog:/home/cjerzak/Documents/fastrerandomize-diagonal-prep-20261022/baseline/source/fastrerandomize/
+rsync -az fastrerandomize/ cjerzak-rog:/home/cjerzak/Documents/fastrerandomize-diagonal-prep-20261022/optimized/source/fastrerandomize/
+for revision in baseline optimized; do
+  rsync -az --exclude=results --exclude='*.png' --exclude='*.pdf' --exclude='*.svg' benchmarks/ "cjerzak-rog:/home/cjerzak/Documents/fastrerandomize-diagonal-prep-20261022/$revision/benchmarks/"
+done
 ```
 
-`run.sh` defaults to the existing conda environment and interpreter. Override `SOL_CONDA_ENV`, `RETICULATE_CONDA`, and `RETICULATE_PYTHON` if necessary. The private library is looked up relative to `SOL_ROOT`, which the runner sets to its repository root.
+On the remote machine, install into separate private libraries:
+
+```bash
+cd /home/cjerzak/Documents/fastrerandomize-diagonal-prep-20261022
+R CMD INSTALL --library=baseline/rlib baseline/source/fastrerandomize
+R CMD INSTALL --library=optimized/rlib optimized/source/fastrerandomize
+```
+
+`run.sh` selects the existing CUDA interpreter, disables JAX preallocation, and sets OMP/OpenBLAS threads to one. `SOL_CONDA_ENV`, `RETICULATE_CONDA`, and `RETICULATE_PYTHON` can override its defaults. In the recorded runs there were no custom XLA flags; R used the system reference BLAS. Each revision runs in a separate R process and uses its own installed package.
+
+## Validate before measuring
+
+The tests request an environment named `fastrerandomize_env`. Expose the existing interpreter through a private directory, without modifying the existing environment. Copy its conda history as well: an empty history is insufficient for this reticulate version.
+
+```bash
+cd /home/cjerzak/Documents/fastrerandomize-diagonal-prep-20261022
+mkdir -p envs/fastrerandomize_env/{bin,conda-meta}
+ln -s /home/cjerzak/miniconda3/envs/preference_fm_cuda_20261009/bin/python envs/fastrerandomize_env/bin/python
+cp /home/cjerzak/miniconda3/envs/preference_fm_cuda_20261009/conda-meta/history envs/fastrerandomize_env/conda-meta/history
+export CONDA_ENVS_PATH="$PWD/envs"
+export RETICULATE_CONDA=/home/cjerzak/miniconda3/bin/conda
+export RETICULATE_PYTHON="$CONDA_ENVS_PATH/fastrerandomize_env/bin/python"
+export XLA_PYTHON_CLIENT_PREALLOCATE=false OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+cd optimized
+JAX_PLATFORMS=cuda Rscript benchmarks/speed_of_light/validate.R > results/tests_cuda.log 2>&1
+JAX_PLATFORMS=cpu SOL_TEST_FILTER='kernels|pure-r' Rscript benchmarks/speed_of_light/validate.R > results/tests_cpu.log 2>&1
+```
+
+`validate.R` requires a working backend before running tests, records the device, and exports assertion totals. The separate `diagnose-custom-tail.R` reproduces the legacy custom-callback limitation described in the report; its expected baseline failure is not part of the passing regression suite.
+
+Local package checks used:
+
+```bash
+R CMD build --no-build-vignettes fastrerandomize
+R CMD check --no-manual --ignore-vignettes fastrerandomize_0.4.tar.gz
+```
+
+Vignettes and the PDF manual were excluded. Local JAX tests skipped because the default conda environment was absent; CUDA and CPU coverage above ran explicitly without skips.
 
 ## Run measurements sequentially
 
-Do not overlap GPU jobs; close other compute workloads first. The current high-dimensional R API benchmark takes several minutes because it repeats the existing host preparation.
+Use a fresh shell after validation so the test environment overrides do not leak into benchmarking. Do not overlap GPU jobs. From the remote study root:
 
 ```bash
-benchmarks/speed_of_light/calibrate > results/calibration.jsonl
-bash benchmarks/speed_of_light/run.sh sweep > results/sweep.log 2>&1
-SOL_P=2048 bash benchmarks/speed_of_light/run.sh focus > results/focus.log 2>&1
-SOL_P=2048 bash benchmarks/speed_of_light/run.sh pipeline > results/pipeline.log 2>&1
-SOL_P=2048 bash benchmarks/speed_of_light/run.sh api > results/api.log 2>&1
-SOL_P=2048 bash benchmarks/speed_of_light/run.sh hostprep > results/hostprep.log 2>&1
+cd /home/cjerzak/Documents/fastrerandomize-diagonal-prep-20261022
+bash optimized/benchmarks/speed_of_light/run-comparison.sh > comparison.log 2>&1
 ```
 
-`focus`, `pipeline`, `api`, `profile`, and `hostprep` accept `SOL_N`, `SOL_P`, `SOL_BATCH`, and `SOL_DRAWS`. The primary case is `4096, 2048, 4096, 1048576`. The normal default for `SOL_P` is 1024, so explicitly set 2048 as above. The generator and balance kernels come from the installed production package. `hostprep` is a separate preparation experiment and does not modify that package.
+The runner builds calibration tools, then measures baseline followed by optimized. For each revision it runs `api`, `hostprep`, `focus`, `pipeline`, and `sweep`, then captures three full-pipeline and three single-batch calls with Nsight Systems. GPU timings wait on `jax.block_until_ready`. The primary workload explicitly sets `SOL_P=2048`; other primary defaults are 4,096 units, batch 4,096, and 1,048,576 draws. Data seed is 20261022, assignment seed 77, and acceptance probability 0.001. The automatic package batch size would be 1,024.
 
-The helpers save unprofiled individual timings, compilation times, validation results, compiler HLO, environment metadata, and 100 ms `nvidia-smi` telemetry. Remote telemetry timestamps use America/Chicago; `measurement_start_epoch` and `measurement_end_epoch` are Unix timestamps. The initial exploratory sweep and pipeline were recorded before epoch-window logging was added; their sample timings are unchanged.
+Sampling:
 
-## Capture GPU execution
+- Complete API: one first call after backend/input setup, then seven warmed calls returning R objects. Validation and saving comparison outputs are outside the timers.
+- Production preparation: one Rprof capture and five unprofiled calls. `production_design()` requests the same internal shortcut as the default package caller, while retaining compatibility with the baseline helper.
+- Resident balance and generated batch: 100 synchronized calls after 300 and 150 warmups, respectively.
+- Complete fused GPU pipeline: 15 synchronized calls after three warmups.
+- Nearby shapes: the same seven cases, 30 synchronized calls after five warmups.
+- Nsight Systems: three synchronized calls after five warmups for each capture target. Profiling timings remain separate from headline unprofiled timings.
+
+CUDA-event calibration uses 300 warmup launches and 31 samples, each averaging five kernel launches. Its DRAM triad, FP32 FMA, and strict-FP32 square SGEMMs provide empirical references, not universal throughput ceilings.
+
+The runner attempts Nsight Compute `SpeedOfLight` on the production batch using existing permissions and `--clock-control none`. If it fails with `ERR_NVGPUCTRPERM`, keep that log and retain the analytical roofline label. Do not substitute instrumented timings for the unprofiled results.
+
+## Collect and verify evidence
+
+From the local implementation worktree:
 
 ```bash
-SOL_P=2048 SOL_TARGET=all SOL_OUTPUT_TAG=profile_all nsys profile \
-  --trace=cuda,nvtx --sample=none --cpuctxsw=none \
-  --cuda-graph-trace=node --capture-range=cudaProfilerApi \
-  --capture-range-end=stop --force-overwrite=true \
-  --output=results/profile_all \
-  bash benchmarks/speed_of_light/run.sh profile > results/profile_all.log 2>&1
-
-nsys stats --report cuda_gpu_kern_sum,cuda_gpu_mem_time_sum,nvtx_sum \
-  --format csv --force-export=true results/profile_all.nsys-rep \
-  > results/profile_all_stats.txt 2>&1
+for revision in baseline optimized; do
+  rsync -az "cjerzak-rog:/home/cjerzak/Documents/fastrerandomize-diagonal-prep-20261022/$revision/results/" "benchmarks/speed_of_light/results/$revision/"
+done
 ```
 
-For the supplementary single-batch trace, replace `SOL_TARGET=all` with `SOL_TARGET=batch`, `SOL_OUTPUT_TAG=profile_all` with `SOL_OUTPUT_TAG=profile_batch`, and the output filenames with `profile_batch`. Each capture follows five warmups and records three synchronized calls. The output tag keeps each capture's telemetry separate. The initial full-pipeline capture used the default metadata directory `results/profile/`. The NVTX labels distinguish the timed regions. Nsight's kernel union duration, rather than `nvidia-smi` GPU utilization, is used to check dispatch gaps.
+`compare.py` rebuilds each summary, verifies decoded R assignments, keys, and balance scores with `identical()`, and writes `results/comparison.json`. It requires R/jsonlite and the exported Nsight SQLite files. The figure requires NumPy and Matplotlib. The original results remain untouched.
 
-The original attempt to collect actual Nsight Compute counters was:
+Record and verify source and measurement-harness hashes before comparing; the
+comparison also uses these manifests to normalize source paths in compiled HLO:
 
 ```bash
-/usr/local/cuda/bin/ncu --section SpeedOfLight --launch-count 1 \
-  benchmarks/speed_of_light/calibrate > results/ncu_attempt.log 2>&1
+python3 benchmarks/speed_of_light/manifest.py baseline --source-root /Users/cjerzak/Documents/fastrerandomize-sol-20261022 --commit 4489e28e5f2ee1dddc34415afc4de23bfd31796d --remote-root /home/cjerzak/Documents/fastrerandomize-diagonal-prep-20261022/baseline
+python3 benchmarks/speed_of_light/manifest.py optimized --source-root /Users/cjerzak/Documents/fastrerandomize-diagonal-prep-20261022 --commit 171777d1838e7c2a16bca89c6cec6081f3bf23bf --remote-root /home/cjerzak/Documents/fastrerandomize-diagonal-prep-20261022/optimized
 ```
 
-It reported `ERR_NVGPUCTRPERM`. The tool continued running the calibration executable; those instrumented calibration timings were not used. No privilege or driver setting was changed. A future counter-enabled study should profile the production `SOL_TARGET=batch` capture with `--profile-from-start off`, using the existing CUDA profiler start/stop markers, and should compare profiler timing against the unprofiled run before interpreting SOL counters.
-
-## Rebuild the summary and figure
-
-From the local analysis worktree, copy the raw outputs back:
+Then rebuild the comparison and figure:
 
 ```bash
-rsync -az cjerzak-rog:/home/cjerzak/Documents/fastrerandomize-sol-20261022/results/ benchmarks/speed_of_light/results/
-python3 benchmarks/speed_of_light/analyze.py
-python3 benchmarks/speed_of_light/plot.py
+python3 benchmarks/speed_of_light/compare.py
+/Users/cjerzak/miniconda3/bin/python3 benchmarks/speed_of_light/plot.py
 ```
 
-`analyze.py` uses only the standard library and needs the exported Nsight SQLite files. It normalizes trailing whitespace and line endings in readable log exports; original raw exports remain on the remote host. `plot.py` requires NumPy and Matplotlib and writes PNG, PDF, and SVG figures. The original local figure used `/Users/cjerzak/miniconda3/bin/python3`, which already had those packages.
-
-Raw `.nsys-rep`, `.sqlite`, `.hlo.txt`, and `.Rprof` files remain in the study worktree and on the remote machine but are excluded from Git. Summary JSON, individual timing samples, readable profiler summaries, validation results, and the source manifest are included in the analysis branch. No production source, main-branch documentation, system environment, or GPU policy needs to change to reproduce the measurements.
+Raw `.nsys-rep`, `.sqlite`, `.hlo.txt`, `.Rprof`, and saved `.rds` outputs remain in the worktree and on the remote host, excluded from Git. Git contains source manifests, individual timing samples, correctness results, telemetry, readable profiler summaries, the comparison, and the report figure.

@@ -1,0 +1,22 @@
+{
+  "jax": "0.11.1",
+  "jaxlib": "0.11.1",
+  "numpy": "2.5.3",
+  "devices": [
+    "cuda:0"
+  ],
+  "timezone": [
+    "CST",
+    "CDT"
+  ],
+  "x64": false,
+  "default_matmul_precision": "None",
+  "environment": {
+    "XLA_FLAGS": null,
+    "JAX_PLATFORMS": "cuda",
+    "XLA_PYTHON_CLIENT_PREALLOCATE": "false",
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1"
+  },
+  "gpu": "NVIDIA GeForce RTX 5080 Laptop GPU, 615.71.10, 1500 MHz, 11001 MHz, 62, 24.87 W"
+}

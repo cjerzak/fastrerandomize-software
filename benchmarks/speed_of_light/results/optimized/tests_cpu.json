@@ -1,0 +1,372 @@
+[
+  {
+    "file": "test-kernels.R",
+    "test": "counter-derived keys equal jax.random.split",
+    "nb": 2,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 2
+  },
+  {
+    "file": "test-kernels.R",
+    "test": "monte_carlo reproduces the legacy key stream and selection",
+    "nb": 30,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 30
+  },
+  {
+    "file": "test-kernels.R",
+    "test": "monte_carlo results do not depend on batch size or dispatch mode",
+    "nb": 9,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 9
+  },
+  {
+    "file": "test-kernels.R",
+    "test": "monte_carlo edge cases",
+    "nb": 7,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 7
+  },
+  {
+    "file": "test-kernels.R",
+    "test": "a custom threshold_func uses the legacy signature",
+    "nb": 2,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 2
+  },
+  {
+    "file": "test-kernels.R",
+    "test": "default generation skips full preparation without changing results",
+    "nb": 6,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 6
+  },
+  {
+    "file": "test-kernels.R",
+    "test": "custom thresholds retain the full inverse with approximate_inv TRUE",
+    "nb": 6,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 6
+  },
+  {
+    "file": "test-kernels.R",
+    "test": "exact enumeration matches double-precision Hotelling T^2",
+    "nb": 6,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 6
+  },
+  {
+    "file": "test-kernels.R",
+    "test": "closed-form fiducial interval matches the legacy search",
+    "nb": 1,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 1
+  },
+  {
+    "file": "test-kernels.R",
+    "test": "p-values count exact ties like the double-precision implementation",
+    "nb": 6,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 6
+  },
+  {
+    "file": "test-kernels.R",
+    "test": "GEMM-form distances match double-precision references",
+    "nb": 8,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 8
+  },
+  {
+    "file": "test-pure-r.R",
+    "test": "hotellingT2_R basic calculation works",
+    "nb": 1,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 1
+  },
+  {
+    "file": "test-pure-r.R",
+    "test": "hotellingT2_R returns NA for invalid assignment",
+    "nb": 1,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 1
+  },
+  {
+    "file": "test-pure-r.R",
+    "test": "diff_in_means_R basic calculation works",
+    "nb": 1,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 1
+  },
+  {
+    "file": "test-pure-r.R",
+    "test": "diff_in_means_R with positive effect works",
+    "nb": 1,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 1
+  },
+  {
+    "file": "test-pure-r.R",
+    "test": "compute_diff_at_tau_for_oneW_R basic calculation works",
+    "nb": 1,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 1
+  },
+  {
+    "file": "test-pure-r.R",
+    "test": "compute_diff_at_tau_for_oneW_R with zero tau works",
+    "nb": 1,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 1
+  },
+  {
+    "file": "test-pure-r.R",
+    "test": "randomization_test_R returns correct p-value and tau_obs",
+    "nb": 2,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 2
+  },
+  {
+    "file": "test-pure-r.R",
+    "test": "randomization_test_R with no effect has p-value of 1",
+    "nb": 2,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 2
+  },
+  {
+    "file": "test-pure-r.R",
+    "test": "generate_randomizations_R monte_carlo output structure is valid",
+    "nb": 2,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 2
+  },
+  {
+    "file": "test-pure-r.R",
+    "test": "generate_randomizations_R exact output structure is valid",
+    "nb": 3,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 3
+  },
+  {
+    "file": "test-pure-r.R",
+    "test": "generate_randomizations_R accept_prob filtering works",
+    "nb": 1,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 1
+  },
+  {
+    "file": "test-pure-r.R",
+    "test": "backend and exact-enumeration helpers handle boundary cases",
+    "nb": 6,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 6
+  },
+  {
+    "file": "test-pure-r.R",
+    "test": "JAX availability helper treats NULL and errors as unavailable",
+    "nb": 2,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 2
+  },
+  {
+    "file": "test-pure-r.R",
+    "test": "fiducial helpers use symmetric bounds and alpha over two",
+    "nb": 10,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 10
+  },
+  {
+    "file": "test-pure-r.R",
+    "test": "base-R fiducial search handles negative effects and c_initial",
+    "nb": 3,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 3
+  },
+  {
+    "file": "test-pure-r.R",
+    "test": "JAX seeds use the full R integer-compatible range",
+    "nb": 5,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 5
+  },
+  {
+    "file": "test-pure-r.R",
+    "test": "diagnostic print retains R2 when sigma is absent",
+    "nb": 1,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 1
+  },
+  {
+    "file": "test-pure-r.R",
+    "test": "randomization_test validates required R inputs before JAX",
+    "nb": 3,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 3
+  },
+  {
+    "file": "test-pure-r.R",
+    "test": "whitened balance design reproduces Hotelling T^2 in double precision",
+    "nb": 4,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 4
+  },
+  {
+    "file": "test-pure-r.R",
+    "test": "diagonal-only preparation preserves the existing design exactly",
+    "nb": 35,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 35
+  },
+  {
+    "file": "test-pure-r.R",
+    "test": "diagonal-only preparation does not construct or decompose covariance",
+    "nb": 2,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 2
+  },
+  {
+    "file": "test-pure-r.R",
+    "test": "full balance design uses a pseudo-inverse for collinear covariates",
+    "nb": 1,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 1
+  },
+  {
+    "file": "test-pure-r.R",
+    "test": "covariate preparation drops constant columns and rejects non-finite values",
+    "nb": 6,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 6
+  },
+  {
+    "file": "test-pure-r.R",
+    "test": "closed-form fiducial statistic matches direct construction",
+    "nb": 5,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 5
+  },
+  {
+    "file": "test-pure-r.R",
+    "test": "row-count invariant and batch sizing helpers behave",
+    "nb": 9,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 9
+  },
+  {
+    "file": "test-pure-r.R",
+    "test": "JAX availability check is cached per conda environment",
+    "nb": 3,
+    "failed": 0,
+    "skipped": false,
+    "error": false,
+    "warning": 0,
+    "passed": 3
+  }
+]

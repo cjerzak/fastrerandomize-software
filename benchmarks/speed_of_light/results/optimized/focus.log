@@ -1,0 +1,4 @@
+/usr/bin/bash: /home/cjerzak/miniconda3/envs/preference_fm_cuda_20261009/lib/libtinfo.so.6: no version information available (required by /usr/bin/bash)
+None
+{"name": "n4096_p2048_b4096_d1048576_balance", "compile_seconds": 4.470579086999351, "measurement_start_epoch": 1792690241.460331, "measurement_end_epoch": 1792690241.9190483, "median_ms": 4.531926500931149, "min_ms": 3.9912159991217777, "max_ms": 5.4355040010705125, "p10_ms": 4.226238699993701, "p90_ms": 4.96169959915278}
+{"name": "n4096_p2048_b4096_d1048576_batch", "compile_seconds": 0.403438091998396, "measurement_start_epoch": 1792690244.6636739, "measurement_end_epoch": 1792690245.847709, "median_ms": 11.744239500330877, "min_ms": 10.884024999540998, "max_ms": 13.139180002326611, "p10_ms": 11.082023097696947, "p90_ms": 12.71454570160131}

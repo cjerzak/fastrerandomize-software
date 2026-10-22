@@ -10,6 +10,7 @@ from pathlib import Path
 import re
 import sqlite3
 import statistics
+import argparse
 
 ROOT = Path(__file__).resolve().parent
 RESULTS = ROOT / "results"
@@ -67,7 +68,8 @@ def profile_summary(path):
     return outputs
 
 
-def main():
+def main(results=RESULTS):
+    results = Path(results)
     b, n, p = 4096, 4096, 2048
     work = 2 * b * n * p
     bytes_gemm = 4 * (b*n + n*p + b*p)
@@ -83,12 +85,12 @@ def main():
         "reference_dram_bytes_per_second": bandwidth_reference,
         "gemm_compute_lower_bound_ms": work / fp32_reference * 1000,
         "gemm_dram_lower_bound_ms": bytes_gemm / bandwidth_reference * 1000,
-        "calibration": [json.loads(line) for line in (RESULTS / "calibration.jsonl").read_text().splitlines()],
+        "calibration": [json.loads(line) for line in (results / "calibration.jsonl").read_text().splitlines()],
         "profiles": {}, "sweep": [],
     }
-    for path in sorted(RESULTS.glob("profile_*.sqlite")):
+    for path in sorted(results.glob("profile_*.sqlite")):
         summary["profiles"][path.stem] = profile_summary(path)
-    for path in sorted((RESULTS / "sweep").glob("*.json")):
+    for path in sorted((results / "sweep").glob("*.json")):
         match = re.fullmatch(r"n(\d+)_p(\d+)_b(\d+)_(balance|batch)", path.stem)
         if not match:
             continue
@@ -99,18 +101,22 @@ def main():
                                  "p10_ms": data["p10_ms"], "p90_ms": data["p90_ms"],
                                  "useful_balance_tflops": 2*nn*pp*bb / (data["median_ms"] * 1e9)})
     for mode in ("pipeline", "focus", "api", "hostprep"):
-        summary[mode] = {path.stem: read_json(path) for path in sorted((RESULTS / mode).glob("n*.json"))}
-    (RESULTS / "summary.json").write_text(json.dumps(summary, indent=2))
-    with (RESULTS / "sweep_summary.csv").open("w") as f:
+        summary[mode] = {path.stem: read_json(path) for path in sorted((results / mode).glob("n*.json"))}
+    summary["sweep"].sort(key=lambda row: (row["n"], row["p"], row["batch"], row["scope"]))
+    (results / "summary.json").write_text(json.dumps(summary, indent=2))
+    with (results / "sweep_summary.csv").open("w") as f:
         writer = csv.DictWriter(f, fieldnames=list(summary["sweep"][0]), lineterminator="\n")
         writer.writeheader()
         writer.writerows(summary["sweep"])
     # Normalize readable tool exports for Git without changing numeric data.
     # Original raw exports remain on the remote host.
-    for path in list(RESULTS.glob("*.log")) + list(RESULTS.glob("*.txt")):
+    for path in list(results.glob("*.log")) + list(results.glob("*.txt")):
         path.write_text("\n".join(line.rstrip() for line in path.read_text().splitlines()).rstrip() + "\n")
-    print(json.dumps({k: v for k, v in summary.items() if k not in ("profiles", "sweep", "calibration")}, indent=2))
+    return summary
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--results-dir", type=Path, default=RESULTS)
+    summary = main(parser.parse_args().results_dir)
+    print(json.dumps({k: v for k, v in summary.items() if k not in ("profiles", "sweep", "calibration")}, indent=2))
