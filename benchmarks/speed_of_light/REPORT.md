@@ -90,5 +90,3 @@ An additional diagnostic using a custom callback to sum full and diagonal scores
 ## Interpretation
 
 In this disclosed favorable domain, the warmed complete R call takes 3.410 seconds and the balance GEMM sustains about 53% of the stated analytical FP32 reference. The GEMM result does not establish that the complete operation is near the GPU's Speed of Light. GPU assignment permutation sorting is the clearest remaining target.
-
-Raw profiler captures, HLO, Rprof files, and saved R outputs remain available in the study worktree and on `cjerzak-rog`; readable results and source hashes are committed. [Reproduce the analysis](REPRODUCE.md).

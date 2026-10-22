@@ -55,7 +55,7 @@ On an AMD Radeon RX 7600M XT GPU, repeated calls became 10–110× faster for Mo
 
 # Speed of Light Analysis<a id="speed-of-light-analysis"></a>
 
-The balance matrix multiplication (GEMM) sustains 18.6 TFLOP/s on an NVIDIA RTX 5080 Laptop GPU, reaching approximately 53% of the analytical FP32 reference throughput at NVIDIA’s listed upper boost clock. The benchmark evaluates default diagonal scoring for 1,048,576 Monte Carlo draws with 4,096 units and 2,048 covariates (batch size 4,096; 0.1% accepted). Under this workload, the warmed complete R call took 3.41 s with R’s reference BLAS, while the separately measured GPU stage took 2.95 s, within which permutation sorting is the largest GPU cost. Hardware counters were unavailable, so the GEMM roofline percentage is an estimate.
+The balance matrix multiplication (GEMM) sustains 18.6 TFLOP/s on an NVIDIA RTX 5080 Laptop GPU, reaching approximately 53% of the analytical FP32 reference throughput at NVIDIA’s listed upper boost clock. The benchmark evaluates default diagonal scoring for 1,048,576 Monte Carlo draws with 4,096 units and 2,048 covariates (batch size 4,096; 0.1% accepted). Under this workload, the GPU stage took 2.95 s, within which permutation sorting is the largest GPU cost. Hardware counters were unavailable, so the GEMM roofline percentage is an estimate.
 
 [Read the full analysis](benchmarks/speed_of_light/REPORT.md).
 
