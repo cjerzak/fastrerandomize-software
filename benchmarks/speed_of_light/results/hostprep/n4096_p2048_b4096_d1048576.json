@@ -1,0 +1,99 @@
+{
+  "original_seconds": 23.712,
+  "diagonal_only_seconds": [0.3420000000000023, 0.33900000000000219, 0.36499999999999844, 0.41000000000000014, 0.34400000000000119],
+  "identical_Xw": true,
+  "identical_inverse_variance": true,
+  "profile_by_self": [
+    {
+      "self.time": 9.9700000000000006,
+      "self.pct": 42.030000000000001,
+      "total.time": 9.9700000000000006,
+      "total.pct": 42.030000000000001,
+      "_row": "\"stats::cov\""
+    },
+    {
+      "self.time": 8.1899999999999995,
+      "self.pct": 34.530000000000001,
+      "total.time": 8.1899999999999995,
+      "total.pct": 34.530000000000001,
+      "_row": "\"%*%\""
+    },
+    {
+      "self.time": 4.96,
+      "self.pct": 20.91,
+      "total.time": 5.0599999999999996,
+      "total.pct": 21.329999999999998,
+      "_row": "\"eigen\""
+    },
+    {
+      "self.time": 0.34000000000000002,
+      "self.pct": 1.4299999999999999,
+      "total.time": 0.34000000000000002,
+      "total.pct": 1.4299999999999999,
+      "_row": "\"aperm.default\""
+    },
+    {
+      "self.time": 0.089999999999999997,
+      "self.pct": 0.38,
+      "total.time": 0.089999999999999997,
+      "total.pct": 0.38,
+      "_row": "\"structure\""
+    },
+    {
+      "self.time": 0.050000000000000003,
+      "self.pct": 0.20999999999999999,
+      "total.time": 0.050000000000000003,
+      "total.pct": 0.20999999999999999,
+      "_row": "\"t.default\""
+    },
+    {
+      "self.time": 0.029999999999999999,
+      "self.pct": 0.13,
+      "total.time": 0.029999999999999999,
+      "total.pct": 0.13,
+      "_row": "\"array\""
+    },
+    {
+      "self.time": 0.02,
+      "self.pct": 0.080000000000000002,
+      "total.time": 9.2100000000000009,
+      "total.pct": 38.829999999999998,
+      "_row": "\".psd_inv_sqrt\""
+    },
+    {
+      "self.time": 0.02,
+      "self.pct": 0.080000000000000002,
+      "total.time": 0.39000000000000001,
+      "total.pct": 1.6399999999999999,
+      "_row": "\"sweep\""
+    },
+    {
+      "self.time": 0.02,
+      "self.pct": 0.080000000000000002,
+      "total.time": 0.02,
+      "total.pct": 0.080000000000000002,
+      "_row": "\"is.data.frame\""
+    },
+    {
+      "self.time": 0.01,
+      "self.pct": 0.040000000000000001,
+      "total.time": 0.029999999999999999,
+      "total.pct": 0.13,
+      "_row": "\"colMeans\""
+    },
+    {
+      "self.time": 0.01,
+      "self.pct": 0.040000000000000001,
+      "total.time": 0.01,
+      "total.pct": 0.040000000000000001,
+      "_row": "\"diag\""
+    },
+    {
+      "self.time": 0.01,
+      "self.pct": 0.040000000000000001,
+      "total.time": 0.01,
+      "total.pct": 0.040000000000000001,
+      "_row": "\"is.finite\""
+    }
+  ]
+}

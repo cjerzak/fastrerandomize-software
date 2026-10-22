@@ -1,0 +1,8 @@
+# Compiled tools and raw profiler exports stay available in the worktree.
+calibrate
+markers.so
+results/*.nsys-rep
+results/*.sqlite
+results/**/*.hlo.txt
+results/**/*.Rprof
+results/analysis.log

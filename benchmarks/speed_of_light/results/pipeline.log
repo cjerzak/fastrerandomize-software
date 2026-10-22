@@ -1,0 +1,4 @@
+/usr/bin/bash: /home/cjerzak/miniconda3/envs/preference_fm_cuda_20261009/lib/libtinfo.so.6: no version information available (required by /usr/bin/bash)
+None
+{"name": "n4096_p2048_b4096_d1048576_all", "compile_seconds": 4.59583559500004, "median_ms": 2895.853451999983, "min_ms": 2866.661522999948, "max_ms": 2927.1951499999886, "p10_ms": 2869.672665200028, "p90_ms": 2925.1276564000136}
+[Array(shape=(1048576,), dtype=int32), Array(shape=(1048576,), dtype=float32), Array(0, dtype=int32)]

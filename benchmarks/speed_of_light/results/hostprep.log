@@ -1,0 +1,29 @@
+/usr/bin/bash: /home/cjerzak/miniconda3/envs/preference_fm_cuda_20261009/lib/libtinfo.so.6: no version information available (required by /usr/bin/bash)
+None
+$original_seconds
+[1] 23.712
+
+$diagonal_only_seconds
+[1] 0.342 0.339 0.365 0.410 0.344
+
+$identical_Xw
+[1] TRUE
+
+$identical_inverse_variance
+[1] TRUE
+
+$profile_by_self
+                self.time self.pct total.time total.pct
+"stats::cov"         9.97    42.03       9.97     42.03
+"%*%"                8.19    34.53       8.19     34.53
+"eigen"              4.96    20.91       5.06     21.33
+"aperm.default"      0.34     1.43       0.34      1.43
+"structure"          0.09     0.38       0.09      0.38
+"t.default"          0.05     0.21       0.05      0.21
+"array"              0.03     0.13       0.03      0.13
+".psd_inv_sqrt"      0.02     0.08       9.21     38.83
+"sweep"              0.02     0.08       0.39      1.64
+"is.data.frame"      0.02     0.08       0.02      0.08
+"colMeans"           0.01     0.04       0.03      0.13
+"diag"               0.01     0.04       0.01      0.04
+"is.finite"          0.01     0.04       0.01      0.04
